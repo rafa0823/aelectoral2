@@ -7,7 +7,11 @@ ejemplo <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultor
 ejemplo2 <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos",
                          ano = 2012, tipo = "Federal", eleccion = "Presidencia", nivel = "casilla")
 
+ejemplo3 <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos",
+                          ano = 2015, tipo = "Federal", eleccion = "Diputados", nivel = "casilla")
 
-ejemplo2$eliminar_especiales()
+
+ejemplo3$eliminar_especiales()
+ejemplo3$bd
 
 

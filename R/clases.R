@@ -1,0 +1,42 @@
+#' Title
+#'
+#' @param inicial
+#' @param ano
+#' @param tipo
+#' @param eleccion
+#' @param entidad
+#' @param normal
+#' @param nivel
+#'
+#' @return
+#' @export
+#' @import dplyr
+#' @examples
+
+Electoral <- R6::R6Class("Electoral",
+                         public = list(bd = NA,
+                                       inicial = NA_character_,
+                                       ano = NA_integer_,
+                                       tipo = NA_character_,
+                                       eleccion = NA_character_,
+                                       entidad = NA_character_,
+                                       normal = T,
+                                       nivel = NA_character_,
+                                       initialize = function(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/Resultados definitivos",
+                                                             ano, tipo, eleccion, entidad, normal = T, nivel = "seccion"){
+                                         self$inicial <- inicial
+                                         self$ano <- ano
+                                         self$tipo <- tipo
+                                         self$eleccion <- eleccion
+                                         self$entidad <- entidad
+                                         self$normal <- normal
+                                         self$nivel <- nivel
+
+                                         self$obtener_bd()
+
+                                       },
+                                       obtener_bd = function(){
+                                         self$bd <- leer_base(inicial = self$inicial, ano = self$ano, tipo = self$tipo, eleccion = self$eleccion,
+                                                            entidad = self$entidad, normal = self$normal, nivel = self$nivel)
+                                       }
+                         ))

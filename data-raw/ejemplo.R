@@ -4,4 +4,5 @@ ejemplo <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultor
   ano = 2011, tipo = "Local", eleccion = "Municipio", entidad = "michoacan", nivel = "casilla")
 
 
-ejemplo$bd
+
+

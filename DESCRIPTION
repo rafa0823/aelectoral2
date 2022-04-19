@@ -16,5 +16,6 @@ Imports:
     glue,
     janitor,
     R6,
-    readr
+    readr,
+    stringr
 RoxygenNote: 7.1.2

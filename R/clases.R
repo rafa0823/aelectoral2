@@ -28,7 +28,7 @@ Electoral <- R6::R6Class("Electoral",
                                          self$ano <- ano
                                          self$tipo <- tipo
                                          self$eleccion <- eleccion
-                                         self$entidad <- entidad
+                                         if(self$tipo == "Local") self$entidad <- entidad
                                          self$normal <- normal
                                          self$nivel <- nivel
 
@@ -41,8 +41,8 @@ Electoral <- R6::R6Class("Electoral",
                                            limpiar_base()
 
                                          revisar_nombres(self$bd)
-
-
-
+                                       },
+                                       eliminar_especiales = function(){
+                                         self$bd <- eliminar_especiales(self$bd)
                                        }
                          ))

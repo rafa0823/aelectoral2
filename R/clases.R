@@ -37,6 +37,12 @@ Electoral <- R6::R6Class("Electoral",
                                        },
                                        obtener_bd = function(){
                                          self$bd <- leer_base(inicial = self$inicial, ano = self$ano, tipo = self$tipo, eleccion = self$eleccion,
-                                                            entidad = self$entidad, normal = self$normal, nivel = self$nivel)
+                                                            entidad = self$entidad, normal = self$normal, nivel = self$nivel) %>%
+                                           limpiar_base()
+
+                                         revisar_nombres(self$bd)
+
+
+
                                        }
                          ))

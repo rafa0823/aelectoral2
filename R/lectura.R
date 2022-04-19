@@ -23,3 +23,18 @@ leer_base <- function(inicial, ano, tipo, eleccion, entidad, normal, nivel){
   }
   return(readr::read_csv(wd) %>% janitor::clean_names())
 }
+
+limpiar_base <- function(bd){
+  # quitar enters
+  bd <- bd %>% mutate(across(where(is.character),
+                             ~stringr::str_replace_all(string = .x,pattern = "\\n",replacement = " ")))
+
+  return(bd)
+}
+
+revisar_nombres <- function(bd){
+  nombres <- bd %>% select(matches("[[:digit:]]")) %>% names
+  if(length(nombres)>0) warning(glue::glue("\n Revisar las columnas {paste(nombres, collapse = ', ')} \n\n Las columnas que tienen números es porque los nombres están repetidos y readr les agrega el número de la columna.
+                                         \n Esto es por un error manual y lo deberá arreglar Andrés."))
+  return(nombres)
+}

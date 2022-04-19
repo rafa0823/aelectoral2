@@ -33,7 +33,8 @@ limpiar_base <- function(bd){
 }
 
 revisar_nombres <- function(bd){
-  nombres <- bd %>% select(matches("[[:digit:]]")) %>% names
+  nombres <- bd %>% select(-contains("independiente")) %>% #en el caso de independientes sí pueden haber números
+    select(matches("[[:digit:]]")) %>% names
   if(length(nombres)>0) warning(glue::glue("\n Revisar las columnas {paste(nombres, collapse = ', ')} \n\n Las columnas que tienen números es porque los nombres están repetidos y readr les agrega el número de la columna.
                                          \n Esto es por un error manual y lo deberá arreglar Andrés."))
   return(nombres)
@@ -43,4 +44,5 @@ eliminar_especiales <- function(bd){
   aux <- bd %>% filter(tipo_casilla != "S")
 
   message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} individuos"))
+  return(aux)
 }

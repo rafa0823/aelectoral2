@@ -11,3 +11,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/morant-consultores/aelectoral2
 BugReports: https://github.com/morant-consultores/aelectoral2/issues
+Imports: 
+    dplyr,
+    R6,
+    readr

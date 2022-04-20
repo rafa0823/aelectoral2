@@ -49,5 +49,8 @@ Electoral <- R6::R6Class("Electoral",
                                          } else{
                                            warning(glue::glue("Ha elegido una base de datos que no es por casilla."))
                                          }
+                                       },
+                                       eliminar_votoExtranjero = function(){
+                                         self$bd <- eliminar_votoExtranjero(self$bd)
                                        }
                          ))

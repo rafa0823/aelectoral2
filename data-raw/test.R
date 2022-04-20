@@ -26,6 +26,17 @@ col_rep %>% write_excel_csv("data-raw/col_rep_federal.csv")
 #todas las federales están por casilla
 ja2 %>% discard(~.x$tipo_casilla)
 
+#consistencia de variables
+
+aux <- ja2 %>% map(~{
+  tibble(variables = .x %>% pluck("vars"),
+         archivo = .x %>% pluck("archivo")
+         )
+}) %>% bind_rows()
+
+no_todo <- aux %>% count(variables,sort = T) %>% mutate(n_base = length(ja2)) %>% filter(n != n_base)
+aux %>% semi_join(no_todo) %>% write_excel_csv("data-raw/columnas_inconsistentes_federal.csv")
+aux %>% anti_join(no_todo) %>% write_excel_csv("data-raw/columnas_consistentes_federal.csv")
 # Locales -----------------------------------------------------------------
 wd2 <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local"
 local <- list.files(wd2, full.names = T) %>% map(~{
@@ -61,3 +72,13 @@ s_tipo_casilla <- local2 %>% discard(~.x$tipo_casilla) %>% map(~{
 
 s_tipo_casilla %>% select(archivo) %>% write_excel_csv("data-raw/tipo_casilla_local.csv")
 
+#consistencia de variables
+
+aux_loc <- local2 %>% map(~{
+  tibble(variables = .x %>% pluck("vars"),
+         archivo = .x %>% pluck("archivo")
+  )
+}) %>% bind_rows()
+
+no_todo_local <- aux_loc %>% count(variables,sort = T) %>% mutate(n_base = length(local2)) %>% filter(n != n_base)
+aux_loc %>% semi_join(no_todo_local) %>% write_excel_csv("data-raw/columnas_inconsistentes_local.csv")

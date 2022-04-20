@@ -46,3 +46,9 @@ eliminar_especiales <- function(bd){
   message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} individuos"))
   return(aux)
 }
+
+eliminar_votoExtranjero <- function(bd){
+  aux <- bd %>%  filter(seccion != 0)
+  message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} casillas"))
+  return(aux)
+}

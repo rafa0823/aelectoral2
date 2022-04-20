@@ -40,9 +40,14 @@ Electoral <- R6::R6Class("Electoral",
                                                             entidad = self$entidad, normal = self$normal, nivel = self$nivel) %>%
                                            limpiar_base()
 
+                                         #indica si hay columnas con números pues probablemente sea un error manual
                                          revisar_nombres(self$bd)
                                        },
                                        eliminar_especiales = function(){
-                                         self$bd <- eliminar_especiales(self$bd)
+                                         if(self$nivel == "casilla"){
+                                           self$bd <- eliminar_especiales(self$bd)
+                                         } else{
+                                           warning(glue::glue("Ha elegido una base de datos que no es por casilla."))
+                                         }
                                        }
                          ))

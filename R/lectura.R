@@ -21,13 +21,14 @@ leer_base <- function(inicial, ano, tipo, eleccion, entidad, normal, nivel){
     wd <- glue::glue("{wd}/{eleccion}/{entidad}_")
     if(normal) wd <- glue::glue("{wd}normal_{nivel}.csv") else wd <- glue::glue("{wd}extraordinaria_{nivel}.csv")
   }
-  return(readr::read_csv(wd) %>% janitor::clean_names())
+  return(readr::read_csv(wd))
 }
 
 limpiar_base <- function(bd){
   # quitar enters
-  bd <- bd %>% mutate(across(where(is.character),
-                             ~stringr::str_replace_all(string = .x,pattern = "\\n",replacement = " ")))
+  bd <- bd %>% janitor::clean_names() %>%
+    mutate(across(where(is.character),
+                  ~stringr::str_replace_all(string = .x,pattern = "\\n",replacement = " ")))
 
   return(bd)
 }
@@ -43,6 +44,6 @@ revisar_nombres <- function(bd){
 eliminar_especiales <- function(bd){
   aux <- bd %>% filter(tipo_casilla != "S")
 
-  message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} individuos"))
+  message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} casillas"))
   return(aux)
 }

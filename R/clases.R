@@ -23,7 +23,7 @@ Electoral <- R6::R6Class("Electoral",
                                        normal = T,
                                        nivel = NA_character_,
                                        initialize = function(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/Resultados definitivos",
-                                                             ano, tipo, eleccion, entidad, normal = T, nivel = "seccion"){
+                                                             ano, tipo, eleccion, entidad, normal = T, nivel = "casilla"){
                                          self$inicial <- inicial
                                          self$ano <- ano
                                          self$tipo <- tipo

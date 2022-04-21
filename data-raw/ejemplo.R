@@ -1,16 +1,16 @@
 devtools::load_all()
 
 ejemplo <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos",
-  ano = 2011, tipo = "Local", eleccion = "Municipio", entidad = "michoacan", nivel = "casilla")
+  ano = 2011, tipo = "Local", eleccion = "Municipio", entidad = "michoacan")
 
 
 ejemplo2 <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos",
-                         ano = 2018, tipo = "Federal", eleccion = "Presidente", nivel = "casilla")
+                         ano = 2018, tipo = "Federal", eleccion = "Presidente")
 
 ejemplo3 <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos",
                           ano = c(2012, 2015, 2018),
                           tipo = rep("Federal",3),
-                          eleccion = c("Diputado"), nivel = "casilla")
+                          eleccion = c("Diputado"))
 
 
 ejemplo2$eliminar_especiales()

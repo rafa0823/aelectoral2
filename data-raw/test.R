@@ -4,15 +4,24 @@ library(readr)
 library(purrr)
 library(tibble)
 wd <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Federal"
+partidos <- c("pan", "pri", "prd", "pvem", "pt", "mc", "panal", "morena", "es")
 ja <- list.files(wd, full.names = T) %>% map(~{
   list.files(.x, full.names = T) %>% map(~{
     aux <- read_csv(.x)
 
     rep <- aux %>% revisar_nombres()
+
+    part_falt <- NULL
+    for(i in seq_along(partidos)){
+      no_esta <- sum(grepl(partidos[i], names(aux))) == 0
+      if(no_esta) part_falt <- part_falt %>% append(partidos[i])
+    }
+
     list(vars = names(aux),
          repetidas = paste(rep, collapse = ", "),
          tipo_casilla = "TIPO_CASILLA" %in% names(aux),
-         archivo = .x
+         archivo = .x,
+         partidos_faltantes = paste(part_falt, collapse = ", ")
     )
   })
 })
@@ -40,15 +49,24 @@ aux %>% anti_join(no_todo) %>% write_excel_csv("data-raw/columnas_consistentes_f
 # Locales -----------------------------------------------------------------
 wd2 <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local"
 local <- list.files(wd2, full.names = T) %>% map(~{
+
   list.files(.x, full.names = T) %>% map(~{
     list.files(.x, full.names = T) %>% map(~{
-      aux <- read_csv(.x)
+      aux <- read_csv(.x) %>% janitor::clean_names()
 
       rep <- aux %>% revisar_nombres()
+
+      part_falt <- NULL
+      for(i in seq_along(partidos)){
+        no_esta <- sum(grepl(partidos[i], names(aux))) == 0
+        if(no_esta) part_falt <- part_falt %>% append(partidos[i])
+      }
+
       list(vars = names(aux),
            repetidas = paste(rep, collapse = ", "),
            tipo_casilla = "TIPO_CASILLA" %in% names(aux),
-           archivo = .x
+           archivo = .x,
+           partidos_faltantes = paste(part_falt, collapse = ", ")
       )
     })
 

@@ -5,12 +5,12 @@ ejemplo <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultor
 
 
 ejemplo2 <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos",
-                         ano = 2018, tipo = "Federal", eleccion = "Presidente")
+                         ano = 2015, tipo = "Federal", eleccion = "Diputado")
 
 ejemplo3 <- Electoral$new(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos",
-                          ano = c(2012, 2015, 2018),
-                          tipo = rep("Federal",3),
-                          eleccion = c("Diputado"))
+                          ano = c(2018),
+                          tipo = rep("Federal",1),
+                          eleccion = c("Diputado","Presidente","Senador"))
 
 
 ejemplo2$eliminar_especiales()

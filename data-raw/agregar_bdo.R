@@ -104,8 +104,8 @@ final_df21 <- insertar_sufijo(bd=df21, "df", "21") %>%
 
 # guardar rda
 nac_df_21 <- final_df21
-usethis::use_data(nac_df_21,overwrite = F)
 
+nac_df_21 %>% write_rds("inst/electoral/nac_df_21.rda")
 
 rm(df21)
 
@@ -164,8 +164,10 @@ final_pr18 <- insertar_sufijo(bd=pr18, "pr", "18")
 
 
 # guardar rda
+
 nac_pr_18 <- final_pr18
-usethis::use_data(nac_pr_18,overwrite = F)
+
+nac_pr_18 %>% write_rds("inst/electoral/nac_pr_18.rda")
 
 rm(pr18)
 
@@ -226,8 +228,8 @@ final_df18 <- insertar_sufijo(bd=df18, "df", "18")
 
 # guardar rda
 nac_df_18 <- final_df18
-usethis::use_data(nac_df_18,overwrite = F)
 
+nac_df_18 %>% write_rds("inst/electoral/nac_df_18.rda")
 
 rm(df18)
 
@@ -289,8 +291,8 @@ final_df15 <- insertar_sufijo(bd=df15, "df", "15")
 
 # guardar rda
 nac_df_15 <- final_df15
-usethis::use_data(nac_df_15,overwrite = F)
 
+nac_df_15 %>% write_rds("inst/electoral/nac_df_15.rda")
 
 rm(df15)
 
@@ -337,8 +339,8 @@ final_pm21_mex <- final_pm21_mex %>%
 # guardar rda
 
 mex_pm_21 <- final_pm21_mex
-usethis::use_data(mex_pm_21,overwrite = F)
 
+mex_pm_21 %>% write_rds("inst/electoral/mex_pm_21.rda")
 
 rm(pm21)
 
@@ -389,8 +391,8 @@ final_pm18_mex <-  final_pm18_mex %>%
 # guardar rda
 
 mex_pm_18 <- final_pm18_mex
-usethis::use_data(mex_pm_18,overwrite = F)
 
+mex_pm_18 %>% write_rds("inst/electoral/mex_pm_18.rda")
 
 rm(pm18)
 
@@ -461,7 +463,7 @@ gb17 <- bd_gb_17_mex   %>%
 
 # revisar nombres de varianles
 
-colnames(pm17)
+colnames(gb17)
 
 gb17 <- gb17 %>%
   rename("noreg"=no_reg,
@@ -488,8 +490,7 @@ final_gb17_mex <-  final_gb17_mex %>%
   mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
-                                   nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
-         MR_MP = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
+                                   nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
          estado = 15,
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
@@ -498,8 +499,8 @@ final_gb17_mex <-  final_gb17_mex %>%
 # guardar rda
 
 mex_gb_17 <- final_gb17_mex
-usethis::use_data(mex_gb_17,overwrite = F)
 
+mex_gb_17 %>% write_rds("inst/electoral/mex_gb_17.rda")
 
 rm(gb17)
 

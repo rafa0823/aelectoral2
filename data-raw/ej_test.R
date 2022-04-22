@@ -5,13 +5,21 @@ pr18 <- nac_pr_18 %>% as_tibble %>% mutate(across(starts_with("ele_"), ~as.numer
 
 t_nac(pr18, "candidato", "morena_|pt_|pes_")
 
-t_nivel(pr18, "candidato", "morena_|pt_|pes_", estado = 1, nivel = "nombre_estado",seleccion = "AGUASCALIENTES")
-t_nivel(pr18, "candidato", "morena_|pt_|pes_", estado = 1, nivel = "distritof",seleccion = "1")
-
 t_nac(pr18, "partido", "total_")
 t_nac(pr18, "partido", "morena_")
 
-pr18 %>%
-  group_by(estado) %>%
-  summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T)))
+
+t_nivel(pr18, "candidato", "morena_|pt_|pes_", estado = 1, nivel = "nombre_estado",seleccion = "AGUASCALIENTES")
+t_nivel(pr18, "candidato", "morena_|pt_|pes_", estado = 1, nivel = "distritof",seleccion = "1")
+
+#estado
+t_nivel(pr18, "partido", "morena_", estado = 1, nivel = "nombre_estado",seleccion = "AGUASCALIENTES")
+#distritof
+t_nivel(pr18, "partido", "morena_", estado = 1, nivel = "distritof",seleccion = "1")
+#casilla
+cas <- pr18 %>% sample_n(1) %>% pull(clave_casilla)
+t_nivel(pr18, "candidato", "ele_morena_pr_18", estado = 15, nivel = "clave_casilla", seleccion = cas)
+
+
+
 

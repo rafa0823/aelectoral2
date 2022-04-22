@@ -45,18 +45,22 @@ Electoral <- R6::R6Class("Electoral",
                                            self$llave <- llave
                                          }
 
+                                         if(!self$especiales){
+                                           add <- add %>% eliminar_especiales()
+                                         }
+
+                                         if(!self$extranjero){
+                                           add <- add %>% eliminar_votoExtranjero()
+                                         }
+
                                          self$bd <- self$bd %>% full_join(
                                            add %>% reducir(llave), by = llave
                                          )
 
                                        },
                                        eliminar_especiales = function(){
-                                         if("tipo_casilla" %in% names(self$bd)){
-                                           self$bd <- eliminar_especiales(self$bd)
-                                           self$especiales <- F
-                                         } else{
-                                           warning(glue::glue("Ha elegido una base de datos que no es por casilla."))
-                                         }
+                                         self$bd <- eliminar_especiales(self$bd)
+                                         self$especiales <- F
                                        },
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)

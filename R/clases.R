@@ -15,44 +15,31 @@
 
 Electoral <- R6::R6Class("Electoral",
                          public = list(bd = NA,
-                                       inicial = NA_character_,
-                                       ano = NA_integer_,
-                                       tipo = NA_character_,
                                        eleccion = NA_character_,
                                        entidad = NA_character_,
-                                       normal = T,
-                                       nivel = NA_character_,
-                                       initialize = function(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/Resultados definitivos",
-                                                             ano, tipo, eleccion, entidad, normal = T, nivel = "casilla"){
-                                         self$inicial <- inicial
-                                         self$ano <- ano
-                                         self$tipo <- tipo
+                                       initialize = function(eleccion, entidad){
                                          self$eleccion <- eleccion
-                                         if(self$tipo == "Local") self$entidad <- entidad
-                                         self$normal <- normal
-                                         self$nivel <- nivel
+                                         self$entidad <- entidad
 
                                          self$obtener_bd()
 
-                                         self$join_bd()
-
                                        },
                                        obtener_bd = function(){
-                                         self$bd <- leer_base(inicial = self$inicial, ano = self$ano, tipo = self$tipo, eleccion = self$eleccion,
-                                                              entidad = self$entidad, normal = self$normal, nivel = self$nivel) %>%
-                                           limpiar_base()
+                                         self$bd <- leer_base(eleccion = self$eleccion,
+                                                              entidad = self$entidad)# %>%
+                                           # limpiar_base()
                                          #indica si hay columnas con números pues probablemente sea un error manual
-                                         revisar_nombres(self$bd)
+                                         # revisar_nombres(self$bd)
                                        },
-                                       join_bd = function(){
+                                       agregar_bd = function(){
                                          #caso federal
                                          if(n_distinct(self$tipo) == 1 & self$tipo == "Federal"){
                                            if(n_distinct(self$ano) == 1){ # por casilla
 
                                              self$bd <- self$bd %>% imap(~{
-                                               sufijo(.x, .y,"clave_casilla")
+                                               sufijo(.x, .y, geograficas$columna)
                                              }) %>%
-                                               reduce(full_join,by = "clave_casilla")
+                                               reduce(full_join)
 
                                            } else{ #por sección
                                              self$bd <- self$bd %>% imap(~{

@@ -14,24 +14,21 @@
 #'
 #' @examples
 #'
-leer_base <- function(inicial, ano, tipo, eleccion, entidad, normal, nivel){
-  wd <- glue::glue("{inicial}/{tipo}/{ano}")
-  if(tipo == "Federal") wd <- glue::glue("{wd}/{eleccion}_{nivel}.csv")
-  if(tipo == "Local"){
-    wd <- glue::glue("{wd}/{eleccion}/{entidad}_")
-    if(normal) wd <- glue::glue("{wd}normal_{nivel}.csv") else wd <- glue::glue("{wd}extraordinaria_{nivel}.csv")
-  }
+leer_base <- function(eleccion, entidad){
 
-  res <- wd %>% map(~readr::read_csv(.x)) %>% purrr::set_names(glue::glue("{tipo}/{ano}/{eleccion}"))
   return(res)
 }
 
 limpiar_base <- function(bd){
-  # quitar enters
+
   bd <- bd %>% map(~{
-    .x %>% janitor::clean_names() %>%
+    aux <- .x %>%
+      select(-matches(basura$columna)) %>%
+      mutate(across(any_of(geograficas$columna), ~as.character(.x))) #variables geográficas character
+    aux %>%
+      mutate(across(all_of(names(aux)[is.na(match(names(aux), geograficas$columna))]), ~as.numeric(.x))) %>%
       mutate(across(where(is.character),
-                    ~stringr::str_replace_all(string = .x,pattern = "\\n",replacement = " ")))
+                    ~stringr::str_replace_all(string = .x,pattern = "\\n",replacement = " ")))# quitar enters
   })
 
   return(bd)
@@ -47,22 +44,9 @@ revisar_nombres <- function(bd){
 
 }
 
-eliminar_especiales <- function(bd){
-  aux <- bd %>% filter(tipo_casilla != "S")
-
-  message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} casillas"))
-  return(aux)
-}
-
-eliminar_votoExtranjero <- function(bd){
-  aux <- bd %>%  filter(seccion != 0)
-  message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} casillas"))
-  return(aux)
-}
-
-sufijo <- function(bd, nombre, nivel){
+sufijo <- function(bd, nombre, geo){
   aux <- nombre %>% str_split("/") %>% pluck(1)
   s <- glue::glue("{substr(aux[3],1,1)}{substr(aux[1],1,1)}_{substr(aux[2],3,4)}") %>% tolower
-  bd <- bd %>% rename_at(vars(-!!rlang::sym(nivel)),function(x) paste(x, s, sep = "_"))
+  bd <- bd %>% rename_at(vars(-any_of(geo)), function(x) paste(x, s, sep = "_"))
   return(bd)
 }

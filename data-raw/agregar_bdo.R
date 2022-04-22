@@ -43,6 +43,10 @@ bd_dl_21_mex <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Est
   janitor::clean_names() %>%
   as_tibble()
 
+bd_gb_17_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2017/Gobernador/edomex_normal_casilla.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble()
+
 # FEDERALES -----------------------------------------------------------------------
 
 ## dipfed 21 ------------------------------------------------------------------
@@ -100,7 +104,7 @@ final_df21 <- insertar_sufijo(bd=df21, "df", "21") %>%
 
 # guardar rda
 nac_df_21 <- final_df21
-usethis::use_data(nac_df_21,overwrite = T)
+usethis::use_data(nac_df_21,overwrite = F)
 
 
 rm(df21)
@@ -161,7 +165,7 @@ final_pr18 <- insertar_sufijo(bd=pr18, "pr", "18")
 
 # guardar rda
 nac_pr_18 <- final_pr18
-usethis::use_data(nac_pr_18,overwrite = T)
+usethis::use_data(nac_pr_18,overwrite = F)
 
 rm(pr18)
 
@@ -222,7 +226,7 @@ final_df18 <- insertar_sufijo(bd=df18, "df", "18")
 
 # guardar rda
 nac_df_18 <- final_df18
-usethis::use_data(nac_df_18,overwrite = T)
+usethis::use_data(nac_df_18,overwrite = F)
 
 
 rm(df18)
@@ -285,7 +289,7 @@ final_df15 <- insertar_sufijo(bd=df15, "df", "15")
 
 # guardar rda
 nac_df_15 <- final_df15
-usethis::use_data(nac_df_15,overwrite = T)
+usethis::use_data(nac_df_15,overwrite = F)
 
 
 rm(df15)
@@ -333,7 +337,7 @@ final_pm21_mex <- final_pm21_mex %>%
 # guardar rda
 
 mex_pm_21 <- final_pm21_mex
-usethis::use_data(mex_pm_21,overwrite = T)
+usethis::use_data(mex_pm_21,overwrite = F)
 
 
 rm(pm21)
@@ -350,7 +354,7 @@ pm18 <- bd_pm_18_mex   %>%
 
 colnames(pm18)
 
-pl18 <- pm18 %>%
+pm18 <- pm18 %>%
   rename("noreg"=no_reg,
          "municipio_pm_18" = municipio,
          "nombre_municipio_pm_18" = nombre_municipio,
@@ -375,20 +379,20 @@ final_pm18_mex <-  final_pm18_mex %>%
   mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
-                                   nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
-         MR_MP = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
+                                   nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
          estado = 15,
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
 
+
 # guardar rda
 
 mex_pm_18 <- final_pm18_mex
-usethis::use_data(mex_pm_18,overwrite = T)
+usethis::use_data(mex_pm_18,overwrite = F)
 
 
-rm(pm21)
+rm(pm18)
 
 
 
@@ -440,10 +444,64 @@ final_dl18_mex <- insertar_sufijo(bd=dl18, "dl", "18")
 # guardar rda
 
 mex_dl_18 <- final_dl18_mex
-usethis::use_data(mex_dl_18,overwrite = T)
+
+mex_dl_18 %>% write_rds("inst/electoral/mex_dl_18.rda")
 
 
-rm(dl21)
+rm(dl18)
+
+## GOBERNADOR 17 EDOMEX ----------------------------------------------------------------------------
+
+
+
+gb17 <- bd_gb_17_mex   %>%
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))%>%
+  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
+         across(pan:nominal, ~as.numeric(.x)))
+
+# revisar nombres de varianles
+
+colnames(pm17)
+
+gb17 <- gb17 %>%
+  rename("noreg"=no_reg,
+         "municipio_gb_17" = municipio,
+         "nombre_municipio_gb_17" = nombre_municipio,
+         "distritol" = distrito)%>%
+  mutate(across(pan:nominal, ~as.numeric(.x)))
+
+
+gb17 <- gb17 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(gb17)
+
+# sufijo para join
+
+final_gb17_mex <- insertar_sufijo(bd=gb17, "gb", "17")
+
+# agregar clave casilla
+
+final_gb17_mex <-  final_gb17_mex %>%
+  mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                   nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                   nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                   nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
+         MR_MP = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
+         estado = 15,
+         nombre_estado = "MÉXICO",
+         clave_casilla = paste0(estado,seccion,clave_casilla))
+
+
+# guardar rda
+
+mex_gb_17 <- final_gb17_mex
+usethis::use_data(mex_gb_17,overwrite = F)
+
+
+rm(gb17)
 
 
 

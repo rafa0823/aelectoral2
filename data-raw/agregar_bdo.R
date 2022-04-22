@@ -131,7 +131,8 @@ pr18 <- pr18  %>%
          "pes" = es,
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
-         "morena_pes" = morena_es)
+         "morena_pes" = morena_es) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)))
 
 pr18 <- pr18 %>%
   rename_with.(~paste0('ele_', .x),
@@ -348,8 +349,7 @@ rm(pm21)
 
 pm18 <- bd_pm_18_mex   %>%
   mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))%>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-         across(pan:nominal, ~as.numeric(.x)))
+  mutate(seccion = formatC(seccion, width = 4,flag = "0"))
 
 # revisar nombres de varianles
 

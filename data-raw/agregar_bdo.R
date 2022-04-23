@@ -1,6 +1,6 @@
 
 renv::deactivate()
-library(pacman)
+
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
 bd_pr_18 <- pr_18 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Federal/2018/Presidente_casilla.csv")%>%
@@ -21,11 +21,6 @@ bd_df_15 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadís
   janitor::clean_names() %>%
   as_tibble()
 
-bd_pm_21_ch <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/2021/Computos Distritales/Chiapas/2021_AYUN_LOC_MR_CHIS_CAS.xlsx",
-                          n_max = 20036)%>%
-  janitor::clean_names() %>%
-  as_tibble()
-
 bd_pm_21_mex <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/2021/Computos Distritales/Estado de México/Casillas_computo_municipio_por_partido_politico_2021.xlsx",
                            n_max = 20036)%>%
   janitor::clean_names() %>%
@@ -39,7 +34,15 @@ bd_dl_18_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
   janitor::clean_names() %>%
   as_tibble()
 
-bd_dl_21_mex <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/2021/Computos Distritales/Estado de México/Casillas_computo_distrito_por_partido_politico_2021.xlsx") %>%
+bd_dl_21_mex <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2021/Distrito local/edomex_normal_casilla.xlsx",
+                           skip = 4,
+                           n_max = 20035) %>%
+  janitor::clean_names() %>%
+  as_tibble()%>%
+  rename("pt_morena_naem" = pt_morena_naem_22,
+         "pt_morena_naem_cc" = pt_morena_naem_26)
+
+bd_gb_17_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2017/Gobernador/edomex_normal_casilla.csv") %>%
   janitor::clean_names() %>%
   as_tibble()
 
@@ -63,8 +66,8 @@ df21 <- df21  %>%
          "nulos" = votos_nulos,
          "total" = total_votos_calculados,
          "nominal" = lista_nominal_casilla,
-         "distritof" = id_distrito,
-         "nombre_distritof" = nombre_distrito,
+         "distritof_21" = id_distrito,
+         "nombre_distritof_21" = nombre_distrito,
          "estado" = id_estado) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)))
 
@@ -100,8 +103,8 @@ final_df21 <- insertar_sufijo(bd=df21, "df", "21") %>%
 
 # guardar rda
 nac_df_21 <- final_df21
-usethis::use_data(nac_df_21,overwrite = T)
 
+nac_df_21 %>% write_rds("inst/electoral/nac_df_21.rda")
 
 rm(df21)
 
@@ -123,12 +126,13 @@ colnames(pr18)
 
 pr18 <- pr18  %>%
   rename("noreg" = no_reg,
-         "distritof" = distrito,
-         "nombre_distritof" = nombre_distrito,
+         "distritof_18" = distrito,
+         "nombre_distritof_18" = nombre_distrito,
          "pes" = es,
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
-         "morena_pes" = morena_es)
+         "morena_pes" = morena_es) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)))
 
 pr18 <- pr18 %>%
   rename_with.(~paste0('ele_', .x),
@@ -160,8 +164,10 @@ final_pr18 <- insertar_sufijo(bd=pr18, "pr", "18")
 
 
 # guardar rda
+
 nac_pr_18 <- final_pr18
-usethis::use_data(nac_pr_18,overwrite = T)
+
+nac_pr_18 %>% write_rds("inst/electoral/nac_pr_18.rda")
 
 rm(pr18)
 
@@ -184,7 +190,7 @@ colnames(df18)
 
 df18 <- df18  %>%
   rename("noreg" = no_reg,
-         "distritof" = distrito,
+         "distritof_18" = distrito,
          "pes" = es,
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
@@ -222,8 +228,8 @@ final_df18 <- insertar_sufijo(bd=df18, "df", "18")
 
 # guardar rda
 nac_df_18 <- final_df18
-usethis::use_data(nac_df_18,overwrite = T)
 
+nac_df_18 %>% write_rds("inst/electoral/nac_df_18.rda")
 
 rm(df18)
 
@@ -250,7 +256,7 @@ colnames(df15)
 
 df15 <- df15  %>%
   rename("noreg" = no_reg,
-         "distritof" = distrito,
+         "distritof_15" = distrito,
          "pes" = ps) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)))
 
@@ -285,12 +291,12 @@ final_df15 <- insertar_sufijo(bd=df15, "df", "15")
 
 # guardar rda
 nac_df_15 <- final_df15
-usethis::use_data(nac_df_15,overwrite = T)
 
+nac_df_15 %>% write_rds("inst/electoral/nac_df_15.rda")
 
 rm(df15)
 
-# LOCALES -------------------------------------------------------------------------------------------
+# LOCALES EDOMEX-------------------------------------------------------------------------------------------
 
 # PM 21 EDOMEX ------------------------------------------------------------------
 
@@ -333,8 +339,8 @@ final_pm21_mex <- final_pm21_mex %>%
 # guardar rda
 
 mex_pm_21 <- final_pm21_mex
-usethis::use_data(mex_pm_21,overwrite = T)
 
+mex_pm_21 %>% write_rds("inst/electoral/mex_pm_21.rda")
 
 rm(pm21)
 
@@ -343,18 +349,17 @@ rm(pm21)
 
 pm18 <- bd_pm_18_mex   %>%
   mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))%>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-         across(pan:nominal, ~as.numeric(.x)))
+  mutate(seccion = formatC(seccion, width = 4,flag = "0"))
 
 # revisar nombres de varianles
 
 colnames(pm18)
 
-pl18 <- pm18 %>%
+pm18 <- pm18 %>%
   rename("noreg"=no_reg,
          "municipio_pm_18" = municipio,
          "nombre_municipio_pm_18" = nombre_municipio,
-         "distritol" = distrito)%>%
+         "distritol_18" = distrito)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)))
 
 
@@ -375,23 +380,72 @@ final_pm18_mex <-  final_pm18_mex %>%
   mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
-                                   nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
-         MR_MP = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
+                                   nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
          estado = 15,
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
 
+
 # guardar rda
 
 mex_pm_18 <- final_pm18_mex
-usethis::use_data(mex_pm_18,overwrite = T)
+
+mex_pm_18 %>% write_rds("inst/electoral/mex_pm_18.rda")
+
+rm(pm18)
+
+## LOCALES 21 EDOMEX -----------------------------------------------------------
+
+dl21 <- bd_dl_21_mex  %>%
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio)) %>%
+  rename("noreg"=no_registrados,
+         "nominal" = lista_nominal,
+         "municipio_dl_21" = id_municipio,
+         "nombre_municipio_dl_21" = municipio,
+         "seccion" = id_seccion,
+         "distritol_21"=id_distrito,
+         "nombre_distritol_21" = distrito,
+         "panal" = naem,
+         "pt_morena_panal" = pt_morena_naem,
+         "pt_morena_panal_cc" = pt_morena_naem_cc,
+         "pt_panal" = pt_naem,
+         "morena_panal" = morena_naem) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)))
 
 
-rm(pm21)
+
+dl21 <- dl21 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(dl21)
+
+# sufijo para join
+
+final_dl21_mex <- insertar_sufijo(bd=dl21, "dl", "21")
+
+# agregar clave casilla
+
+final_dl21_mex <-  final_dl21_mex %>%
+  mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                   nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                   nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                   nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
+         estado = 15,
+         nombre_estado = "MÉXICO",
+         clave_casilla = paste0(estado,seccion,clave_casilla))
 
 
 
+# guardar rda
+
+mex_dl_21 <- final_dl21_mex
+
+mex_dl_21 %>% write_rds("inst/electoral/mex_dl_21.rda")
+
+rm(dl21)
 
 
 ## DL 18 EDOMEX -------------------------------------------------------------------------------------
@@ -409,7 +463,7 @@ dl18 <- dl18 %>%
   rename("noreg"=no_reg,
          "municipio_dl_18" = municipio,
          "nombre_municipio_dl_18" = nombre_municipio,
-         "distritol" = distrito)%>%
+         "distritol_18" = distrito)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)))
 
 
@@ -440,10 +494,63 @@ final_dl18_mex <- insertar_sufijo(bd=dl18, "dl", "18")
 # guardar rda
 
 mex_dl_18 <- final_dl18_mex
-usethis::use_data(mex_dl_18,overwrite = T)
+
+mex_dl_18 %>% write_rds("inst/electoral/mex_dl_18.rda")
 
 
-rm(dl21)
+rm(dl18)
+
+## GOBERNADOR 17 EDOMEX ----------------------------------------------------------------------------
+
+
+
+gb17 <- bd_gb_17_mex   %>%
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))%>%
+  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
+         across(pan:nominal, ~as.numeric(.x)))
+
+# revisar nombres de varianles
+
+colnames(gb17)
+
+gb17 <- gb17 %>%
+  rename("noreg"=no_reg,
+         "municipio_gb_17" = municipio,
+         "nombre_municipio_gb_17" = nombre_municipio,
+         "distritol_17" = distrito)%>%
+  mutate(across(pan:nominal, ~as.numeric(.x)))
+
+
+gb17 <- gb17 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(gb17)
+
+# sufijo para join
+
+final_gb17_mex <- insertar_sufijo(bd=gb17, "gb", "17")
+
+# agregar clave casilla
+
+final_gb17_mex <-  final_gb17_mex %>%
+  mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                   nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                   nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                   nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
+         estado = 15,
+         nombre_estado = "MÉXICO",
+         clave_casilla = paste0(estado,seccion,clave_casilla))
+
+
+# guardar rda
+
+mex_gb_17 <- final_gb17_mex
+
+mex_gb_17 %>% write_rds("inst/electoral/mex_gb_17.rda")
+
+rm(gb17)
 
 
 

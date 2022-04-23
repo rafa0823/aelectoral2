@@ -18,16 +18,26 @@ Electoral <- R6::R6Class("Electoral",
                                        todas = NULL,
                                        eleccion = NA_character_,
                                        entidad = NA_character_,
-                                       extranjero = T,
-                                       especiales = T,
+                                       extranjero = NA,
+                                       especiales = NA,
                                        llave = NULL,
-                                       initialize = function(eleccion, entidad){
+                                       initialize = function(eleccion, entidad, extranjero = T, especiales = T){
                                          self$eleccion <- eleccion
                                          self$entidad <- entidad
+                                         self$extranjero <- extranjero
+                                         self$especiales <- especiales
 
                                          self$obtener_bd()
-
                                          self$todas <- list(self$bd)
+
+                                         if(!self$extranjero){
+                                           self$eliminar_votoExtranjero()
+                                         }
+
+                                         if(!self$especiales){
+                                           self$eliminar_especiales()
+                                         }
+
 
                                        },
                                        obtener_bd = function(){
@@ -60,10 +70,8 @@ Electoral <- R6::R6Class("Electoral",
                                        },
                                        eliminar_especiales = function(){
                                          self$bd <- eliminar_especiales(self$bd)
-                                         self$especiales <- F
                                        },
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)
-                                         self$extranjero <- F
                                        }
                          ))

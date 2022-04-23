@@ -11,6 +11,8 @@ t_nac(pr18, "candidato", "morena_|pt_|pes_")
 #partido
 t_nac(pr18, "partido", "total_")
 t_nac(pr18, "partido", "morena_")
+t_nac(pr18, "partido", "pt_")
+t_nac(pr18, "partido", "pes_")
 
 # Niveles -----------------------------------------------------------------
 
@@ -30,8 +32,17 @@ cas <- pr18 %>% sample_n(1) %>% pull(clave_casilla)
 t_nivel(pr18, "candidato", "ele_morena_pr_18", estado = 15, nivel = "clave_casilla", seleccion = cas)
 
 
+<<<<<<< HEAD
 # edomex pm21 -------------------------------------------------------------
 
+=======
+pr18 %>% group_by(distritof) %>%
+  summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>%
+  select(distritof, matches("morena_|pt_|pes_")) %>%
+  pivot_longer(-distritof) %>% mutate(partidos = str_count(name,"_")-2) %>%
+  mutate(cociente = value %/% partidos,
+         residuo = value %% partidos)
+>>>>>>> upstream/dev
 
 load("data/mex_pm_21.rda")
 edomex <-mex_pm_21 %>%  as_tibble()

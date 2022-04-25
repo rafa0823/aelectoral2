@@ -1,14 +1,17 @@
 devtools::load_all()
 # devtools::install()
 # library(aelectoral2)
-
 library(purrr)
 library(dplyr)
 library(tidyr)
 library(stringr)
 
 mex <- Electoral$new(eleccion = "df_21", entidad = "mex",extranjero = F,especiales = T)
-
+bd$todas$df_21
+bd$bd
+bd$agregar_variables(eleccion = "df_21", variables = c("estado","nombre_estado", "distritof_21"))
+bd$agregar_variables(eleccion = "df_18", variables = c("distritof_18"))
+bd$bd
 
 c("df_18", "df_15", "pr_18", "pm_21", "pm_18", "gb_17", "dl_18") %>%
   walk(~{

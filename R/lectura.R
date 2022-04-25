@@ -26,8 +26,13 @@ leer_base <- function(eleccion, entidad){
   return(res)
 }
 
-reducir <- function(bd, llave){
-  bd %>% group_by(across(all_of(llave))) %>%
+reducir <- function(bd, llaves){
+  llaves_bd <- NULL
+  for( i in seq_along(llaves)){
+    llaves_bd <- llaves_bd %>% append(names(bd)[grepl(llaves[i], names(bd))])
+  }
+
+  bd %>% group_by(across(all_of(llaves_bd))) %>%
     summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>% ungroup
 }
 

@@ -20,7 +20,7 @@ Electoral <- R6::R6Class("Electoral",
                                        entidad = NA_character_,
                                        extranjero = NA,
                                        especiales = NA,
-                                       llave = NULL,
+                                       llaves = NULL,
                                        initialize = function(eleccion, entidad, extranjero = T, especiales = T){
                                          self$eleccion <- eleccion
                                          self$entidad <- entidad
@@ -47,15 +47,15 @@ Electoral <- R6::R6Class("Electoral",
                                        agregar_variables = function(eleccion, variables){
                                          agregar_variables(self, eleccion, variables)
                                        },
-                                       agregar_bd = function(eleccion, entidad, llave = "seccion"){
-                                         llave <- match.arg(llave, "seccion")
+                                       agregar_bd = function(eleccion, entidad, llaves = "seccion"){
+                                         # llave <- match.arg(llave, "seccion")
                                          add <- leer_base(eleccion = eleccion,
                                                    entidad = entidad)
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
-                                         if(is.null(self$llave)){
-                                           self$bd <- self$bd %>% reducir(llave)
-                                           self$llave <- llave
+                                         if(is.null(self$llaves)){
+                                           self$llaves <- llaves
+                                           self$bd <- self$bd %>% reducir(self$llaves)
                                          }
 
                                          if(!self$especiales){
@@ -67,7 +67,7 @@ Electoral <- R6::R6Class("Electoral",
                                          }
 
                                          self$bd <- self$bd %>% full_join(
-                                           add %>% reducir(llave), by = llave
+                                           add %>% reducir(self$llaves), by = "seccion"
                                          )
 
                                        },

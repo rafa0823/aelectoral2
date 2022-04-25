@@ -21,13 +21,18 @@ Electoral <- R6::R6Class("Electoral",
                                        extranjero = NA,
                                        especiales = NA,
                                        llave = NULL,
-                                       initialize = function(eleccion, entidad, extranjero = T, especiales = T){
+                                       initialize = function(eleccion, entidad, extranjero = T,
+                                                             especiales = T, extraordinaria = NULL){
                                          self$eleccion <- eleccion
                                          self$entidad <- entidad
                                          self$extranjero <- extranjero
                                          self$especiales <- especiales
 
                                          self$obtener_bd()
+                                         # if(!is.null(self$extraordinaria)){
+                                         #   self$leer_base(eleccion = self$extraordinaria,
+                                         #                  entidad = self$entidad)
+                                         # }
                                          self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
 
                                          if(!self$extranjero){

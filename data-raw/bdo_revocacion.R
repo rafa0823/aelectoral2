@@ -25,7 +25,6 @@ cp22 <- cp22  %>%
          estado_cp_22 = formatC(estado_cp_22, width = 2, flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
 
-
 # prefijo
 
 cp22 <- cp22 %>%

@@ -87,5 +87,3 @@ rm(cp22)
  usethis::use_data(presidentes_mpos_mex)
 
 
-
-

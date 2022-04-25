@@ -35,8 +35,3 @@ reducir <- function(bd, llaves){
   bd %>% group_by(across(all_of(llaves_bd))) %>%
     summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>% ungroup
 }
-
-agregar_variables <- function(self, eleccion, variables){
-  vars <- self$todas %>% purrr::pluck(eleccion) %>% distinct(seccion, across(all_of(variables)))
-  self$bd <- self$bd %>% left_join(vars) %>% relocate(variables, .after = 1)
-}

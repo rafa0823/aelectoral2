@@ -52,6 +52,24 @@ bd_gb_17_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
   janitor::clean_names() %>%
   as_tibble()
 
+# CATALOGO DE UNIDADES TERRITOTIALES
+
+# library(tidyverse)
+# cat_utm_22 <- read_delim("../revocacion/data_raw/CATALOGO_UNIDADES_TERRITORIALES_RM2022.csv",
+#                   delim = ",", escape_double = FALSE, trim_ws = TRUE, locale = locale(encoding = "UTF-8")) %>%
+#   janitor::clean_names() %>%
+#   as_tibble()  %>%
+#   rename("estado" = id_entidad,
+#          "nombre_estado" = entidad,
+#          "distritof_22" = id_distrito_federal,
+#          "nombre_distritof_22" = distrito_federal) %>%
+#   mutate(seccion = formatC(seccion, width = 4, flag = "0"),
+#          unidad_territorial = formatC(unidad_territorial, width = 2, flag = "0"),
+#          distritof_22 = formatC(distritof_22, width = 2, flag = "0"),
+#          estado = formatC(estado, width = 2, flag = "0"))
+#
+# usethis::use_data(cat_utm_22)
+
 # FEDERALES -----------------------------------------------------------------------
 
 ## dipfed 21 ------------------------------------------------------------------

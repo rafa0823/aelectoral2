@@ -52,6 +52,7 @@ bd_gb_17_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
   janitor::clean_names() %>%
   as_tibble()
 
+
 # FEDERALES -----------------------------------------------------------------------
 
 ## dipfed 21 ------------------------------------------------------------------

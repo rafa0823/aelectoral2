@@ -6,7 +6,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 
-<<<<<<< HEAD
+
 mex <- Electoral$new(eleccion = "df_21", entidad = "mex",extranjero = T,especiales = T)
 mex$agregar_bd("df_18", entidad = "mex",llaves = c("seccion", "distritof", "distritol"))
 c("df_15", "pr_18", "pm_21", "pm_18", "gb_17", "dl_21","dl_18") %>%
@@ -71,7 +71,7 @@ mex$bd %>%  t_nivel("candidato", "ele_pvem_dl_18", estado = 15,
                     nivel = "seccion",  seleccion = "0057")
 
 
-=======
+
 bd$agregar_bd("df_18", entidad = "mex",llaves = c("seccion", "distritof", "distritol"))
 bd$agregar_bd("pr_18", entidad = "mex")
->>>>>>> upstream/dev
+

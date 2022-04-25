@@ -26,6 +26,12 @@ bd_pm_21_mex <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Est
   janitor::clean_names() %>%
   as_tibble()
 
+bd_pmext_21_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2021/Municipio/edomex_extraordinaria_casilla.csv",
+                          skip = 3,
+                          n_max = 47)%>%
+  janitor::clean_names() %>%
+  as_tibble()
+
 bd_pm_18_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2018/Municipio/edomex_normal_casilla.csv")%>%
   janitor::clean_names() %>%
   as_tibble()
@@ -302,8 +308,7 @@ rm(df15)
 
 pm21 <- bd_pm_21_mex   %>%
   mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))%>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-         across(pan:nominal, ~as.numeric(.x)))
+  mutate(seccion = formatC(seccion, width = 4,flag = "0"))
 
 # revisar nombres de varianles
 
@@ -343,6 +348,58 @@ mex_pm_21 <- final_pm21_mex
 mex_pm_21 %>% write_rds("inst/electoral/mex_pm_21.rda")
 
 rm(pm21)
+
+# PM EXTRAORDINARIAS 21 ---------------------------------------------------------------------------
+
+pmext21 <- bd_pmext_21_mex   %>%
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))%>%
+  mutate(id_seccion = formatC(id_seccion, width = 4,flag = "0"))
+
+# revisar nombres de varianles
+
+colnames(pmext21)
+
+pmext21 <- pmext21 %>%
+  rename("noreg"=no_registrados,
+         "seccion" = id_seccion,
+         "distritol_21" = id_distrito,
+         "nombre_distritol_21" = distrito,
+         "municipio_pm_21" = id_municipio,
+         "nombre_municipio_pm_21" = municipio,
+         "panal" = naem,
+         "nominal" = lista_nominal)%>%
+  mutate(across(pan:nominal, ~as.numeric(.x)))
+
+
+pmext21 <- pmext21 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(pmext21)
+
+# sufijo para join
+
+final_pmext21_mex <- insertar_sufijo(bd=pmext21, "pm", "21")
+
+final_pmext21_mex <- final_pmext21_mex %>%
+  mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                   nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                   nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                   nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00"))) %>%
+  mutate(estado = 15,
+         nombre_estado = "MÉXICO",
+         clave_casilla = paste0(estado,seccion,clave_casilla))
+
+
+# guardar rda
+
+mex_pmext_21 <- final_pmext21_mex
+
+mex_pmext_21 %>% write_rds("inst/electoral/mex_pmext_21.rda")
+
+rm(pmext21)
+
 
 
 ## PM 18 EDOMEX -------------------------------------------------------------------------------------

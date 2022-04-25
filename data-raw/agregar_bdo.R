@@ -59,8 +59,7 @@ bd_gb_17_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
 # Identificar nombres de variables y nombres de partidos
 
 df21 <- bd_df_21 %>%
-  clean_names() %>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"))
+  clean_names()
 
 
 colnames(df21)
@@ -75,7 +74,13 @@ df21 <- df21  %>%
          "distritof_21" = id_distrito,
          "nombre_distritof_21" = nombre_distrito,
          "estado" = id_estado) %>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         estado = formatC(estado, width = 2,flag = "0"),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         id_casilla = formatC(id_casilla, width = 2,flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
+         distritof_21 = formatC(distritof_21, width = 2, flag = "0"),
+         seccion = if_else(tipo_casilla == "P","9999",seccion))
 
 
 df21 <- df21 %>%
@@ -94,7 +99,9 @@ municipios_df_21 <- read_excel("data-raw/DatosAbiertos-derfe-pdln_edms_sexo_2021
          seccion,
          "municipio_df_21" = clave_municipio,
          "nombre_municipio_df_21" = nombre_municipio) %>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0")) %>%
+  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
+         estado = formatC(estado, width = 4,flag = "0"),
+         municipio_df_21 = formatC(municipio_df_21, width = 4,flag = "0")) %>%
   unique()
 
 df21 <- df21 %>%
@@ -121,8 +128,7 @@ rm(df21)
 
 pr18 <- bd_pr_18 %>%
   clean_names() %>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-         clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1))
+  mutate(clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1))
 
 
 colnames(pr18)
@@ -138,7 +144,12 @@ pr18 <- pr18  %>%
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
          "morena_pes" = morena_es) %>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         estado = formatC(estado, width = 2,flag = "0"),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
+         distritof_18 = formatC(distritof_18, width = 2, flag = "0"),
+         seccion = if_else(tipo_casilla == "P","9999",seccion))
 
 pr18 <- pr18 %>%
   rename_with.(~paste0('ele_', .x),
@@ -184,8 +195,7 @@ rm(pr18)
 # Identificar nombres de variables y nombres de partidos
 
 df18 <- bd_df_18 %>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-         clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1))
+  mutate(clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1))
 
 df18[df18 == "-"] <- NA
 
@@ -201,7 +211,13 @@ df18 <- df18  %>%
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
          "morena_pes" = morena_es) %>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         estado = formatC(estado, width = 2,flag = "0"),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         id_casilla = formatC(id_casilla, width = 2,flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
+         distritof_18 = formatC(distritof_18, width = 2, flag = "0"),
+         seccion = if_else(tipo_casilla == "P","9999",seccion))
 
 
 
@@ -247,10 +263,6 @@ rm(df18)
 # Identificar nombres de variables y nombres de partidos
 
 df15 <- bd_df_15%>%
-  mutate(estado = formatC(estado, width = 2,flag = "0"),
-         seccion = formatC(seccion, width = 4,flag = "0"),
-         id_casilla = formatC(id_casilla, width = 2,flag = "0"),
-         ext_contigua = formatC(ext_contigua, width = 2,flag = "0")) %>%
   mutate(clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla,ext_contigua))
 
 df15[df15 == "-"] <- NA
@@ -264,7 +276,13 @@ df15 <- df15  %>%
   rename("noreg" = no_reg,
          "distritof_15" = distrito,
          "pes" = ps) %>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         estado = formatC(estado, width = 2,flag = "0"),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         id_casilla = formatC(id_casilla, width = 2,flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
+         distritof_15 = formatC(distritof_15, width = 2, flag = "0"),
+         seccion = if_else(tipo_casilla == "P","9999",seccion))
 
 
 
@@ -307,16 +325,20 @@ rm(df15)
 # PM 21 EDOMEX ------------------------------------------------------------------
 
 pm21 <- bd_pm_21_mex   %>%
-  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))%>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"))
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))
 
 # revisar nombres de varianles
 
 colnames(pm21)
 
 pm21 <- pm21 %>%
-  rename("noreg"="no_reg")%>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  rename("noreg"="no_reg",
+         "municipio_pm_21" = municipio,
+         "nombre_municipio_pm_21" = nombre_municipio)%>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         municipio_pm_21 = formatC(municipio_pm_21, width = 2, flag = "0"))
 
 
 pm21 <- pm21 %>%
@@ -336,7 +358,7 @@ final_pm21_mex <- final_pm21_mex %>%
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")))%>%
-  mutate(estado = 15,
+  mutate(estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
@@ -352,8 +374,7 @@ rm(pm21)
 # PM EXTRAORDINARIAS 21 ---------------------------------------------------------------------------
 
 pmext21 <- bd_pmext_21_mex   %>%
-  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))%>%
-  mutate(id_seccion = formatC(id_seccion, width = 4,flag = "0"))
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
 
 # revisar nombres de varianles
 
@@ -368,7 +389,10 @@ pmext21 <- pmext21 %>%
          "nombre_municipio_pm_21" = municipio,
          "panal" = naem,
          "nominal" = lista_nominal)%>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         municipio_pm_21 = formatC(municipio_pm_21, width = 2, flag = "0"))
 
 
 pmext21 <- pmext21 %>%
@@ -387,7 +411,7 @@ final_pmext21_mex <- final_pmext21_mex %>%
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00"))) %>%
-  mutate(estado = 15,
+  mutate(estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
@@ -417,7 +441,11 @@ pm18 <- pm18 %>%
          "municipio_pm_18" = municipio,
          "nombre_municipio_pm_18" = nombre_municipio,
          "distritol_18" = distrito)%>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
+         municipio_pm_18 = formatC(municipio_pm_18, width = 2, flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion))
 
 
 pm18 <- pm18 %>%
@@ -438,7 +466,7 @@ final_pm18_mex <-  final_pm18_mex %>%
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
-         estado = 15,
+         estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))%>%
   mutate(seccion = formatC(seccion, width = 4,flag = "0"))
@@ -469,8 +497,11 @@ dl21 <- bd_dl_21_mex  %>%
          "pt_morena_panal_cc" = pt_morena_naem_cc,
          "pt_panal" = pt_naem,
          "morena_panal" = morena_naem) %>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-         across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
+         municipio_dl_21 = formatC(municipio_dl_21, width = 2, flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion))
 
 
 
@@ -492,7 +523,7 @@ final_dl21_mex <-  final_dl21_mex %>%
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
-         estado = 15,
+         estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
@@ -510,19 +541,22 @@ rm(dl21)
 ## DL 18 EDOMEX -------------------------------------------------------------------------------------
 
 dl18 <- bd_dl_18_mex   %>%
-  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))%>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"))
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))
 
 # revisar nombres de varianles
 
-colnames(pm18)
+colnames(dl18)
 
 dl18 <- dl18 %>%
   rename("noreg"=no_reg,
          "municipio_dl_18" = municipio,
          "nombre_municipio_dl_18" = nombre_municipio,
          "distritol_18" = distrito)%>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
+         municipio_dl_18 = formatC(municipio_dl_18, width = 2, flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion))
 
 
 dl18 <- dl18 %>%
@@ -544,7 +578,7 @@ final_dl18_mex <- insertar_sufijo(bd=dl18, "dl", "18")
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
          MR_MP = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
-         estado = 15,
+         estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
@@ -575,7 +609,11 @@ gb17 <- gb17 %>%
          "municipio_gb_17" = municipio,
          "nombre_municipio_gb_17" = nombre_municipio,
          "distritol_17" = distrito)%>%
-  mutate(across(pan:nominal, ~as.numeric(.x)))
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+                seccion = formatC(seccion, width = 4,flag = "0"),
+                distritol_17 = formatC(distritol_17, width = 2, flag = "0"),
+                municipio_gb_17 = formatC(municipio_gb_17, width = 2, flag = "0"),
+                seccion = if_else(casilla == "P","9999",seccion))
 
 
 gb17 <- gb17 %>%
@@ -596,7 +634,7 @@ final_gb17_mex <-  final_gb17_mex %>%
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
-         estado = 15,
+         estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
 

@@ -1,6 +1,7 @@
 devtools::load_all()
 # devtools::install()
 # library(aelectoral2)
+<<<<<<< HEAD
 library(purrr)
 library(dplyr)
 library(tidyr)
@@ -21,3 +22,13 @@ mex$bd %>%  t_nivel("partido", "ele_morena_df_21", estado = 15,
 
 mex$bd %>%  t_nivel("partido", "ele_mc_df_21", estado = 15,
                     nivel = "seccion",  seleccion = "0392")
+=======
+bd <- Electoral$new("df_21", entidad = "mex", extranjero = T)
+
+bd$agregar_bd("df_18", entidad = "mex")
+bd$agregar_bd("pr_18", entidad = "mex")
+
+bd$todas$df_21
+bd$agregar_variables(eleccion = "df_21", variables = c("estado","nombre_estado", "distritof_21"))
+bd$bd
+>>>>>>> upstream/dev

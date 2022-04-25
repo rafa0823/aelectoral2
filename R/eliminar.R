@@ -11,7 +11,7 @@ eliminar_especiales <- function(bd){
 }
 
 eliminar_votoExtranjero <- function(bd){
-  aux <- bd %>%  filter(seccion != 0)
+  aux <- bd %>%  filter(seccion != "0000")
   message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} casillas de voto extranjero"))
   return(aux)
 }

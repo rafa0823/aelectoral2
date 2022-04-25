@@ -28,7 +28,7 @@ Electoral <- R6::R6Class("Electoral",
                                          self$especiales <- especiales
 
                                          self$obtener_bd()
-                                         self$todas <- list(self$bd)
+                                         self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
 
                                          if(!self$extranjero){
                                            self$eliminar_votoExtranjero()
@@ -44,11 +44,14 @@ Electoral <- R6::R6Class("Electoral",
                                          self$bd <- leer_base(eleccion = self$eleccion,
                                                               entidad = self$entidad)
                                        },
+                                       agregar_variables = function(eleccion, variables){
+                                         agregar_variables(self, eleccion, variables)
+                                       },
                                        agregar_bd = function(eleccion, entidad, llave = "seccion"){
                                          llave <- match.arg(llave, "seccion")
                                          add <- leer_base(eleccion = eleccion,
                                                    entidad = entidad)
-                                         self$todas <- self$todas %>% append(list(add))
+                                         self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
                                          if(is.null(self$llave)){
                                            self$bd <- self$bd %>% reducir(llave)

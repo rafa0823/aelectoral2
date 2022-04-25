@@ -192,3 +192,17 @@ t_nivel(dl18, "candidato", "morena_", estado = 15,
 load("data/")
 df15<- nac_df_15 %>%  as_tibble()
 
+nex<- readRDS("inst/electoral/mex_pmext_21.rda") %>%  as_tibble()
+
+t_nac(nex, "candidato", "total_")
+t_nac(nex, "candidato", "morena_")
+
+t_nivel(nex, "partido", "morena_", estado = 15,
+        nivel = "nombre_municipio",  seleccion = "NEXTLALPAN")
+
+t_nivel(nex, "candidato", "fxm_", estado = 15,
+        nivel = "seccion",  seleccion = "3040")
+
+
+
+

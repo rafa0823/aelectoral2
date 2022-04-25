@@ -15,65 +15,64 @@
 
 Electoral <- R6::R6Class("Electoral",
                          public = list(bd = NA,
-                                       inicial = NA_character_,
-                                       ano = NA_integer_,
-                                       tipo = NA_character_,
+                                       todas = NULL,
                                        eleccion = NA_character_,
                                        entidad = NA_character_,
-                                       normal = T,
-                                       nivel = NA_character_,
-                                       initialize = function(inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/Resultados definitivos",
-                                                             ano, tipo, eleccion, entidad, normal = T, nivel = "casilla"){
-                                         self$inicial <- inicial
-                                         self$ano <- ano
-                                         self$tipo <- tipo
+                                       extranjero = NA,
+                                       especiales = NA,
+                                       llaves = NULL,
+                                       initialize = function(eleccion, entidad, extranjero = T, especiales = T){
                                          self$eleccion <- eleccion
-                                         if(self$tipo == "Local") self$entidad <- entidad
-                                         self$normal <- normal
-                                         self$nivel <- nivel
+                                         self$entidad <- entidad
+                                         self$extranjero <- extranjero
+                                         self$especiales <- especiales
 
                                          self$obtener_bd()
+                                         self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
 
-                                         self$join_bd()
+                                         if(!self$extranjero){
+                                           self$eliminar_votoExtranjero()
+                                         }
+
+                                         if(!self$especiales){
+                                           self$eliminar_especiales()
+                                         }
+
 
                                        },
                                        obtener_bd = function(){
-                                         self$bd <- leer_base(inicial = self$inicial, ano = self$ano, tipo = self$tipo, eleccion = self$eleccion,
-                                                              entidad = self$entidad, normal = self$normal, nivel = self$nivel) %>%
-                                           limpiar_base()
-                                         #indica si hay columnas con números pues probablemente sea un error manual
-                                         revisar_nombres(self$bd)
+                                         self$bd <- leer_base(eleccion = self$eleccion,
+                                                              entidad = self$entidad)
                                        },
-                                       join_bd = function(){
-                                         #caso federal
-                                         if(n_distinct(self$tipo) == 1 & self$tipo == "Federal"){
-                                           if(n_distinct(self$ano) == 1){ # por casilla
+                                       agregar_variables = function(eleccion, variables){
+                                         agregar_variables(self, eleccion, variables)
+                                       },
+                                       agregar_bd = function(eleccion, entidad, llaves = "seccion"){
+                                         # llave <- match.arg(llave, "seccion")
+                                         add <- leer_base(eleccion = eleccion,
+                                                   entidad = entidad)
+                                         self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
-                                             self$bd <- self$bd %>% imap(~{
-                                               sufijo(.x, .y,"clave_casilla")
-                                             }) %>%
-                                               reduce(full_join,by = "clave_casilla")
-
-                                           } else{ #por sección
-                                             self$bd <- self$bd %>% imap(~{
-                                               .x %>% group_by(seccion) %>% tidyr::nest() %>%
-                                                 sufijo(.y,"seccion")
-                                                 }) %>%
-                                               reduce(full_join, by = "seccion")
-
-                                           }
+                                         if(is.null(self$llaves)){
+                                           self$llaves <- llaves
+                                           self$bd <- self$bd %>% reducir(self$llaves)
                                          }
-                                         # caso local
-                                         if(n_distinct(self$tipo) == 1 & self$tipo == "Local"){
 
+                                         if(!self$especiales){
+                                           add <- add %>% eliminar_especiales()
                                          }
+
+                                         if(!self$extranjero){
+                                           add <- add %>% eliminar_votoExtranjero()
+                                         }
+
+                                         self$bd <- self$bd %>% full_join(
+                                           add %>% reducir(self$llaves), by = "seccion"
+                                         )
+
                                        },
                                        eliminar_especiales = function(){
-                                         if(self$nivel == "casilla"){
-                                           self$bd <- eliminar_especiales(self$bd)
-                                         } else{
-                                           warning(glue::glue("Ha elegido una base de datos que no es por casilla."))
-                                         }
+                                         self$bd <- eliminar_especiales(self$bd)
                                        },
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)

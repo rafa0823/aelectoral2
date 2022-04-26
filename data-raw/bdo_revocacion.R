@@ -65,7 +65,7 @@ rm(cp22)
           estado = formatC(estado, width = 2, flag = "0"))
 
 
- usethis::use_data(cat_utm_22, overwrite = F)
+ usethis::use_data(cat_utm_22, overwrite = T)
 
  # REGIONES
 
@@ -73,7 +73,7 @@ rm(cp22)
    mutate(estado = "15",
           nombre_estado = "MÉXICO")
 
- usethis::use_data(regiones)
+ usethis::use_data(regiones, overwrite = T)
 
 
  # PRESIDENTES MUNICIPALES EDOMEX
@@ -84,8 +84,6 @@ rm(cp22)
           estado = "15",
           nombre_estado = "MÉXICO")
 
- usethis::use_data(presidentes_mpos_mex)
-
-
+ usethis::use_data(presidentes_mpos_mex, overwrite = T)
 
 

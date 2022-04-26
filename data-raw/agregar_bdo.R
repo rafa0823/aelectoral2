@@ -94,19 +94,19 @@ detectar_partidos(df21)
 
 # Agregar municipios del año
 
-municipios_df_21 <- read_excel("data-raw/DatosAbiertos-derfe-pdln_edms_sexo_20210415.xlsx") %>%
-  janitor::clean_names() %>%
-  select("estado" = clave_entidad,
-         seccion,
-         "municipio_df_21" = clave_municipio,
-         "nombre_municipio_df_21" = nombre_municipio) %>%
-  mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-         estado = formatC(estado, width = 4,flag = "0"),
-         municipio_df_21 = formatC(municipio_df_21, width = 4,flag = "0")) %>%
-  unique()
-
-df21 <- df21 %>%
-  left_join(municipios_df_21)
+# municipios_df_21 <- read_excel("data-raw/DatosAbiertos-derfe-pdln_edms_sexo_20210415.xlsx") %>%
+#   janitor::clean_names() %>%
+#   select("estado" = clave_entidad,
+#          seccion,
+#          "municipio_df_21" = clave_municipio,
+#          "nombre_municipio_df_21" = nombre_municipio) %>%
+#   mutate(seccion = formatC(seccion, width = 4,flag = "0"),
+#          estado = formatC(estado, width = 4,flag = "0"),
+#          municipio_df_21 = formatC(municipio_df_21, width = 4,flag = "0")) %>%
+#   unique()
+#
+# df21 <- df21 %>%
+#   left_join(municipios_df_21)
 
 
 

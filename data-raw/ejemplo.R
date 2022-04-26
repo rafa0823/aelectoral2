@@ -6,7 +6,14 @@ bd <- Electoral$new("df_21", entidad = "mex", extranjero = T)
 
 
 bd$agregar_bd("df_18", entidad = "mex",llaves = c("seccion", "distritof", "distritol", "municipio"))
-bd$agregar_bd("pm_21", entidad = "mex")
+
+
+# Agregar pm_21 con extraordinaria ----------------------------------------
+bd$agregar_bd("pm_21", entidad = "mex",extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
+
+bd$bd %>% names
+bd$bd %>% nrow
+# Agregar consulta popular 22 ---------------------------------------------
 
 
 bd$agregar_bd("cp_22", entidad = "mex")
@@ -35,3 +42,5 @@ presidentes <- presidentes_mpos_mex %>% select(1:3) %>%
 presidentes %>% anti_join(bd$bd, by = c("nombre_municipio" = "nombre_municipio_pm_21"))
 bd$agregar_manual(presidentes, by = c("nombre_municipio_pm_21" = "nombre_municipio"))
 nrow(bd$bd)
+
+

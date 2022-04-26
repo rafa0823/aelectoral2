@@ -3,18 +3,16 @@ pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
 # RESULTADOS REVOCACIÓN DE MANDATO 2022
 
-cp22 <- read_csv("../revocacion/data_raw/20220411_1845_COMPUTOS_RM2022.csv", skip = 5,locale = locale(encoding = "CP1252")) %>%
+cp22 <- read_csv("../revocacion/data_raw/20220411_1845_COMPUTOS_RM2022.csv", skip = 5,locale = locale(encoding = "CP1252"),na = "-") %>%
   janitor::clean_names() %>%
-  as_tibble() %>%
-  mutate(seccion = as.numeric(seccion))
+  as_tibble()
 
-cp22[cp22 == "-"] <- NA
 
 cp22 <- cp22  %>%
   mutate(clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1)) %>%
-  rename("estado" = id_entidad,
-         "nombre_estado" = entidad,
-         "distritof_22" = id_distrito_federal,
+  rename(estado = id_entidad,
+         nombre_estado = entidad,
+         distritof_22 = id_distrito_federal,
          "nombre_distritof_22" = distrito_federal,
          "revoca" = que_se_le_revoque_el_mandato_por_perdida_de_la_confianza,
          "continua" = que_siga_en_la_presidencia_de_la_republica,
@@ -22,7 +20,7 @@ cp22 <- cp22  %>%
          "nominal" = lista_nominal) %>%
   mutate(seccion = formatC(seccion, width = 4, flag = "0"),
          distritof_22 = formatC(distritof_22, width = 2, flag = "0"),
-         estado_cp_22 = formatC(estado_cp_22, width = 2, flag = "0"),
+         estado = formatC(estado, width = 2, flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
 
 # prefijo

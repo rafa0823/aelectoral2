@@ -12,8 +12,8 @@ cp22[cp22 == "-"] <- NA
 
 cp22 <- cp22  %>%
   mutate(clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1)) %>%
-  rename("estado_cp_22" = id_entidad,
-         "nombre_estado_cp_22" = entidad,
+  rename("estado" = id_entidad,
+         "nombre_estado" = entidad,
          "distritof_22" = id_distrito_federal,
          "nombre_distritof_22" = distrito_federal,
          "revoca" = que_se_le_revoque_el_mandato_por_perdida_de_la_confianza,

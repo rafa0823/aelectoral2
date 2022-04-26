@@ -47,11 +47,20 @@ Electoral <- R6::R6Class("Electoral",
                                        agregar_variables = function(eleccion, variables){
                                          agregar_variables(self, eleccion, variables)
                                        },
-                                       agregar_bd = function(eleccion, entidad, llaves = NULL){
+                                       agregar_bd = function(eleccion, entidad, llaves = NULL, extraordinaria = NULL){
                                          # llave <- match.arg(llave, "seccion")
                                          add <- leer_base(eleccion = eleccion,
                                                           entidad = entidad)
+
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
+
+                                         if(!is.null(extraordinaria)){
+                                          ext <- leer_base(eleccion = extraordinaria[["eleccion"]],
+                                                           entidad = extraordinaria[["entidad"]])
+
+                                          self$todas <- self$todas %>% append(list(ext) %>%
+                                                                                purrr::set_names(extraordinaria[["eleccion"]]))
+                                         }
 
                                          if(is.null(self$llaves)){
                                            self$llaves <- llaves
@@ -64,14 +73,36 @@ Electoral <- R6::R6Class("Electoral",
 
                                          if(!self$especiales){
                                            add <- add %>% eliminar_especiales()
+
+                                           if(!is.null(extraordinaria)){
+                                             ext <- ext %>% eliminar_especiales()
+                                           }
                                          }
 
                                          if(!self$extranjero){
                                            add <- add %>% eliminar_votoExtranjero()
+                                           if(!is.null(extraordinaria)){
+                                             ext <- ext %>% eliminar_votoExtranjero()
+                                           }
+                                         }
+
+                                         if(!is.null(extraordinaria)){
+                                           ext_r <- ext %>% reducir(self$llaves) %>%
+                                             mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := T)
+
+                                           add <- add %>% reducir(self$llaves) %>% mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := F) %>%
+                                             anti_join(
+                                               ext_r, by = "seccion"
+                                             ) %>%
+                                             bind_rows(
+                                               ext_r
+                                             )
+                                         } else{
+                                           add <- add %>% reducir(self$llaves)
                                          }
 
                                          self$bd <- self$bd %>% full_join(
-                                           add %>% reducir(self$llaves), by = "seccion"
+                                           add, by = "seccion"
                                          )
 
                                        },

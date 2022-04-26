@@ -47,15 +47,19 @@ Electoral <- R6::R6Class("Electoral",
                                        agregar_variables = function(eleccion, variables){
                                          agregar_variables(self, eleccion, variables)
                                        },
-                                       agregar_bd = function(eleccion, entidad, llaves = "seccion"){
+                                       agregar_bd = function(eleccion, entidad, llaves = NULL){
                                          # llave <- match.arg(llave, "seccion")
                                          add <- leer_base(eleccion = eleccion,
-                                                   entidad = entidad)
+                                                          entidad = entidad)
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
                                          if(is.null(self$llaves)){
                                            self$llaves <- llaves
                                            self$bd <- self$bd %>% reducir(self$llaves)
+                                         }
+
+                                         if(!is.null(llaves)){
+                                           self$llaves <- self$llaves %>% append(llaves)
                                          }
 
                                          if(!self$especiales){
@@ -70,6 +74,11 @@ Electoral <- R6::R6Class("Electoral",
                                            add %>% reducir(self$llaves), by = "seccion"
                                          )
 
+                                       },
+                                       agregar_manual = function(bd, by){
+                                         self$bd <- self$bd %>% full_join(
+                                           bd, by = by
+                                         )
                                        },
                                        eliminar_especiales = function(){
                                          self$bd <- eliminar_especiales(self$bd)

@@ -15,7 +15,7 @@
 #' @examples
 #'
 leer_base <- function(eleccion, entidad){
-  estado <- if_else(grepl("df_|pr_",eleccion), "nac",entidad)
+  estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nac",entidad)
   res <- readr::read_rds(system.file(glue::glue("electoral/{estado}_{eleccion}.rda"),
                                      package = "aelectoral2",
                                      mustWork = TRUE)) %>% tibble::as_tibble()
@@ -33,5 +33,5 @@ reducir <- function(bd, llaves){
   }
 
   bd %>% group_by(across(all_of(llaves_bd))) %>%
-    summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>% ungroup
+    summarise(across(c(starts_with("ele_"), starts_with("cp_")), ~sum(.x,na.rm = T))) %>% ungroup
 }

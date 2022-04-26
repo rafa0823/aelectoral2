@@ -63,7 +63,7 @@ rm(cp22)
           estado = formatC(estado, width = 2, flag = "0"))
 
 
- usethis::use_data(cat_utm_22, overwrite = T)
+ usethis::use_data(cat_utm_22, overwrite = F)
 
  # REGIONES
 
@@ -71,12 +71,12 @@ rm(cp22)
    mutate(estado = "15",
           nombre_estado = "MÉXICO")
 
- usethis::use_data(regiones, overwrite = T)
+ usethis::use_data(regiones, overwrite = F)
 
 
  # PRESIDENTES MUNICIPALES EDOMEX
 
- presidentes_mpos_mex <- read_excel("../revocacion/data_raw/Presidentes Municipales Chiapas 2022.xlsx") %>% janitor::clean_names() %>%
+ presidentes_mpos_mex <- read_excel("../revocacion/data_raw/Presidentes Municipales Edomex 2022.xlsx") %>% janitor::clean_names() %>%
    rename("nombre_municipio" = municipio) %>%
    mutate(nombre_municipio=toupper(nombre_municipio) %>% stringi::stri_trans_general("Latin-ASCII"),
           estado = "15",

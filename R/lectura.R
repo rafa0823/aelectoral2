@@ -28,6 +28,7 @@ leer_base <- function(eleccion, entidad){
 
 reducir <- function(bd, llaves){
   llaves_bd <- NULL
+
   for( i in seq_along(llaves)){
     llaves_bd <- llaves_bd %>% append(names(bd)[grepl(llaves[i], names(bd))])
   }

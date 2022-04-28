@@ -16,6 +16,8 @@
 Electoral <- R6::R6Class("Electoral",
                          public = list(bd = NA,
                                        todas = NULL,
+                                       bd_partido = list(),
+                                       bd_candidato = list(),
                                        eleccion = NA_character_,
                                        entidad = NA_character_,
                                        extranjero = NA,
@@ -44,8 +46,18 @@ Electoral <- R6::R6Class("Electoral",
                                          self$bd <- leer_base(eleccion = self$eleccion,
                                                               entidad = self$entidad)
                                        },
-                                       agregar_variables = function(eleccion, variables){
-                                         agregar_variables(self, eleccion, variables)
+                                       partido = function(nivel, eleccion){
+                                         aux_c <- self$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)
+
+                                         self$bd_partido <- self$bd_partido %>%
+                                           append(list(aux_c) %>% purrr::set_names(eleccion))
+                                       },
+                                       candidato = function(alianzas, nivel, eleccion){
+                                         aux_c <- repartir_candidato(bd = self$bd_partido[[eleccion]],
+                                                                     alianzas, nivel, eleccion)
+
+                                         self$bd_candidato <- self$bd_candidato %>%
+                                           append(list(aux_c) %>% purrr::set_names(eleccion))
                                        },
                                        agregar_bd = function(eleccion, entidad, llaves = NULL, extraordinaria = NULL){
                                          # llave <- match.arg(llave, "seccion")

@@ -83,6 +83,7 @@ df21 <- df21  %>%
          distritof_21 = formatC(distritof_21, width = 2, flag = "0"),
          mr_rp = gsub(pattern = "[[:digit:]]","",num_acta_impreso),
          mr_rp = gsub(pattern = "E","",mr_rp),
+         mr_rp = if_else(mr_rp == "","MR",mr_rp),
          seccion = if_else(tipo_casilla == "P","9999",seccion))
 
 
@@ -223,7 +224,7 @@ df18 <- df18  %>%
          seccion = if_else(tipo_casilla == "P","9999",seccion),
          mr_rp = gsub(pattern = "7","MR",num_acta_impreso),
          mr_rp = gsub(pattern = "8","PR",mr_rp),
-         mr_rp = gsub(pattern = "6",NA,mr_rp))
+         mr_rp = gsub(pattern = "6","MR",mr_rp))
 
 
 
@@ -288,8 +289,10 @@ df15 <- df15  %>%
          id_casilla = formatC(id_casilla, width = 2,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
          distritof_15 = formatC(distritof_15, width = 2, flag = "0"),
-         seccion = if_else(tipo_casilla == "P","9999",seccion))
-
+         seccion = if_else(tipo_casilla == "P","9999",seccion),
+         mr_rp = if_else(tipo_acta == 2, "MR", ""),
+         mr_rp = if_else(tipo_acta == 3, "MR",mr_rp),
+         mr_rp = if_else(tipo_casilla == "S" & tipo_acta == 4, "RP",mr_rp))
 
 
 df15 <- df15 %>%

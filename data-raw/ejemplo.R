@@ -48,9 +48,15 @@ bd$bd_partido$df_18
 
 
 # Coalición candidato -----------------------------------------------------
+ja <- readr::read_delim("data-raw/df_21.csv",delim = "|",skip = 1,
+                        locale = readr::locale(encoding = "CP1252"))
+al_df_21 <- ja %>%
+  filter(PARTIDO_CI %in% c("PAN_PRI_PRD", "PVEM_PT_MORENA")) %>%
+  transmute(distritof_21 = paste(formatC(ESTADO, width = 2, flag = 0),
+                              formatC(DISTRITO, width = 2, flag = 0),sep = "_"),
+            coalicion = tolower(PARTIDO_CI))
 
-alianzas_df18 <- readr::read_csv("data-raw/df_18_edomex.csv") %>%
-  mutate(distritof_18 = formatC(distritof_18, width = 2, flag = 0))
+usethis::use_data(al_df_21, overwrite = T)
 
 undebug(repartir_candidato)
 bd$candidato(alianzas_df18,nivel = "distritof_18", "df_18")

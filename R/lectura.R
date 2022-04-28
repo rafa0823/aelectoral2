@@ -20,9 +20,11 @@ leer_base <- function(eleccion, entidad){
                                      package = "aelectoral2",
                                      mustWork = TRUE)) %>% tibble::as_tibble()
   if(estado == "nac") {
-    nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
-    res <- res %>% filter(estado == !!nombre)
-    }
+    if(entidad != "nacional"){
+      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
+      res <- res %>% filter(estado == !!nombre)
+    }}
+
   return(res)
 }
 

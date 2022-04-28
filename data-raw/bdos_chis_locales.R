@@ -1,4 +1,7 @@
 
+# CHIAPAS LOCALES
+
+# CARGAR BASES -------------------------------------------------------------------------------------------------------
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
@@ -28,7 +31,78 @@ bd_dl_21_chis <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Es
   as_tibble()
 
 
-############################################### COSAS PARA DOCUMENTO DE CHIAPAS EXTRA
+
+# PM 21 CHIAPAS ------------------------------------------
+
+pm21 <- bd_pm_21_chis   %>%
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+
+# revisar nombres de varianles
+
+colnames(pm21)
+
+pm21 <- pm21 %>%
+  rename("id_estado" = id_estado,
+         "estado" = estado,
+         "noreg"= no_registrados,
+         "id_municipio_pm_21" = id_municipio,
+         "municipio_pm_21" = municipio,
+         "nombre_municipio_pm_21" = nombre_municipio,
+         "nominal" = lista_nominal,
+         "total" = total_votos)%>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         id_municipio_pm_21 = formatC(municipio_pm_21, width = 2, flag = "0"),
+         id_casilla = formatC(id_casilla, width = 2, flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
+
+
+pm21 <- pm21 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(pm21)
+
+# sufijo para join
+
+final_pm21_chis <- insertar_sufijo(bd=pm21, "pm", "21")
+
+final_pm21_chis <- final_pm21_mex %>%
+  mutate(estado = "15",
+         nombre_estado = "CHIAPAS",
+         clave_casilla = paste0(id_estado,seccion,id_casilla,ext_contigua))
+
+
+# guardar rda
+
+chis_pm_21 <- final_pm21_chis
+
+chis_pm_21 %>% write_rds("inst/electoral/chis_pm_21.rda")
+
+rm(pm21)
+
+
+## EXT PM 21 CHIAPAS -------------------------------------
+
+## FINAL PM21 CHIAPAS -----------------------------------
+
+
+# PM 18 CHIAPAS ------------------------------------------
+
+
+# PM 15 CHIAPAS ------------------------------------------
+
+
+# GB 18 CHIAPAS ------------------------------------------
+
+
+# DL 21 CHIAPAS --------------------------------------------
+
+
+
+############################################### COSAS PARA DOCUMENTO DE CHIAPAS EXTRA ------------------------------------------------------------------------
 
 catalogo_utm <- read_csv("data_raw/CATALOGO_UNIDADES_TERRITORIALES_RM2022.csv",
                          skip = 1, locale = locale(encoding = "CP1252")) %>%

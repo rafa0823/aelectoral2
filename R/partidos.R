@@ -45,7 +45,6 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
   partidos_alianza <- al %>% distinct(coalicion) %>% pull(coalicion)
   res <-  partidos_alianza %>%
     purrr::map(~{
-      browser()
       aux_n <- al %>% filter(coalicion == .x) %>% pull(nivel)
       partidos <- stringr::str_split(.x,"_") %>% purrr::pluck(1)
       p_vars <- paste("ele", partidos, eleccion, sep = "_")

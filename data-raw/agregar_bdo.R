@@ -81,6 +81,8 @@ df21 <- df21  %>%
          id_casilla = formatC(id_casilla, width = 2,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
          distritof_21 = formatC(distritof_21, width = 2, flag = "0"),
+         mr_rp = gsub(pattern = "[[:digit:]]","",num_acta_impreso),
+         mr_rp = gsub(pattern = "E","",mr_rp),
          seccion = if_else(tipo_casilla == "P","9999",seccion))
 
 
@@ -218,7 +220,10 @@ df18 <- df18  %>%
          id_casilla = formatC(id_casilla, width = 2,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
          distritof_18 = formatC(distritof_18, width = 2, flag = "0"),
-         seccion = if_else(tipo_casilla == "P","9999",seccion))
+         seccion = if_else(tipo_casilla == "P","9999",seccion),
+         mr_rp = gsub(pattern = "7","MR",num_acta_impreso),
+         mr_rp = gsub(pattern = "8","PR",mr_rp),
+         mr_rp = gsub(pattern = "6",NA,mr_rp))
 
 
 
@@ -524,6 +529,8 @@ final_dl21_mex <-  final_dl21_mex %>%
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")),
+         mr_rp = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
+         mr_rp = gsub(pattern = "S","",mr_rp),
          estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))
@@ -578,7 +585,8 @@ final_dl18_mex <- insertar_sufijo(bd=dl18, "dl", "18")
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
-         MR_MP = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
+         mr_rp = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
+         mr_rp = gsub(pattern = "S","",mr_rp),
          estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))

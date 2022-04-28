@@ -590,6 +590,7 @@ final_dl18_mex <- insertar_sufijo(bd=dl18, "dl", "18")
                                    nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
          mr_rp = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
          mr_rp = gsub(pattern = "S","",mr_rp),
+         mr_rp = if_else(mr_rp == "","MR",mr_rp),
          estado = "15",
          nombre_estado = "MÉXICO",
          clave_casilla = paste0(estado,seccion,clave_casilla))

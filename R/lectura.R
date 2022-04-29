@@ -1,19 +1,14 @@
+
 #' Title
 #'
-#' @param ano
-#' @param tipo
 #' @param eleccion
 #' @param entidad
-#' @param normal
-#' @param nivel
-#' @param inicial
+#' @param tipo_eleccion
 #'
-#' @import dplyr
 #' @return
 #' @export
 #'
 #' @examples
-#'
 leer_base <- function(eleccion, entidad, tipo_eleccion){
   estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nac",entidad)
   res <- readr::read_rds(system.file(glue::glue("electoral/{estado}_{eleccion}.rda"),
@@ -30,6 +25,16 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
   return(res)
 }
 
+#' Title
+#'
+#' @param bd
+#' @param completa
+#' @param llaves
+#'
+#' @return
+#' @export
+#'
+#' @examples
 reducir <- function(bd, completa, llaves){
 
   llaves_bd <- NULL

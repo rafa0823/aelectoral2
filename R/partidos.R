@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param bd
+#' @param nivel
+#' @param eleccion
+#'
+#' @return
+#' @export
+#'
+#' @examples
 repartir_coalicion <- function(bd, nivel, eleccion){
   aux <- bd %>% group_by(across(all_of(nivel))) %>%
     summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>%
@@ -41,6 +51,17 @@ repartir_coalicion <- function(bd, nivel, eleccion){
   return(total)
 }
 
+#' Title
+#'
+#' @param bd
+#' @param al
+#' @param nivel
+#' @param eleccion
+#'
+#' @return
+#' @export
+#'
+#' @examples
 repartir_candidato <- function(bd, al, nivel, eleccion){
   partidos_alianza <- al %>% distinct(coalicion) %>% pull(coalicion)
   res <-  partidos_alianza %>%
@@ -73,6 +94,16 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
   return(res)
 }
 
+#' Title
+#'
+#' @param bd
+#' @param nivel
+#' @param eleccion
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ganador <- function(bd, nivel, eleccion){
   aux <- bd %>% group_by(across(all_of(nivel))) %>% summarise(across(c(starts_with("ele_"),starts_with("cand_")), ~sum(.x,na.rm = T))) %>%
     filter(!is.na(!!rlang::sym(nivel)))
@@ -85,7 +116,6 @@ ganador <- function(bd, nivel, eleccion){
     ungroup
 
   aux <- aux %>%
-    # select(contains(nivel)) %>%
     bind_cols(g)
   return(aux)
 

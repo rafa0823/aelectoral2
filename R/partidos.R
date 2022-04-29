@@ -74,7 +74,7 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
 }
 
 ganador <- function(bd, nivel, eleccion){
-  aux <- bd %>% group_by(across(all_of(nivel))) %>% summarise(across(starts_with("ele_|cand_"), ~sum(.x,na.rm = T))) %>%
+  aux <- bd %>% group_by(across(all_of(nivel))) %>% summarise(across(c(starts_with("ele_"),starts_with("cand_")), ~sum(.x,na.rm = T))) %>%
     filter(!is.na(!!rlang::sym(nivel)))
 
   g <- aux %>%

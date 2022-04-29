@@ -10,6 +10,7 @@ bd_pm_21_chis <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Es
   janitor::clean_names() %>%
   as_tibble()
 
+
 bd_pm_18_chis <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/2021/Computos Distritales/Chiapas/2021_AYUN_LOC_MR_CHIS_CAS.xlsx",
                             n_max = 20036)%>%
   janitor::clean_names() %>%
@@ -70,7 +71,7 @@ detectar_partidos(pm21)
 final_pm21_chis <- insertar_sufijo(bd=pm21, "pm", "21")
 
 final_pm21_chis <- final_pm21_mex %>%
-  mutate(estado = "15",
+  mutate(estado = "07",
          nombre_estado = "CHIAPAS",
          clave_casilla = paste0(id_estado,seccion,id_casilla,ext_contigua))
 
@@ -86,14 +87,116 @@ rm(pm21)
 
 ## EXT PM 21 CHIAPAS -------------------------------------
 
+
 ## FINAL PM21 CHIAPAS -----------------------------------
 
 
 # PM 18 CHIAPAS ------------------------------------------
 
+pm18 <- bd_pm_18_chis   %>%
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+
+# revisar nombres de varianles
+
+colnames(pm18)
+
+pm18 <- pm18 %>%
+  rename("id_estado" = id_estado,
+         "estado" = estado,
+         "noreg"= no_registrados,
+         "id_municipio_pm_18" = id_municipio,
+         "municipio_pm_18" = municipio,
+         "nombre_municipio_pm_18" = nombre_municipio,
+         "nominal" = lista_nominal,
+         "total" = total_votos,
+         "distritol_18" = distrito_loc,
+         "id_distritol_18" = id_distrito_loc)%>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         id_municipio_pm_18 = formatC(municipio_pm_18, width = 2, flag = "0"),
+         id_casilla = formatC(id_casilla, width = 2, flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
+
+
+pm18 <- pm18 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(pm18)
+
+# sufijo para join
+
+final_pm18_chis <- insertar_sufijo(bd=pm18, "pm", "18")
+
+final_pm18_chis <- final_pm18_chis %>%
+  mutate(estado = "07",
+         nombre_estado = "CHIAPAS",
+         clave_casilla = paste0(id_estado,seccion,id_casilla,ext_contigua))
+
+
+# guardar rda
+
+chis_pm_18 <- final_pm18_chis
+
+chis_pm_18 %>% write_rds("inst/electoral/chis_pm_18.rda")
+
+rm(pm18)
+
 
 # PM 15 CHIAPAS ------------------------------------------
 
+pm15 <- bd_pm_15_chis   %>%
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+
+# revisar nombres de varianles
+
+colnames(pm15)
+
+pm15 <- pm15 %>%
+  rename("id_estado" = id_estado,
+         "estado" = estado,
+         "noreg"= no_registrados,
+         "id_municipio_pm_15" = id_municipio,
+         "municipio_pm_15" = municipio,
+         "nombre_municipio_pm_15" = nombre_municipio,
+         "nominal" = lista_nominal,
+         "total" = total_votos,
+         "distritol_15" = distrito_loc,
+         "id_distritol_15" = id_distrito_loc)%>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         id_municipio_pm_15 = formatC(municipio_pm_15, width = 2, flag = "0"),
+         id_casilla = formatC(id_casilla, width = 2, flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
+
+
+pm15 <- pm15 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(pm15)
+
+# sufijo para join
+
+final_pm15_chis <- insertar_sufijo(bd=pm15, "pm", "15")
+
+final_pm15_chis <- final_pm15_chis %>%
+  mutate(estado = "07",
+         nombre_estado = "CHIAPAS",
+         clave_casilla = paste0(id_estado,seccion,id_casilla,ext_contigua))
+
+
+# guardar rda
+
+chis_pm_15 <- final_pm15_chis
+
+chis_pm_15 %>% write_rds("inst/electoral/chis_pm_15.rda")
+
+rm(pm15)
 
 # GB 18 CHIAPAS ------------------------------------------
 

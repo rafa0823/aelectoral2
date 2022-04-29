@@ -51,5 +51,5 @@ bd$bd_partido$df_18
 
 bd$candidato(al_df_21,nivel = "distritof_21", "df_21")
 
-bd$bd_candidato
+bd$bd %>% ganador(nivel = "distritof_21", "df_21") %>% select(contains("ganador"))
 

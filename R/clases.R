@@ -37,10 +37,27 @@ Electoral <- R6::R6Class("Electoral",
                                            self$eliminar_votoExtranjero()
                                          }
 
-                                         self$accion_especiales(self$especiales)
+                                         self$bd <- self$bd %>% self$accion_especiales(self$especiales)
 
                                          self$bd <- self$bd %>% reducir(NULL, self$llaves)
 
+                                       },
+                                       print = function(){
+
+                                         mensaje <- cat(
+                                           glue::glue("Entidad: {self$entidad} \nElecciones agregadas: {paste(self$todas %>% names, collapse = ', ')}
+
+Variables cartográficas agregadas en bd: {paste(self$llaves, collapse = ', ')}
+
+{if(self$extranjero) 'Se mantiene el voto en el etranjero' else 'Se elimina el voto en el extranjero'}
+Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción especial realizada' else self$especiales}
+
+{if(length(self$bd_partido)> 0)  paste('Elecciones repartidas por partido:', paste(names(self$bd_partido), collapse = ', ')) else ''}
+{if(length(self$bd_candidato)> 0) paste('Elecciones repartidas por candidato:', paste(names(self$bd_candidato), collapse = ', ')) else ''}
+                                                      ")
+                                         )
+
+                                         return(mensaje)
                                        },
                                        obtener_bd = function(){
                                          self$bd <- leer_base(eleccion = self$eleccion,
@@ -75,10 +92,10 @@ Electoral <- R6::R6Class("Electoral",
                                          }
 
 
-                                         add <- add %>% accion_especiales(self$especiales)
+                                         add <- add %>% self$accion_especiales(self$especiales)
 
                                          if(!is.null(extraordinaria)){
-                                           ext <- ext %>% accion_especiales(self$especiales)
+                                           ext <- ext %>% self$accion_especiales(self$especiales)
                                          }
 
                                          if(!self$extranjero){
@@ -113,16 +130,17 @@ Electoral <- R6::R6Class("Electoral",
                                            bd, by = by
                                          )
                                        },
-                                       accion_especiales = function(accion){
+                                       accion_especiales = function(bd, accion){
                                          if(!is.null(accion)){
                                            if(accion == "eliminar"){
-                                             self$bd <- eliminar_especiales(self$bd)
+                                             bd <- eliminar_especiales(bd)
                                            }
 
                                            if(accion == "repartir"){
-                                             self$bd <- repartir_especiales(self$bd)
+                                             bd <- repartir_especiales(bd)
                                            }
                                          }
+                                         return(bd)
                                        },
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)

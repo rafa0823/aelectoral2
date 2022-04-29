@@ -83,7 +83,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            append(list(aux_c) %>% purrr::set_names(eleccion))
                                        },
                                        agregar_bd = function(eleccion, entidad, extraordinaria = NULL){
-                                         # llave <- match.arg(llave, "seccion")
+
                                          add <- leer_base(eleccion = eleccion,
                                                           entidad = entidad)
 

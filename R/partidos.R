@@ -6,7 +6,7 @@ repartir_coalicion <- function(bd, nivel, eleccion){
     select(all_of(nivel), contains(eleccion))
 
   division <- aux %>%
-    pivot_longer(-nivel) %>% mutate(
+    tidyr::pivot_longer(-nivel) %>% mutate(
       partidos = stringr::str_split(gsub(pattern = glue::glue("ele_|_{eleccion}|_cc"),"",name), "_"),
       num_partidos = purrr::map_int(partidos,~length(.x)),
       partido = value %/% num_partidos,

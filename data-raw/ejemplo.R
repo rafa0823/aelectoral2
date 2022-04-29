@@ -4,25 +4,25 @@ devtools::load_all()
 library(tidyr)
 bd <- Electoral$new("df_21", entidad = "mex",
                     llaves = c("seccion", "distritof", "distritol", "municipio"), extranjero = T)
-bd$bd
 
-bd$agregar_bd("df_18", entidad = "mex")
+c("df_18", "df_15","pr_18", "cp_22") %>% purrr::walk(~{
+  bd$agregar_bd(.x, entidad = "mex")
+})
 
 
 # Agregar pm_21 con extraordinaria ----------------------------------------
 bd$agregar_bd("pm_21", entidad = "mex",extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
-# Agregar consulta popular 22 ---------------------------------------------
+# Agregar bds auxiliares ---------------------------------------------
 
 
-bd$agregar_bd("cp_22", entidad = "mex")
-data(cat_utm_22)
 cat <- cat_utm_22 %>% filter(estado == 15) %>%
-  distinct(seccion, unidad_territorial, sede)
+  distinct(estado, seccion, unidad_territorial, sede) %>%
+  mutate(seccion = paste(estado, seccion, sep = "_")) %>% select(-estado)
 
 bd$agregar_manual(cat, by = "seccion")
 
 # Agregar regiones --------------------------------------------------------
-data(regiones)
+
 reg <- regiones %>% select(region, municipio)
 
 # reg %>% anti_join(bd$bd, by = c("municipio" = "nombre_municipio_pm_21"))
@@ -30,11 +30,9 @@ bd$agregar_manual(reg, by = c("nombre_municipio_pm_21" = "municipio"))
 
 # Agregar presidentes municipales -----------------------------------------
 
-data("presidentes_mpos_mex")
 presidentes <- presidentes_mpos_mex %>% select(1:3) %>%
   mutate(nombre_municipio = stringr::str_replace(nombre_municipio,"CASTANEDA", "CASTAÑEDA"))
 
-presidentes %>% anti_join(bd$bd, by = c("nombre_municipio" = "nombre_municipio_pm_21"))
 bd$agregar_manual(presidentes, by = c("nombre_municipio_pm_21" = "nombre_municipio"))
 nrow(bd$bd)
 
@@ -59,8 +57,7 @@ al_df_21 <- ja %>%
 
 usethis::use_data(al_df_21, overwrite = T)
 
-undebug(repartir_candidato)
-bd$candidato(alianzas_df18,nivel = "distritof_18", "df_18")
+bd$candidato(al_df_21,nivel = "distritof_21", "df_21")
 
 bd$bd_candidato
 

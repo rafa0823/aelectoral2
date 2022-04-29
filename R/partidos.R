@@ -63,9 +63,11 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
 
     }) %>% purrr::reduce(full_join)
 
+
   res <- res %>% left_join(
     bd %>% select(-matches(partidos_alianza %>% stringr::str_split("_") %>% do.call(c,.)))
-  )
+  ) %>%
+    rename_with(~stringr::str_replace(.x, "ele_", "cand_"), starts_with("ele_"))
 
   return(res)
 }

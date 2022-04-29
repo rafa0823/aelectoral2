@@ -23,7 +23,7 @@ Electoral <- R6::R6Class("Electoral",
                                        extranjero = NA,
                                        especiales = NA,
                                        llaves = NULL,
-                                       initialize = function(eleccion, entidad, llaves = "seccion", extranjero = T, especiales = T){
+                                       initialize = function(eleccion, entidad, llaves = "seccion", extranjero = T, especiales = NULL){
                                          self$eleccion <- eleccion
                                          self$entidad <- entidad
                                          self$extranjero <- extranjero
@@ -37,9 +37,7 @@ Electoral <- R6::R6Class("Electoral",
                                            self$eliminar_votoExtranjero()
                                          }
 
-                                         if(!self$especiales){
-                                           self$eliminar_especiales()
-                                         }
+                                         self$accion_especiales(self$especiales)
 
                                          self$bd <- self$bd %>% reducir(NULL, self$llaves)
 
@@ -69,20 +67,18 @@ Electoral <- R6::R6Class("Electoral",
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
                                          if(!is.null(extraordinaria)){
-                                          ext <- leer_base(eleccion = extraordinaria[["eleccion"]],
-                                                           entidad = extraordinaria[["entidad"]])
+                                           ext <- leer_base(eleccion = extraordinaria[["eleccion"]],
+                                                            entidad = extraordinaria[["entidad"]])
 
-                                          self$todas <- self$todas %>% append(list(ext) %>%
-                                                                                purrr::set_names(extraordinaria[["eleccion"]]))
+                                           self$todas <- self$todas %>% append(list(ext) %>%
+                                                                                 purrr::set_names(extraordinaria[["eleccion"]]))
                                          }
 
 
-                                         if(!self$especiales){
-                                           add <- add %>% eliminar_especiales()
+                                         add <- add %>% accion_especiales(self$especiales)
 
-                                           if(!is.null(extraordinaria)){
-                                             ext <- ext %>% eliminar_especiales()
-                                           }
+                                         if(!is.null(extraordinaria)){
+                                           ext <- ext %>% accion_especiales(self$especiales)
                                          }
 
                                          if(!self$extranjero){
@@ -117,8 +113,16 @@ Electoral <- R6::R6Class("Electoral",
                                            bd, by = by
                                          )
                                        },
-                                       eliminar_especiales = function(){
-                                         self$bd <- eliminar_especiales(self$bd)
+                                       accion_especiales = function(accion){
+                                         if(!is.null(accion)){
+                                           if(accion == "eliminar"){
+                                             self$bd <- eliminar_especiales(self$bd)
+                                           }
+
+                                           if(accion == "repartir"){
+                                             self$bd <- repartir_especiales(self$bd)
+                                           }
+                                         }
                                        },
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)

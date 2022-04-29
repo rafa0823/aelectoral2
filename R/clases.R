@@ -20,15 +20,19 @@ Electoral <- R6::R6Class("Electoral",
                                        bd_candidato = list(),
                                        eleccion = NA_character_,
                                        entidad = NA_character_,
+                                       tipo_eleccion = NA_character_,
                                        extranjero = NA,
                                        especiales = NA,
                                        llaves = NULL,
-                                       initialize = function(eleccion, entidad, llaves = "seccion", extranjero = T, especiales = NULL){
+                                       initialize = function(eleccion, entidad, llaves = "seccion",
+                                                             tipo_eleccion = "MR",
+                                                             extranjero = T, especiales = NULL){
                                          self$eleccion <- eleccion
                                          self$entidad <- entidad
                                          self$extranjero <- extranjero
                                          self$especiales <- especiales
                                          self$llaves <- c("estado", llaves)
+                                         self$tipo_eleccion <- tipo_eleccion
 
                                          self$obtener_bd()
                                          self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
@@ -49,6 +53,7 @@ Electoral <- R6::R6Class("Electoral",
 
 Variables cartográficas agregadas en bd: {paste(self$llaves, collapse = ', ')}
 
+Tipo de elección: {self$tipo_eleccion}
 {if(self$extranjero) 'Se mantiene el voto en el etranjero' else 'Se elimina el voto en el extranjero'}
 Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción especial realizada' else self$especiales}
 
@@ -61,7 +66,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        },
                                        obtener_bd = function(){
                                          self$bd <- leer_base(eleccion = self$eleccion,
-                                                              entidad = self$entidad)
+                                                              entidad = self$entidad,
+                                                              tipo_eleccion = self$tipo_eleccion)
                                        },
                                        partido = function(nivel, eleccion){
                                          aux_c <- self$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)

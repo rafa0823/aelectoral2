@@ -14,7 +14,7 @@
 #'
 #' @examples
 #'
-leer_base <- function(eleccion, entidad){
+leer_base <- function(eleccion, entidad, tipo_eleccion){
   estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nac",entidad)
   res <- readr::read_rds(system.file(glue::glue("electoral/{estado}_{eleccion}.rda"),
                                      package = "aelectoral2",
@@ -24,6 +24,8 @@ leer_base <- function(eleccion, entidad){
       nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
       res <- res %>% filter(estado == !!nombre)
     }}
+
+  if("mr_rp" %in% names(res)) res <- filter(res, mr_rp == !!tipo_eleccion)
 
   return(res)
 }

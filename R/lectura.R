@@ -28,12 +28,22 @@ leer_base <- function(eleccion, entidad){
   return(res)
 }
 
-reducir <- function(bd, llaves){
+reducir <- function(bd, completa, llaves){
+
   llaves_bd <- NULL
 
   for( i in seq_along(llaves)){
-    llaves_bd <- llaves_bd %>% append(names(bd)[grepl(llaves[i], names(bd))])
+    agregar <- names(bd)[grepl(llaves[i], names(bd))]
+
+    if(!is.null(completa)){
+      if(all(is.na(match(agregar, names(completa))))) llaves_bd <- llaves_bd %>% append(agregar)
+    } else{
+      llaves_bd <- llaves_bd %>% append(agregar)
+    }
+
   }
+  if(! "estado" %in% llaves_bd) llaves_bd <- llaves_bd %>% append("estado")
+  if(! "seccion" %in% llaves_bd) llaves_bd <- llaves_bd %>% append("seccion")
 
   bd %>% group_by(across(all_of(llaves_bd))) %>%
     summarise(across(c(starts_with("ele_"), starts_with("cp_")), ~sum(.x,na.rm = T))) %>% ungroup %>%

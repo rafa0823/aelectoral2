@@ -41,7 +41,7 @@ Electoral <- R6::R6Class("Electoral",
                                            self$eliminar_especiales()
                                          }
 
-                                         self$bd <- self$bd %>% reducir(self$llaves)
+                                         self$bd <- self$bd %>% reducir(NULL, self$llaves)
 
                                        },
                                        obtener_bd = function(){
@@ -93,10 +93,10 @@ Electoral <- R6::R6Class("Electoral",
                                          }
 
                                          if(!is.null(extraordinaria)){
-                                           ext_r <- ext %>% reducir(self$llaves) %>%
+                                           ext_r <- ext %>% reducir(self$bd, self$llaves) %>%
                                              mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := T)
 
-                                           add <- add %>% reducir(self$llaves) %>% mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := F) %>%
+                                           add <- add %>% reducir(self$bd, self$llaves) %>% mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := F) %>%
                                              anti_join(
                                                ext_r, by = "seccion"
                                              ) %>%
@@ -104,11 +104,11 @@ Electoral <- R6::R6Class("Electoral",
                                                ext_r
                                              )
                                          } else{
-                                           add <- add %>% reducir(self$llaves)
+                                           add <- add %>% reducir(self$bd, self$llaves)
                                          }
 
                                          self$bd <- self$bd %>% full_join(
-                                           add, by = "seccion"
+                                           add, by = c("estado", "seccion")
                                          )
 
                                        },

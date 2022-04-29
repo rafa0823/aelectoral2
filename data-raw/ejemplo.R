@@ -3,7 +3,8 @@ devtools::load_all()
 # library(aelectoral2)
 library(tidyr)
 bd <- Electoral$new("df_21", entidad = "mex",
-                    llaves = c("seccion", "distritof", "distritol", "municipio"), extranjero = T)
+                    llaves = c("seccion", "distritof", "distritol", "municipio"),
+                    extranjero = T, especial = "repartir")
 
 c("df_18", "df_15","pr_18", "cp_22") %>% purrr::walk(~{
   bd$agregar_bd(.x, entidad = "mex")

@@ -36,5 +36,7 @@ reducir <- function(bd, llaves){
   }
 
   bd %>% group_by(across(all_of(llaves_bd))) %>%
-    summarise(across(c(starts_with("ele_"), starts_with("cp_")), ~sum(.x,na.rm = T))) %>% ungroup
+    summarise(across(c(starts_with("ele_"), starts_with("cp_")), ~sum(.x,na.rm = T))) %>% ungroup %>%
+    # pegar estado a las llaves que no contenga la palabra nombre
+    mutate(across(all_of(grep(pattern = "nombre_", invert = T, value = T, llaves_bd[is.na(match(llaves_bd, "estado"))])), ~paste(estado,.x,sep = "_")))
 }

@@ -2,10 +2,11 @@ devtools::load_all()
 # devtools::install()
 # library(aelectoral2)
 library(tidyr)
-bd <- Electoral$new("df_21", entidad = "mex", extranjero = T)
+bd <- Electoral$new("df_21", entidad = "mex",
+                    llaves = c("seccion", "distritof", "distritol", "municipio"), extranjero = T)
+bd$bd
 
-
-bd$agregar_bd("df_18", entidad = "mex",llaves = c("seccion", "distritof", "distritol", "municipio"))
+bd$agregar_bd("df_18", entidad = "mex")
 
 
 # Agregar pm_21 con extraordinaria ----------------------------------------

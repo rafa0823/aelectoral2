@@ -67,13 +67,14 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
   res <- res %>% left_join(
     bd %>% select(-matches(partidos_alianza %>% stringr::str_split("_") %>% do.call(c,.)))
   ) %>%
-    rename_with(~stringr::str_replace(.x, "ele_", "cand_"), starts_with("ele_"))
+    rename_with(~stringr::str_replace(.x, "ele_", "cand_"), starts_with("ele_")) %>%
+    mutate(across(c(starts_with("cand_")), ~tidyr::replace_na(.x,0))) %>%
 
   return(res)
 }
 
 ganador <- function(bd, nivel, eleccion){
-  aux <- bd %>% group_by(across(all_of(nivel))) %>% summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>%
+  aux <- bd %>% group_by(across(all_of(nivel))) %>% summarise(across(starts_with("ele_|cand_"), ~sum(.x,na.rm = T))) %>%
     filter(!is.na(!!rlang::sym(nivel)))
 
   g <- aux %>%

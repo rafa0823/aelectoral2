@@ -230,4 +230,3 @@ aux<- mex$bd %>%  repartir_coalicion(nivel = "distritol_21", eleccion = "dl_21")
 
 
 
-

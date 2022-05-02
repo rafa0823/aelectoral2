@@ -29,7 +29,7 @@ wd %>% list.files(full.names = T) %>% map(~{
   terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
 
   file.copy(.x,
-            glue::glue("~/Documents/Git/aelectoral2/inst/shp/dl21/{aux}.{terminacion}")
+            glue::glue("~/Documents/Git/aelectoral2/inst/shp/dl_21/{aux}.{terminacion}")
   )
 
 })

@@ -107,7 +107,7 @@ pmext21 <- pmext21 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_pm_21 = formatC(municipio_pm_21, width = 2, flag = "0"))
+         municipio_pm_21 = formatC(municipio_pm_21, width = 3, flag = "0"))
 
 
 pmext21 <- pmext21 %>%
@@ -159,7 +159,7 @@ pm18 <- pm18 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
-         municipio_pm_18 = formatC(municipio_pm_18, width = 2, flag = "0"),
+         municipio_pm_18 = formatC(municipio_pm_18, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 
@@ -215,7 +215,7 @@ dl21 <- bd_dl_21_mex  %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
-         municipio_dl_21 = formatC(municipio_dl_21, width = 2, flag = "0"),
+         municipio_dl_21 = formatC(municipio_dl_21, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 
@@ -272,7 +272,7 @@ dl18 <- dl18 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
-         municipio_dl_18 = formatC(municipio_dl_18, width = 2, flag = "0"),
+         municipio_dl_18 = formatC(municipio_dl_18, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 
@@ -331,7 +331,7 @@ gb17 <- gb17 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_17 = formatC(distritol_17, width = 2, flag = "0"),
-         municipio_gb_17 = formatC(municipio_gb_17, width = 2, flag = "0"),
+         municipio_gb_17 = formatC(municipio_gb_17, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 

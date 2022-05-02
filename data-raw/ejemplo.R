@@ -15,7 +15,11 @@ c("df_15", "pr_18", "pm_21", "pm_18", "gb_17", "dl_21","dl_18") %>%
   })
 
 
-mex$bd %>%  t_nivel("candidato", "ele_morena_df_21", estado = 15,
+
+mex$bd %>%  t_nivel("candidato", "ele_morena_dl_21", estado = 15,
+                    nivel = "estado",  seleccion = "15")
+
+mex$bd %>%  t_nivel("candidato", "ele_morena_dl_21", estado = 15,
                     nivel = "seccion",  seleccion = "5934")
 
 mex$bd %>%  t_nivel("candidato", "ele_mc_df_21", estado = 15,
@@ -37,14 +41,14 @@ mex$bd %>%mutate(estado = 15) %>%
   t_nivel("candidato", "ele_total_df_21", estado = 15,
           nivel = "estado",  seleccion = "15")
 
-mex$bd %>% mutate(estado = 15) %>%     t_nivel("candidato", "ele_total_pm_18", estado = 15,
+mex$bd %>% mutate(estado = 15) %>%     t_nivel("candidato", "ele_total_dl_21", estado = 15,
                       nivel = "estado",  seleccion = "15")
 
-mex$bd %>%  t_nivel("candidato", "ele_panal_pm_18", estado = 15,
-                    nivel = "distritol_18.x",  seleccion = "21")
+mex$bd %>%   t_nivel("candidato", "ele_prd_dl_21", estado = 15,
+                    nivel = "distritol_21",  seleccion = "31")
 
-mex$bd %>%  t_nivel("candidato", "ele_pt_pm_18", estado = 15,
-                    nivel = "seccion",  seleccion = "0546")
+mex$bd %>%  t_nivel("candidato", "ele_pri_dl_21", estado = 15,
+                    nivel = "seccion",  seleccion = "0300")
 
 
 mex$bd %>% mutate(estado = 15) %>%    t_nivel("candidato", "ele_total_gb_17", estado = 15,
@@ -74,4 +78,101 @@ mex$bd %>%  t_nivel("candidato", "ele_pvem_dl_18", estado = 15,
 
 bd$agregar_bd("df_18", entidad = "mex",llaves = c("seccion", "distritof", "distritol"))
 bd$agregar_bd("pr_18", entidad = "mex")
+
+
+# totales -----------------------------------------------------------------
+
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_dl_21", estado = 15,
+          nivel = "estado",  seleccion = "15")
+6689225
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_pm_21", estado = 15,
+          nivel = "estado",  seleccion = "15")
+6687908
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_df_21", estado = 15,
+          nivel = "estado",  seleccion = "15")
+6720518
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_df_18", estado = 15,
+          nivel = "estado",  seleccion = "15")
+8005606
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_df_15", estado = 15,
+          nivel = "estado",  seleccion = "15")
+5569402
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_pr_18", estado = 15,
+          nivel = "estado",  seleccion = "15")
+8040160
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_pm_18", estado = 15,
+          nivel = "estado",  seleccion = "15")
+7979574
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_gb_17", estado = 15,
+          nivel = "estado",  seleccion = "15")
+6080096
+
+
+mex$bd %>%mutate(estado = 15) %>%
+  t_nivel("candidato", "ele_total_dl_18", estado = 15,
+          nivel = "estado",  seleccion = "15")
+7998650
+
+
+
+# coaliciones -------------------------------------------------------------
+
+df21 <- readr::read_rds("inst/electoral/nac_df_21.rda") %>% as_tibble %>%
+  mutate(distritof = paste(estado,distritof_21)) %>%  filter(estado == 15, distritof=="15 07")
+df21 %>% filter(num_acta_impreso!="2ERP") %>% summarise(sum(ele_pan_df_21))
+sum(df21$ele_prd_df_21)
+
+readr::read_rds("inst/electoral/mex_dl_21.rda") %>%  as_tibble()
+
+aux <- mex$bd %>% repartir_coalicion(nivel = "distritof_21", eleccion = "df_21")
+
+
+t_nac(aux, "partido", "morena_")
+16759789-16759917
+
+t_nac(aux, "partido", "pvem_")
+2671032-2670997
+
+t_nac(aux, "partido", "pes_")
+1352544
+
+t_nac(aux, "partido", "rsp_")
+868515
+
+
+t_nac(aux, "partido", "pan_")
+8969273-8969288
+
+#partido
+aux %>%  select(ele_pan_df_21, distritof_21) %>%  filter(distritof_21 == "07")
+47585-47290
+
+aux %>%  select(ele_morena_df_21, distritof_21) %>%  filter(distritof_21 == "08")
+54810-54606
+pr18 %>% repartir_coalicion(nivel = "seccion", eleccion = "pr_18")
+
+mex$bd %>%  t_nivel("candidato", "pan_df_21", estado = 15, nivel = "distritof_21",seleccion = "07")
+
+
+dl21 <-readr::read_rds("inst/electoral/mex_dl_21.rda") %>%  as_tibble()
+aux<- mex$bd %>%  repartir_coalicion(nivel = "distritol_21", eleccion = "dl_21")
+
+
+
 

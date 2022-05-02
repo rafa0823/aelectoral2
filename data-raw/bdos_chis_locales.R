@@ -56,11 +56,12 @@ pm21 <- pm21 %>%
          "nombre_distritol_21" = distrito_loc,
          "nominal" = lista_nominal,
          "total" = total_votos,
+         fxm = fsm
          )%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_21 = formatC(municipio_21, width = 4, flag = "0"),
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
          id_casilla = formatC(id_casilla, width = 2, flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2, flag = "0"),
          distritol_21 = formatC(distritol_21, width = 2, flag = "0"))
@@ -80,7 +81,7 @@ final_pm21_chis <- insertar_sufijo(bd=pm21, "pm", "21")
 final_pm21_chis <- final_pm21_chis %>%
   mutate(estado = "07",
          nombre_estado = "CHIAPAS",
-         clave_casilla = paste0(estado,seccion,id_casilla,ext_contigua))
+         clave_casilla = paste0(estado,seccion,casilla,id_casilla,ext_contigua))
 
 
 # guardar rda
@@ -109,11 +110,12 @@ pmext22 <- pmext22 %>%
          "total" = votos,
          "noreg" = no_reg,
          "distritol_22" = distritol,
-         "nombre_distritol_22" = nombre_distritol)%>%
+         "nombre_distritol_22" = nombre_distritol,
+         fxm = fsm)%>%
   mutate(seccion = substr(clave_casilla, 3,6)) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         municipio_22 = formatC(municipio_22, width = 2, flag = "0"),
+         municipio_22 = formatC(municipio_22, width = 3, flag = "0"),
          distritol_22 = formatC(distritol_22, width = 2, flag = "0"))
 
 
@@ -161,11 +163,19 @@ pm18 <- pm18 %>%
          "pes" = es,
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
-         "morena_pes" = morena_es)%>%
+         "morena_pes" = morena_es,
+         panal = na,
+         c_comun_pri_pvem_panal_pcu = c_comun_pri_pvem_na_pcu,
+         pri_pvem_panal = pri_pvem_na,
+         pri_panal_pcu = pri_na_pcu,
+         pvem_panal_pcu = pvem_na_pcu,
+         pri_panal = pri_na,
+         pvem_panal = pvem_na,
+         panal_pcu = na_pcu)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_18 = formatC(municipio_18, width = 2, flag = "0"),
+         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
          id_casilla = formatC(id_casilla, width = 2, flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2, flag = "0"),
          distritol_18 = formatC(distritol_18, width = 2, flag = "0"))
@@ -185,7 +195,7 @@ final_pm18_chis <- insertar_sufijo(bd=pm18, "pm", "18")
 final_pm18_chis <- final_pm18_chis %>%
   mutate(estado = "07",
          nombre_estado = "CHIAPAS",
-         clave_casilla = paste0(estado,seccion,id_casilla,ext_contigua))
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla,ext_contigua))
 
 
 # guardar rda
@@ -214,7 +224,7 @@ pmext_18 <- pmext_18 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_18 = formatC(municipio_18, width = 2, flag = "0"))
+         municipio_18 = formatC(municipio_18, width = 3, flag = "0"))
 
 
 pmext_18 <- pmext_18 %>%
@@ -259,7 +269,7 @@ pm15 <- pm15 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_15 = formatC(municipio_15, width = 2, flag = "0"),
+         municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
          id_casilla = formatC(id_casilla, width = 2, flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
 
@@ -278,7 +288,7 @@ final_pm15_chis <- insertar_sufijo(bd=pm15, "pm", "15")
 final_pm15_chis <- final_pm15_chis %>%
   mutate(estado = "07",
          nombre_estado = "CHIAPAS",
-         clave_casilla = paste0(id_estado,seccion,id_casilla,ext_contigua))
+         clave_casilla = paste0(id_estado,seccion,tipo_casilla,id_casilla,ext_contigua))
 
 
 # guardar rda
@@ -332,6 +342,8 @@ final_gb_18_chis <- insertar_sufijo(bd=gb_18, "gb", "18")
 # clave casilla
 
 
+final_gb_18_chis <- final_gb_18_chis %>% mutate(clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)))
+
 # guardar rda
 
 chis_gb_18 <- final_gb_18_chis
@@ -355,19 +367,21 @@ dl21 <- dl21 %>%
          "noreg"= no_votos_can_nreg,
          "municipio_21" = id_municipio,
          "nombre_municipio_21" = municipio,
-         "nominal" = lista_nominal,
-         "id_distritol_21" = id_distrito_local,
+         "distritol_21" = id_distrito_local,
          nombre_distritol_21 = cabecera_distrital_local,
          fxm = fsm,
+         panal = pna,
          nulos = num_votos_nulos,
          total = total_votos,
          nominal = lista_nominal_casilla)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         id_municipio_21 = formatC(municipio_21, width = 2, flag = "0"),
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
          id_casilla = formatC(id_casilla, width = 2, flag = "0"),
-         ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
+         ext_contigua = formatC(ext_contigua, width = 2, flag = "0"),
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
+         estado = formatC(estado, width = 2, flag = "0"))
 
 
 dl21 <- dl21 %>%
@@ -384,7 +398,7 @@ final_dl21_chis <- insertar_sufijo(bd=dl21, "dl", "21")
 final_dl21_chis <- final_dl21_chis %>%
   mutate(estado = "07",
          nombre_estado = "CHIAPAS",
-         clave_casilla = paste0(id_estado,seccion,id_casilla,ext_contigua))
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla,ext_contigua))
 
 
 # guardar rda

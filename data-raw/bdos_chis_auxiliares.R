@@ -3,21 +3,20 @@
 
 ######### PADRON BENEFICIARIOS CHIAPAS
 
-beneficiarios <- read_csv("inst/bdos_auxiliares_chis/consMpo7.csv") %>%
+beneficiarios <- read_csv("../revocacion/data_raw/consMpo7.csv") %>%
   janitor::clean_names() %>%
   select("id_estado" = clave_entidad,
          "id_municipio" = clave_municipio,
          "nombre_municipio" = nombe_municipio,
          beneficiarios_unicos)
 
+beneficiarios %>% write_rds("inst/bdos_auxiliares_chis/beneficiarios.rda")
+
 
 ### REFERENTES MOVILIZACION CHIAPAS
 
-informe_referentes <- read_excel("inst/bdos_auxiliares_chis/informe_v2.xlsx") %>%
+informe_referentes <- read_excel("../revocacion/data_raw/informe_v2.xlsx") %>%
   janitor::clean_names()
-
-
-## municipios con referente
 
 referente_mpos <- informe_referentes %>%
   mutate(referente = paste(referente,apellido_referente),
@@ -30,6 +29,6 @@ referente_mpos <- informe_referentes %>%
   select(!c(apellido_referente,apellido_pat_operador,apellido_mat_operador,nombre_operador))
 
 
-
+referente_mpos %>% write_rds("inst/bdos_auxiliares_chis/referente_mpos.rda")
 
 

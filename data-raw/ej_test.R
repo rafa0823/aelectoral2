@@ -1,6 +1,7 @@
+
+
 library(readr)
 library(tidyr)
-load("data/nac_pr_18.rda")
 pr18 <- readr::read_rds("inst/electoral/nac_pr_18.rda") %>% as_tibble %>%
   mutate(distritof_18 = paste(estado,distritof_18))
 
@@ -15,8 +16,23 @@ pr18_partido <- pr18 %>% repartir_coalicion(nivel = "distritof_18", eleccion = "
 
 
 t_nac(pr18_partido, "partido", "morena_")
-t_nac(pr18_partido, "partido", "pt_")
-t_nac(pr18_partido, "partido", "pes_")
+t_nac(pr18_partido, "partido", "pvem_")
+t_nac(pr18_partido, "partido", "pan_")
+
+
+#partido
+t_nivel(pr18_partido, "partido", "pvem_", estado = 15,
+        nivel = "distritof_18", seleccion = "15 18")
+
+pr18 %>% repartir_coalicion(nivel = "seccion", eleccion = "pr_18")
+
+
+
+
+
+
+
+
 
 # Niveles -----------------------------------------------------------------
 

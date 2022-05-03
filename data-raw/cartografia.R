@@ -50,4 +50,21 @@ wd %>% list.files(full.names = T) %>% map(~{
 })
 
 
+# Estados -----------------------------------------------------------------
+
+wd %>% list.files(full.names = T) %>% map(~{
+  list.files(.x,pattern = "ENTIDAD", full.names = T)
+}) %>% flatten() %>% do.call(c,.) %>% map(~{
+
+  aux <- substr(.x,112,113)
+  terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
+
+  file.copy(.x,
+            glue::glue("~/Documents/Git/aelectoral2/inst/shp/gb_21/{aux}.{terminacion}")
+  )
+
+})
+
+
+
 

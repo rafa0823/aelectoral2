@@ -12,7 +12,7 @@ repartir_coalicion <- function(bd, nivel, eleccion){
   aux <- bd %>% group_by(across(all_of(nivel))) %>%
     summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>%
     filter(!is.na(!!rlang::sym(nivel))) %>%
-    select(-contains("total"),-contains("nominal")) %>%
+    # select(-contains("total"),-contains("nominal")) %>%
     select(all_of(nivel), contains(eleccion))
 
   division <- aux %>%

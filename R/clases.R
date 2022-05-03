@@ -85,7 +85,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        agregar_bd = function(eleccion, entidad, extraordinaria = NULL){
 
                                          add <- leer_base(eleccion = eleccion,
-                                                          entidad = entidad)
+                                                          entidad = entidad, tipo_eleccion = self$tipo_eleccion)
 
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
@@ -152,3 +152,11 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                          self$bd <- eliminar_votoExtranjero(self$bd)
                                        }
                          ))
+
+ElectoralSHP <- R6::R6Class("ElectoralSHP",
+                            public = list(
+                              shp = NA,
+                              initialize = function(){
+
+                              }
+                            ))

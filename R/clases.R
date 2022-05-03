@@ -35,6 +35,10 @@ Electoral <- R6::R6Class("Electoral",
                                          self$tipo_eleccion <- tipo_eleccion
 
                                          self$obtener_bd()
+                                         # if(!is.null(self$extraordinaria)){
+                                         #   self$leer_base(eleccion = self$extraordinaria,
+                                         #                  entidad = self$entidad)
+                                         # }
                                          self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
 
                                          if(!self$extranjero){

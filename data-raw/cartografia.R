@@ -34,4 +34,20 @@ wd %>% list.files(full.names = T) %>% map(~{
 
 })
 
+# Municipio ---------------------------------------------------------------
+
+wd %>% list.files(full.names = T) %>% map(~{
+  list.files(.x,pattern = "MUNICIPIO", full.names = T)
+}) %>% flatten() %>% do.call(c,.) %>% map(~{
+
+  aux <- substr(.x,112,113)
+  terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
+
+  file.copy(.x,
+            glue::glue("~/Documents/Git/aelectoral2/inst/shp/pm_21/{aux}.{terminacion}")
+  )
+
+})
+
+
 

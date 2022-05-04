@@ -32,3 +32,7 @@ referente_mpos <- informe_referentes %>%
 referente_mpos %>% write_rds("inst/bdos_auxiliares_chis/referente_mpos.rda")
 
 
+# ALIANZAS
+
+## DF 21
+

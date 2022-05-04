@@ -35,10 +35,7 @@ Electoral <- R6::R6Class("Electoral",
                                          self$tipo_eleccion <- tipo_eleccion
 
                                          self$obtener_bd()
-                                         # if(!is.null(self$extraordinaria)){
-                                         #   self$leer_base(eleccion = self$extraordinaria,
-                                         #                  entidad = self$entidad)
-                                         # }
+
                                          self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
 
                                          if(!self$extranjero){
@@ -58,7 +55,7 @@ Electoral <- R6::R6Class("Electoral",
 Variables cartográficas agregadas en bd: {paste(self$llaves, collapse = ', ')}
 
 Tipo de elección: {self$tipo_eleccion}
-{if(self$extranjero) 'Se mantiene el voto en el etranjero' else 'Se elimina el voto en el extranjero'}
+{if(self$extranjero) 'Se mantiene el voto en el extranjero' else 'Se elimina el voto en el extranjero'}
 Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción especial realizada' else self$especiales}
 
 {if(length(self$bd_partido)> 0)  paste('Elecciones repartidas por partido:', paste(names(self$bd_partido), collapse = ', ')) else ''}

@@ -63,6 +63,7 @@ final_pm19_dgo <- final_pm19_dgo  %>%
 
          estado = "10",
          nombre_estado = "DURANGO",
+         tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
 
@@ -173,6 +174,7 @@ final_pm16_dgo <- final_pm16_dgo  %>%
          mr_rp = if_else(mr_rp == "","MR",mr_rp),
          estado = "10",
          nombre_estado = "DURANGO",
+         tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,clave_casilla))
 
 

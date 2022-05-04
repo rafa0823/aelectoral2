@@ -12,7 +12,7 @@ eliminar_especiales <- function(bd){
 
     message(glue::glue("Se eliminaron {nrow(bd)-nrow(aux)} casillas especiales"))
   } else{
-    warning(glue::glue("Ha elegido una base de datos que no es por casilla."))
+    stop(glue::glue("Ha elegido una base de datos que no es por casilla. O sólo falta la variable tipo_casilla"))
   }
 
   return(aux)
@@ -36,7 +36,7 @@ repartir_especiales <- function(bd){
              ) %>%  select(-especial_p)
 
   } else{
-    warning(glue::glue("Ha elegido una base de datos que no es por casilla."))
+    stop(glue::glue("Ha elegido una base de datos que no es por casilla. O sólo falta la variable tipo_casilla"))
   }
 
   return(aux)

@@ -72,7 +72,6 @@ wd %>% list.files(full.names = T) %>% map(~{
 
 # Sección -----------------------------------------------------------------
 
-# Estados -----------------------------------------------------------------
 
 wd %>% list.files(full.names = T) %>% map(~{
   list.files(.x,pattern = "SECCION.shp", full.names = T)

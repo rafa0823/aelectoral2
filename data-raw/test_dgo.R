@@ -31,9 +31,6 @@ bd$bd_partido %>% map2(names(bd$bd_partido), ~{
   test(.x, .y)
 })
 
-<<<<<<< HEAD
-test
-=======
 
 
 # Segundo intento de test -------------------------------------------------

@@ -12,18 +12,41 @@ bd_dl_18_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
   janitor::clean_names() %>%
   as_tibble()
 
-#### gb 16 por seccion
-bd_gb_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/durango_gb_16_normal_seccion.csv") %>%
-  janitor::clean_names() %>%
-  as_tibble()
+# extraer dtos y mpos de durango 2016
 
-bd_pm_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Municipio/durango_pm_16_normal_casilla.csv") %>%
+dto_mpo_16 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/durango_dl_16_normal_casilla.csv") %>%
   janitor::clean_names() %>%
-  as_tibble()
+  as_tibble() %>%
+  select(estado,distrito,nombre_distrito, municipio, nombre_municipio,seccion) %>%
+  unique()
 
-bd_dl_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/durango_dl_16_normal_casilla.csv") %>%
+bd_gb_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/durango_normal_gb_16_casilla.csv",
+                         skip = 5, n_max =  1102) %>%
   janitor::clean_names() %>%
-  as_tibble()
+  filter(!str_detect("[[:alpha:]]",string = no_y_dtto)) %>%
+  as_tibble() %>% left_join(dto_mpo_16)
+
+# prueba lista nominal
+bd_gb_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
+
+bd_pm_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Municipio/durango_normal_pm_16_casilla.csv",
+                              skip = 5, n_max = 1102) %>%
+  janitor::clean_names() %>%
+  filter(!str_detect("[[:alpha:]]",string = no_y_dtto)) %>%
+  as_tibble()%>% left_join(dto_mpo_16)
+
+# prueba lista nominal
+bd_pm_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
+
+# bd_dl_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/durango_normal_dl_16_casilla.csv",
+#                         # skip = 5, n_max =  1102
+#                          ) %>%
+#   janitor::clean_names() %>%
+#   filter(!str_detect("[[:alpha:]]",string = no)) %>%
+#   as_tibble()
+
+# # prueba lista nominal
+# bd_dl_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
 
 ## PM 19 DURANGO ------------------------------------------------------------------------------------------------------
 
@@ -87,16 +110,14 @@ gb16 <- bd_gb_16_dgo   %>%
 colnames(gb16)
 
 gb16 <- gb16 %>%
-  rename("noreg"= no_reg,
-         "municipio_16" = municipio,
+  select(estado,distrito, nombre_distrito,municipio,nombre_municipio,seccion:l_nominal,pan) %>%
+  rename("municipio_16" = municipio,
          "nombre_municipio_16" = nombre_municipio,
          distritol_16 = distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         pes = es
+         nombre_distritol_16 = nombre_distrito
   )%>%
   mutate(across(pan_prd:pan, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         seccion = if_else(casilla == "P","9999",seccion),
          municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
          distritol_16 = formatC(distritol_16, width = 2, flag = "0"))
 
@@ -113,11 +134,17 @@ detectar_partidos(gb16)
 final_gb16_dgo <- insertar_sufijo(bd=gb16, "gb", "16")
 
 final_gb16_dgo <- final_gb16_dgo  %>%
-  mutate(casilla = formatC(casilla, width = 2,flag = "0"),
-         tipo_casilla = "X",
+  mutate(tipo_casilla = if_else(str_detect(pattern = "ESPECIAL",casillas),"S",substr(casillas,1,1)),
+         id_casilla = gsub(pattern = "[[:alpha:]]","",casillas),
+         id_casilla = case_when(nchar(id_casilla) == 0 ~ "0100",
+                                nchar(id_casilla) == 2 ~  paste0(gsub(" ","0",id_casilla),"00"),
+                                nchar(id_casilla) == 3 ~  paste0(gsub(" ","",id_casilla),"00"),
+                                nchar(id_casilla) == 5 ~  gsub(" 1  ","010",id_casilla)),
+         id_casilla = if_else(nchar(id_casilla) == 3, gsub("100","0100", id_casilla),
+                              id_casilla),
          estado = "10",
          nombre_estado = "DURANGO",
-         clave_casilla = paste0(estado,seccion,tipo_casilla,casilla,"XX"))
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla))
 
 
 # guardar rda
@@ -130,7 +157,7 @@ rm(gb16)
 
 ## PM 16 DURANGO ------------------------------------------------------------------------------------------------------
 
-pm16 <- bd_pm_16_dgo   %>%
+pm16 <- bd_pm_16_dgo  %>%
   mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio),
          pan = 0)
 
@@ -140,17 +167,17 @@ pm16 <- bd_pm_16_dgo   %>%
 colnames(pm16)
 
 pm16 <- pm16 %>%
-  rename("noreg"= no_reg,
-         "municipio_16" = municipio,
+  select(estado,distrito, nombre_distrito,municipio,nombre_municipio,seccion,casillas,pan_prd:l_nominal,pan) %>%
+  rename("municipio_16" = municipio,
          "nombre_municipio_16" = nombre_municipio,
          distritol_16 = distrito,
-         nombre_distritol_16 = nombre_distrito,
+         nombre_distritol_16 = nombre_distrito
   )%>%
   mutate(across(pan_prd:pan, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         seccion = if_else(casilla == "P","9999",seccion),
          municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
          distritol_16 = formatC(distritol_16, width = 2, flag = "0"))
+
 
 
 pm16 <- pm16 %>%
@@ -165,17 +192,17 @@ detectar_partidos(pm16)
 final_pm16_dgo <- insertar_sufijo(bd=pm16, "pm", "16")
 
 final_pm16_dgo <- final_pm16_dgo  %>%
-  mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
-                                   nchar(casilla) == 3 ~ paste0(casilla,"00"),
-                                   nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
-                                   nchar(casilla) == 5 ~ paste0(gsub(pattern = "[MR]","",casilla),"00")),
-         mr_rp = if_else(nchar(casilla) == 5, gsub(pattern = "[[:digit:]]","",casilla),""),
-         mr_rp = gsub(pattern = "S","",mr_rp),
-         mr_rp = if_else(mr_rp == "","MR",mr_rp),
+  mutate(tipo_casilla = if_else(str_detect(pattern = "ESPECIAL",casillas),"S",substr(casillas,1,1)),
+         id_casilla = gsub(pattern = "[[:alpha:]]","",casillas),
+         id_casilla = case_when(nchar(id_casilla) == 0 ~ "0100",
+                                nchar(id_casilla) == 2 ~  paste0(gsub(" ","0",id_casilla),"00"),
+                                nchar(id_casilla) == 3 ~  paste0(gsub(" ","",id_casilla),"00"),
+                                nchar(id_casilla) == 5 ~  gsub(" 1  ","010",id_casilla)),
+         id_casilla = if_else(nchar(id_casilla) == 3, gsub("100","0100", id_casilla),
+                              id_casilla),
          estado = "10",
          nombre_estado = "DURANGO",
-         tipo_casilla = substr(casilla,1,1),
-         clave_casilla = paste0(estado,seccion,clave_casilla))
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla))
 
 
 # guardar rda
@@ -185,3 +212,6 @@ dgo_pm_16 <- final_pm16_dgo
 dgo_pm_16 %>% write_rds("inst/electoral/dgo_pm_16.rda")
 
 rm(pm16)
+
+################################## PRUEBAS
+

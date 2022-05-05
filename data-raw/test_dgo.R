@@ -30,3 +30,5 @@ test <- function(bd, eleccion){
 bd$bd_partido %>% map2(names(bd$bd_partido), ~{
   test(.x, .y)
 })
+
+test

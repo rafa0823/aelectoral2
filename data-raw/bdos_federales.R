@@ -2,7 +2,7 @@
 # FEDERALES
 
 # CARGAR BASES ----------------------------------------------------------------------------------------
-renv::deactivate()
+#renv::deactivate()
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 

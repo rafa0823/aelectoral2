@@ -8,6 +8,7 @@
 #' @return
 #' @export
 #'
+#' @import sf
 #' @examples
 leer_base <- function(eleccion, entidad, tipo_eleccion){
   estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nac",entidad)
@@ -56,4 +57,16 @@ reducir <- function(bd, completa, llaves){
     summarise(across(c(starts_with("ele_"), starts_with("cp_")), ~sum(.x,na.rm = T))) %>% ungroup %>%
     # pegar estado a las llaves que no contenga la palabra nombre
     mutate(across(all_of(grep(pattern = "nombre_", invert = T, value = T, llaves_bd[is.na(match(llaves_bd, "estado"))])), ~paste(estado,.x,sep = "_")))
+}
+
+leer_shp <- function(unidad, entidad){
+  if(entidad == "nacional") id <- diccionario %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0") else{
+    id <- diccionario %>% filter(abreviatura %in% entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
+  }
+
+  res <- id %>% purrr::map(~{
+    readr::read_rds(system.file(glue::glue("shp/{unidad}/{.x}.rda"),
+                                     package = "aelectoral2",
+                                     mustWork = TRUE)) %>% st_transform(st_crs(4326))
+    }) %>% bind_rows()
 }

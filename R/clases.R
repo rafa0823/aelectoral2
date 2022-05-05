@@ -156,8 +156,10 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
 ElectoralSHP <- R6::R6Class("ElectoralSHP",
                             public = list(
-                              shp = NA,
-                              initialize = function(){
+                              shp = list(),
+                              initialize = function(unidad, entidad){
 
+                                aux <- leer_shp(unidad, entidad)
+                                self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               }
                             ))

@@ -63,7 +63,7 @@ rm(cp22)
           estado = formatC(estado, width = 2, flag = "0"))
 
 
- usethis::use_data(cat_utm_22, overwrite = F)
+ cat_utm_22 %>% write_rds("inst/auxiliares/bdos_auxiliares_nac/cat_utm_22.rda")
 
  # REGIONES
 
@@ -71,7 +71,7 @@ rm(cp22)
    mutate(estado = "15",
           nombre_estado = "MÉXICO")
 
- usethis::use_data(regiones, overwrite = F)
+ presidentes_mpos_mex %>% write_rds("inst/auxiliares/bdos_auxiliares_edomex/regiones.rda")
 
 
  # PRESIDENTES MUNICIPALES EDOMEX
@@ -82,6 +82,7 @@ rm(cp22)
           estado = "15",
           nombre_estado = "MÉXICO")
 
- usethis::use_data(presidentes_mpos_mex, overwrite = T)
+ presidentes_mpos_mex %>% write_rds("inst/auxiliares/bdos_auxiliares_edomex/presidentes_mpos_mex.rda")
+
 
 

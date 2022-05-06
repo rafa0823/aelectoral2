@@ -56,7 +56,8 @@ df21 <- df21  %>%
          mr_rp = gsub(pattern = "[[:digit:]]","",num_acta_impreso),
          mr_rp = gsub(pattern = "E","",mr_rp),
          mr_rp = if_else(mr_rp == "","MR",mr_rp),
-         seccion = if_else(tipo_casilla == "P","9999",seccion))
+         seccion = if_else(tipo_casilla == "P","9999",seccion),
+         nombre_distritof_21 = if_else(tipo_casilla == "P","PREVENTIVA",nombre_distritof_21))
 
 
 df21 <- df21 %>%
@@ -125,7 +126,8 @@ pr18 <- pr18  %>%
          seccion = formatC(seccion, width = 4,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
          distritof_18 = formatC(distritof_18, width = 2, flag = "0"),
-         seccion = if_else(tipo_casilla == "P","9999",seccion))
+         seccion = if_else(tipo_casilla == "P","9999",seccion),
+         nombre_distritof_18 = if_else(seccion == "0000","EXTRANJERO",distritof_18))
 
 pr18 <- pr18 %>%
   rename_with.(~paste0('ele_', .x),

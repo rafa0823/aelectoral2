@@ -19,7 +19,8 @@ alianzas_dgo_pm_16 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría
   mutate(estado = "10",
          nombre_estado = "DURANGO",
          municipio_16 = formatC(municipio_16, width = 2, flag = "0"),
-         coaliciones = gsub("__","_",coaliciones))
+         coaliciones = gsub("__","_",coaliciones),
+         coaliciones = gsub("pvem_pri_pd_panal", "pri_pvem_pd_panal",coaliciones))
 
 alianzas_dgo_pm_16 %>% write_rds("inst/alianzas/alianzas_durango/alianzas_dgo_pm_16.rda")
 

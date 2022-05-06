@@ -118,4 +118,3 @@ bd$bd_partido$pm_16 %>% View
 # bd$candidato(al_gb_16,nivel = "estado", eleccion = "gb_16")
 #
 # bd$bd_partido$gb_16 %>% tidyr::pivot_longer(-estado)
-

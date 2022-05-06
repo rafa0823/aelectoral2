@@ -116,7 +116,7 @@ rm(pm19)
 
 ## gb 16 DURANGO  ------------------------------------------------------------------------------------------------------
 
-gb16 <- bd_gb_16_dgo   %>%
+gb16 <- bd_gb_16_dgo %>%
   mutate(nombre_municipio_16 = str_squish(gsub(pattern = "[[:digit:]]|[[:punct:]]",replacement = "",x = Sheet)),
          municipio_16 = str_squish(gsub(pattern = "[[:alpha:]]|[[:punct:]]",replacement = "",x = Sheet)),
          prd = 0,

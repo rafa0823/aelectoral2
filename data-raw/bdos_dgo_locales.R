@@ -119,6 +119,10 @@ rm(pm19)
 gb16 <- bd_gb_16_dgo %>%
   mutate(nombre_municipio_16 = str_squish(gsub(pattern = "[[:digit:]]|[[:punct:]]",replacement = "",x = Sheet)),
          municipio_16 = str_squish(gsub(pattern = "[[:alpha:]]|[[:punct:]]",replacement = "",x = Sheet)),
+         pri = 0,
+         pvem = 0,
+         pd = 0,
+         panal = 0,
          prd = 0,
          pan = 0)
 
@@ -127,7 +131,8 @@ gb16 <- bd_gb_16_dgo %>%
 colnames(gb16)
 
 gb16 <- gb16 %>%
-  rename(drcampa = dr_campa) %>%
+  rename(drcampa = dr_campa,
+         pri_pvem_pd_panal = pri_pvem_pd_pna) %>%
   select(municipio_16,
          nombre_municipio_16,seccion, casilla,pan_prd:pan) %>%
   mutate(across(pan_prd:pan, ~as.numeric(.x)),

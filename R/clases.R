@@ -161,5 +161,8 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
 
                                 aux <- leer_shp(unidad, entidad)
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
+                              },
+                              juntar_bd = function(nivel, bd){
+                                # self$shp[[nivel]] <-
                               }
                             ))

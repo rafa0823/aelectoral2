@@ -20,20 +20,14 @@ dto_mpo_16 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadi�
   select(estado,distrito,nombre_distrito, municipio, nombre_municipio,seccion) %>%
   unique()
 
-bd_gb_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/durango_normal_gb_16_casilla.csv",
-                         skip = 5, n_max =  1102) %>%
-  janitor::clean_names() %>%
-  filter(!str_detect("[[:alpha:]]",string = no_y_dtto)) %>%
-  as_tibble() %>% left_join(dto_mpo_16)
+bd_gb_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/durango_normal_.csv") %>%
+  janitor::clean_names()
 
 # prueba lista nominal
 bd_gb_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
 
-bd_pm_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Municipio/durango_normal_pm_16_casilla.csv",
-                              skip = 5, n_max = 1102) %>%
-  janitor::clean_names() %>%
-  filter(!str_detect("[[:alpha:]]",string = no_y_dtto)) %>%
-  as_tibble()%>% left_join(dto_mpo_16)
+bd_pm_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Municipio/durango_pm_16_normal_casilla.csv") %>%
+  janitor::clean_names()
 
 # prueba lista nominal
 bd_pm_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
@@ -103,6 +97,7 @@ rm(pm19)
 
 gb16 <- bd_gb_16_dgo   %>%
   mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio),
+         prd = 0,
          pan = 0)
 
 # revisar nombres de varianles
@@ -110,7 +105,6 @@ gb16 <- bd_gb_16_dgo   %>%
 colnames(gb16)
 
 gb16 <- gb16 %>%
-  select(estado,distrito, nombre_distrito,municipio,nombre_municipio,seccion:l_nominal,pan) %>%
   rename("municipio_16" = municipio,
          "nombre_municipio_16" = nombre_municipio,
          distritol_16 = distrito,
@@ -159,6 +153,7 @@ rm(gb16)
 
 pm16 <- bd_pm_16_dgo  %>%
   mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio),
+         prd = 0,
          pan = 0)
 
 
@@ -167,7 +162,6 @@ pm16 <- bd_pm_16_dgo  %>%
 colnames(pm16)
 
 pm16 <- pm16 %>%
-  select(estado,distrito, nombre_distrito,municipio,nombre_municipio,seccion,casillas,pan_prd:l_nominal,pan) %>%
   rename("municipio_16" = municipio,
          "nombre_municipio_16" = nombre_municipio,
          distritol_16 = distrito,
@@ -192,14 +186,11 @@ detectar_partidos(pm16)
 final_pm16_dgo <- insertar_sufijo(bd=pm16, "pm", "16")
 
 final_pm16_dgo <- final_pm16_dgo  %>%
-  mutate(tipo_casilla = if_else(str_detect(pattern = "ESPECIAL",casillas),"S",substr(casillas,1,1)),
-         id_casilla = gsub(pattern = "[[:alpha:]]","",casillas),
-         id_casilla = case_when(nchar(id_casilla) == 0 ~ "0100",
-                                nchar(id_casilla) == 2 ~  paste0(gsub(" ","0",id_casilla),"00"),
-                                nchar(id_casilla) == 3 ~  paste0(gsub(" ","",id_casilla),"00"),
-                                nchar(id_casilla) == 5 ~  gsub(" 1  ","010",id_casilla)),
-         id_casilla = if_else(nchar(id_casilla) == 3, gsub("100","0100", id_casilla),
-                              id_casilla),
+  mutate(tipo_casilla = substr(casilla,1,1),
+         id_casilla = case_when(nchar(casilla) == 1 ~ "0100",
+                                nchar(casilla) == 3 ~  paste0(gsub("[[:alpha:]]","",casilla),"00"),
+                                nchar(casilla) == 5 ~  paste0(gsub("[[:alpha:]]","",casilla),"00"),
+                                nchar(casilla) == 6 ~  gsub("[[:alpha:]]","",casilla)),
          estado = "10",
          nombre_estado = "DURANGO",
          clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla))

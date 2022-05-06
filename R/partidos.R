@@ -24,7 +24,6 @@ repartir_coalicion <- function(bd, nivel, eleccion){
 
   total <- division %>% split(.[[nivel]]) %>%
     purrr::map(~{
-
       partidos <- .x %>% filter(num_partidos == 1) %>%
         tidyr::unnest(partidos) %>%
         select(-residuo)
@@ -34,7 +33,9 @@ repartir_coalicion <- function(bd, nivel, eleccion){
         al <- alianzas %>% slice(i)
         modif <- partidos %>%
           filter(partidos %in% (al$partidos %>% purrr::pluck(1))) %>%
+          # arrange(partido) %>% #¿qué pasa en caso de empate?
           mutate(ranking = dense_rank(-partido),
+                 # ranking2 = seq_len(nrow(.)),
                  partido = partido + al$partido + (ranking <= al$residuo)
           ) %>% select(-ranking)
         partidos <- partidos %>% anti_join(modif, by = c(nivel, "name")) %>% bind_rows(modif)

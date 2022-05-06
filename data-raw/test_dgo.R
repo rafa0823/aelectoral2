@@ -113,10 +113,10 @@ bd$todas$pm_16 %>% count(municipio_16)
 bd$bd_partido$pm_16 %>% View
 # gb_16 -------------------------------------------------------------------
 # no esta el prd
-# bd$agregar_bd("gb_16","dgo")
+bd$agregar_bd("gb_16","dgo")
 # bd$partido("estado",eleccion = "gb_16")
-# al_gb_16 <- readr::read_rds("inst/alianzas/alianzas_durango/alianzas_dgo_gb_16.rda") %>%
-#   count(estado,coalicion = coaliciones) %>% select(-n)
+al_gb_16 <- readr::read_rds("inst/alianzas/alianzas_durango/alianzas_dgo_gb_16.rda") %>%
+  count(estado,coalicion = coaliciones) %>% select(-n)
 #
 # bd$candidato(al_gb_16,nivel = "estado", eleccion = "gb_16")
 #

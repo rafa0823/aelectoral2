@@ -1,5 +1,6 @@
 ############################################### AUXILIARES CHIAPAS ------------------------------------------------------------------------
 
+pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
 ######### PADRON BENEFICIARIOS CHIAPAS
 
@@ -34,5 +35,32 @@ referente_mpos %>% write_rds("inst/bdos_auxiliares_chis/referente_mpos.rda")
 
 # ALIANZAS
 
-## DF 21
+alianzas_chis_pm_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_21_chiapas.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(estado = "07",
+         nombre_estado = "CHIAPAS",
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
+         candidatura_comun = NA)
 
+alianzas_chis_pm_21 %>% write_rds("inst/alianzas/alianzas_chiapas/alianzas_chis_pm_21.rda")
+
+alianzas_chis_pm_15 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_15_chiapas.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(estado = "07",
+         nombre_estado = "DURANGO",
+         municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
+         candidatura_comun = NA)
+
+alianzas_chis_pm_15 %>% write_rds("inst/alianzas/alianzas_chiapas/alianzas_chis_pm_15.rda")
+
+alianzas_chis_dl_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/dl_21_chiapas.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(estado = "07",
+         nombre_estado = "CHIAPAS",
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
+         candidatura_comun = NA)
+
+alianzas_chis_dl_21 %>% write_rds("inst/alianzas/alianzas_chiapas/alianzas_chis_dl_21.rda")

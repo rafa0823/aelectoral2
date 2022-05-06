@@ -127,4 +127,3 @@ bd$bd %>% filter(municipio_16 == "10_015") %>% repartir_coalicion("municipio_16"
 # bd$candidato(al_gb_16,nivel = "estado", eleccion = "gb_16")
 #
 # bd$bd_partido$gb_16 %>% tidyr::pivot_longer(-estado)
-

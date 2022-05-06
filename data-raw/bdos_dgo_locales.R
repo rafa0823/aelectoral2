@@ -20,17 +20,38 @@ dto_mpo_16 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadi�
   select(estado,distrito,nombre_distrito, municipio, nombre_municipio,seccion) %>%
   unique()
 
-bd_gb_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/durango_normal_.csv") %>%
-  janitor::clean_names()
+# GB 16
 
-# prueba lista nominal
-bd_gb_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
+path <- "~/Downloads/Tabla Gobernador Municipio.xlsx"
+
+bd_gb_16_dgo <- path %>%
+  excel_sheets() %>%
+  set_names() %>%
+  map_df(~ read_excel(path = path, sheet = .x, skip =5)%>%
+           janitor::clean_names() %>%
+           filter(!str_detect("[[:alpha:]]",string = no_y_dtto)) %>%
+           as_tibble() %>%
+           mutate(seccion = as.double(seccion),
+                  x4 = as.double(x4),
+                  pan_prd = as.double(pan_prd),
+                  pri_pvem_pd_pna = as.double(pri_pvem_pd_pna),
+                  pt = as.double(pt),
+                  morena = as.double(morena),
+                  pes = as.double(pes),
+                  dr_campa = as.double(dr_campa),
+                  noreg = as.double(noreg),
+                  votos_nulos = as.double(votos_nulos),
+                  total = as.double(total),
+                  l_nominal = as.double(l_nominal),
+                  percent = as.double(percent)), .id = "Sheet")
+
+bd_gb_16_dgo %>% filter(Sheet == "05. DURANGO") %>% summarise(sum(l_nominal))
+
+# PM 16
 
 bd_pm_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Municipio/durango_pm_16_normal_casilla.csv") %>%
   janitor::clean_names()
 
-# prueba lista nominal
-bd_pm_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
 
 # bd_dl_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/durango_normal_dl_16_casilla.csv",
 #                         # skip = 5, n_max =  1102
@@ -96,7 +117,8 @@ rm(pm19)
 ## gb 16 DURANGO  ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_dgo   %>%
-  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio),
+  mutate(nombre_municipio_16 = str_squish(gsub(pattern = "[[:digit:]]|[[:punct:]]",replacement = "",x = Sheet)),
+         municipio_16 = str_squish(gsub(pattern = "[[:alpha:]]|[[:punct:]]",replacement = "",x = Sheet)),
          prd = 0,
          pan = 0)
 
@@ -105,15 +127,12 @@ gb16 <- bd_gb_16_dgo   %>%
 colnames(gb16)
 
 gb16 <- gb16 %>%
-  rename("municipio_16" = municipio,
-         "nombre_municipio_16" = nombre_municipio,
-         distritol_16 = distrito,
-         nombre_distritol_16 = nombre_distrito
-  )%>%
+  rename(drcampa = dr_campa) %>%
+  select(municipio_16,
+         nombre_municipio_16,seccion, casilla,pan_prd:pan) %>%
   mutate(across(pan_prd:pan, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 2, flag = "0"))
+         municipio_16 = formatC(municipio_16,width = 3, flag = "0"))
 
 
 gb16 <- gb16 %>%
@@ -128,8 +147,8 @@ detectar_partidos(gb16)
 final_gb16_dgo <- insertar_sufijo(bd=gb16, "gb", "16")
 
 final_gb16_dgo <- final_gb16_dgo  %>%
-  mutate(tipo_casilla = if_else(str_detect(pattern = "ESPECIAL",casillas),"S",substr(casillas,1,1)),
-         id_casilla = gsub(pattern = "[[:alpha:]]","",casillas),
+  mutate(tipo_casilla = if_else(str_detect(pattern = "ESPECIAL",casilla),"S",substr(casilla,1,1)),
+         id_casilla = gsub(pattern = "[[:alpha:]]","",casilla),
          id_casilla = case_when(nchar(id_casilla) == 0 ~ "0100",
                                 nchar(id_casilla) == 2 ~  paste0(gsub(" ","0",id_casilla),"00"),
                                 nchar(id_casilla) == 3 ~  paste0(gsub(" ","",id_casilla),"00"),

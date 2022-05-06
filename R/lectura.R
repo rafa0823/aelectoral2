@@ -67,6 +67,6 @@ leer_shp <- function(unidad, entidad){
   res <- id %>% purrr::map(~{
     readr::read_rds(system.file(glue::glue("shp/{unidad}/{.x}.rda"),
                                      package = "aelectoral2",
-                                     mustWork = TRUE)) %>% st_transform(st_crs(4326))
+                                     mustWork = TRUE)) %>% sf::st_transform(sf::st_crs(4326))
     }) %>% bind_rows()
 }

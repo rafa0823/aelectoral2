@@ -39,7 +39,14 @@ devtools::load_all()
 
 shp <- ElectoralSHP$new("secc_21","dgo")
 
+shp$shp$secc_21_dgo %>%
+  left_join(
+    bd$bd
+  )
 
+join_shp_bd <- function(shp, bd){
+
+}
 # df_21 -------------------------------------------------------------------
 
 bd <- Electoral$new(eleccion = "df_21", entidad = "dgo",llaves = c("distritof", "municipio"))
@@ -79,7 +86,6 @@ bd$bd_candidato$df_18 %>% ganador("distritof_18", "df_18") %>% count(ganador_df_
 
 
 # pm_19 -------------------------------------------------------------------
-
 bd$agregar_bd("pm_19","dgo")
 bd$partido("municipio_19",eleccion = "pm_19")
 al_pm_19 <- readr::read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_19_durango.csv")
@@ -87,9 +93,8 @@ al_pm_19 <- al_pm_19 %>% transmute(municipio_19 = paste("10", stringr::str_pad(s
                                    coalicion = coaliciones)
 
 bd$candidato(al_pm_19, "municipio_19",eleccion = "pm_19")
-bd$bd_candidato$pm_19 %>% View
 
-
+bd$bd_partido$pm_19 %>% summarise(sum(ele_pan_pm_19))
 # pm_16 -------------------------------------------------------------------
 # no tiene prd
 # solo tiene un municipio
@@ -108,6 +113,10 @@ bd$candidato(al_pm_16,nivel = "municipio_16","pm_16")
 bd$bd_partido$pm_16
 bd$todas$pm_16 %>% count(municipio_16)
 bd$bd_partido$pm_16 %>% View
+
+debug(repartir_coalicion)
+bd$bd %>% filter(municipio_16 == "10_015") %>% repartir_coalicion("municipio_16", eleccion = "pm_16") %>%
+  tidyr::pivot_longer(-municipio_16)
 # gb_16 -------------------------------------------------------------------
 # no esta el prd
 # bd$agregar_bd("gb_16","dgo")

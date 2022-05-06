@@ -9,6 +9,9 @@
 #'
 #' @examples
 repartir_coalicion <- function(bd, nivel, eleccion){
+
+  if(sum(is.na(bd[[nivel]]))>0) bd <- bd %>% mutate(!!rlang::sym(nivel) := tidyr::replace_na(!!rlang::sym(nivel),"E"))
+
   aux <- bd %>% group_by(across(all_of(nivel))) %>%
     summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>%
     filter(!is.na(!!rlang::sym(nivel))) %>%

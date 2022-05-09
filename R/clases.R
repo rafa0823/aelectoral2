@@ -16,65 +16,162 @@
 Electoral <- R6::R6Class("Electoral",
                          public = list(bd = NA,
                                        todas = NULL,
+                                       bd_partido = list(),
+                                       bd_candidato = list(),
                                        eleccion = NA_character_,
                                        entidad = NA_character_,
+                                       tipo_eleccion = NA_character_,
                                        extranjero = NA,
                                        especiales = NA,
                                        llaves = NULL,
-                                       initialize = function(eleccion, entidad, extranjero = T, especiales = T){
+                                       initialize = function(eleccion, entidad, llaves = "seccion",
+                                                             tipo_eleccion = "MR",
+                                                             extranjero = T, especiales = NULL){
                                          self$eleccion <- eleccion
                                          self$entidad <- entidad
                                          self$extranjero <- extranjero
                                          self$especiales <- especiales
+                                         self$llaves <- c("estado", llaves)
+                                         self$tipo_eleccion <- tipo_eleccion
 
                                          self$obtener_bd()
+
                                          self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
 
                                          if(!self$extranjero){
                                            self$eliminar_votoExtranjero()
                                          }
 
-                                         if(!self$especiales){
-                                           self$eliminar_especiales()
-                                         }
+                                         self$bd <- self$bd %>% self$accion_especiales(self$especiales)
 
+                                         self$bd <- self$bd %>% reducir(NULL, self$llaves)
 
+                                       },
+                                       print = function(){
+
+                                         mensaje <- cat(
+                                           glue::glue("Entidad: {self$entidad} \nElecciones agregadas: {paste(self$todas %>% names, collapse = ', ')}
+
+Variables cartográficas agregadas en bd: {paste(self$llaves, collapse = ', ')}
+
+Tipo de elección: {self$tipo_eleccion}
+{if(self$extranjero) 'Se mantiene el voto en el extranjero' else 'Se elimina el voto en el extranjero'}
+Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción especial realizada' else self$especiales}
+
+{if(length(self$bd_partido)> 0)  paste('Elecciones repartidas por partido:', paste(names(self$bd_partido), collapse = ', ')) else ''}
+{if(length(self$bd_candidato)> 0) paste('Elecciones repartidas por candidato:', paste(names(self$bd_candidato), collapse = ', ')) else ''}
+                                                      ")
+                                         )
+
+                                         return(mensaje)
                                        },
                                        obtener_bd = function(){
                                          self$bd <- leer_base(eleccion = self$eleccion,
-                                                              entidad = self$entidad)
+                                                              entidad = self$entidad,
+                                                              tipo_eleccion = self$tipo_eleccion)
                                        },
-                                       agregar_variables = function(eleccion, variables){
-                                         agregar_variables(self, eleccion, variables)
+                                       coalicion = function(nivel, eleccion){
+                                         if(!eleccion %in% names(self$todas)) stop("Favor de agregar la elección primero con el método agregar_bd")
+
+                                         self$partido(nivel, eleccion)
+
+                                         al <- leer_alianza(nivel, eleccion, self$entidad)
+
+                                         self$candidato(al, nivel, eleccion)
                                        },
-                                       agregar_bd = function(eleccion, entidad, llaves = "seccion"){
-                                         # llave <- match.arg(llave, "seccion")
+                                       partido = function(nivel, eleccion){
+                                         aux_c <- self$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)
+
+                                         self$bd_partido <- self$bd_partido %>%
+                                           append(list(aux_c) %>% purrr::set_names(eleccion))
+                                       },
+                                       candidato = function(alianzas, nivel, eleccion){
+                                         aux_c <- repartir_candidato(bd = self$bd_partido[[eleccion]],
+                                                                     alianzas, nivel, eleccion)
+
+                                         self$bd_candidato <- self$bd_candidato %>%
+                                           append(list(aux_c) %>% purrr::set_names(eleccion))
+                                       },
+                                       agregar_bd = function(eleccion, entidad, extraordinaria = NULL){
+
                                          add <- leer_base(eleccion = eleccion,
-                                                   entidad = entidad)
+                                                          entidad = entidad, tipo_eleccion = self$tipo_eleccion)
+
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
-                                         if(is.null(self$llaves)){
-                                           self$llaves <- llaves
-                                           self$bd <- self$bd %>% reducir(self$llaves)
+                                         if(!is.null(extraordinaria)){
+                                           ext <- leer_base(eleccion = extraordinaria[["eleccion"]],
+                                                            entidad = extraordinaria[["entidad"]])
+
+                                           self$todas <- self$todas %>% append(list(ext) %>%
+                                                                                 purrr::set_names(extraordinaria[["eleccion"]]))
                                          }
 
-                                         if(!self$especiales){
-                                           add <- add %>% eliminar_especiales()
+
+                                         add <- add %>% self$accion_especiales(self$especiales)
+
+                                         if(!is.null(extraordinaria)){
+                                           ext <- ext %>% self$accion_especiales(self$especiales)
                                          }
 
                                          if(!self$extranjero){
                                            add <- add %>% eliminar_votoExtranjero()
+                                           if(!is.null(extraordinaria)){
+                                             ext <- ext %>% eliminar_votoExtranjero()
+                                           }
+                                         }
+
+                                         if(!is.null(extraordinaria)){
+                                           ext_r <- ext %>% reducir(self$bd, self$llaves) %>%
+                                             mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := T)
+
+                                           add <- add %>% reducir(self$bd, self$llaves) %>% mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := F) %>%
+                                             anti_join(
+                                               ext_r, by = "seccion"
+                                             ) %>%
+                                             bind_rows(
+                                               ext_r
+                                             )
+                                         } else{
+                                           add <- add %>% reducir(self$bd, self$llaves)
                                          }
 
                                          self$bd <- self$bd %>% full_join(
-                                           add %>% reducir(self$llaves), by = "seccion"
+                                           add, by = c("estado", "seccion")
                                          )
 
                                        },
-                                       eliminar_especiales = function(){
-                                         self$bd <- eliminar_especiales(self$bd)
+                                       agregar_manual = function(bd, by){
+                                         self$bd <- self$bd %>% full_join(
+                                           bd, by = by
+                                         )
+                                       },
+                                       accion_especiales = function(bd, accion){
+                                         if(!is.null(accion)){
+                                           if(accion == "eliminar"){
+                                             bd <- eliminar_especiales(bd)
+                                           }
+
+                                           if(accion == "repartir"){
+                                             bd <- repartir_especiales(bd)
+                                           }
+                                         }
+                                         return(bd)
                                        },
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)
                                        }
                          ))
+
+ElectoralSHP <- R6::R6Class("ElectoralSHP",
+                            public = list(
+                              shp = list(),
+                              initialize = function(unidad, entidad){
+
+                                aux <- leer_shp(unidad, entidad)
+                                self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
+                              },
+                              juntar_bd = function(nivel, bd){
+                                self$shp[[nivel]] <- join_shp_bd(self$shp[[nivel]], bd)
+                              }
+                            ))

@@ -92,6 +92,7 @@ los municipios de siltepec, venustiano carranza, el parral y emiliano zapata
 ## Durango
 Partidos políticos locales:
 
+
 Partido Duranguense - PD
 
 ### dgo_gb_16.rda

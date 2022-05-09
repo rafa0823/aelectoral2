@@ -77,6 +77,12 @@ Nueva alianza Chiapas - PANAL
 
 Partido Popular Chiapaneco - PPCH
 
+### chis_dl_21.rda
+### chis_gb_18.rda
+### chis_pm_18.rda
+### chis_pm_21.rda
+### chis_pmext_22.rda
+
 ### Elecciones extraordinarias 
 
 los municipios de siltepec, venustiano carranza, el parral y emiliano zapata
@@ -86,12 +92,27 @@ los municipios de siltepec, venustiano carranza, el parral y emiliano zapata
 ## Durango
 Partidos políticos locales:
 
+
 Partido Duranguense - PD
 
+### dgo_gb_16.rda
+
+### dgo_pm_16.rda
+
+### dgo_pm_19.rda
+
 ## México
-Partidos políticos locales:
+
+### Partidos políticos locales:
 
 Nueva Alianza Estado de México - PANAL
 
+mex_dl_18.rda
+mex_dl_21.rda
+mex_gb_17.rda
+mex_pm_18.rda
+mex_pm_21.rda
 
+### mex_pmext_21.rda
+Estas elecciones fueron en el municipio de Nextlalpan.
 

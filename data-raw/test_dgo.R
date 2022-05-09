@@ -82,7 +82,9 @@ bd$bd_candidato$df_18 %>% ganador("distritof_18", "df_18") %>% count(ganador_df_
 bd$agregar_bd("pm_19","dgo")
 bd$coalicion("municipio_19",eleccion = "pm_19")
 
+
 bd$bd_partido$pm_19 %>% summarise(sum(ele_pan_pm_19))
+
 # pm_16 -------------------------------------------------------------------
 bd$agregar_bd("pm_16","dgo")
 bd$coalicion("municipio_16", eleccion = "pm_16")
@@ -94,3 +96,4 @@ bd$bd_partido$pm_16 %>% View
 # gb_16 -------------------------------------------------------------------
 bd$agregar_bd("gb_16","dgo")
 bd$coalicion("estado",eleccion = "gb_16")
+

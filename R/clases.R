@@ -71,6 +71,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                               tipo_eleccion = self$tipo_eleccion)
                                        },
                                        coalicion = function(nivel, eleccion){
+                                         if(!eleccion %in% names(self$todas)) stop("Favor de agregar la elección primero con el método agregar_bd")
+
                                          self$partido(nivel, eleccion)
 
                                          al <- leer_alianza(nivel, eleccion, self$entidad)

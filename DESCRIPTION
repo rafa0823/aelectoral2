@@ -17,6 +17,7 @@ Imports:
     janitor,
     R6,
     readr,
+    sf,
     stringr
 RoxygenNote: 7.1.2
 Depends: 

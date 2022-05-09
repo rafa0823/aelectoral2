@@ -70,6 +70,15 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                               entidad = self$entidad,
                                                               tipo_eleccion = self$tipo_eleccion)
                                        },
+                                       coalicion = function(nivel, eleccion){
+                                         if(!eleccion %in% names(self$todas)) stop("Favor de agregar la elección primero con el método agregar_bd")
+
+                                         self$partido(nivel, eleccion)
+
+                                         al <- leer_alianza(nivel, eleccion, self$entidad)
+
+                                         self$candidato(al, nivel, eleccion)
+                                       },
                                        partido = function(nivel, eleccion){
                                          aux_c <- self$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)
 
@@ -161,5 +170,8 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
 
                                 aux <- leer_shp(unidad, entidad)
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
+                              },
+                              juntar_bd = function(nivel, bd){
+                                self$shp[[nivel]] <- join_shp_bd(self$shp[[nivel]], bd)
                               }
                             ))

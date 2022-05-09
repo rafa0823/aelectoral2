@@ -39,13 +39,12 @@ devtools::load_all()
 
 shp <- ElectoralSHP$new("secc_21","dgo")
 
-shp$juntar_bd(nivel = "secc_21_dgo",bd = bd$bd)
-shp$shp$secc_21_dgo
+# shp$juntar_bd(nivel = "secc_21_dgo",bd = bd$bd)
+# shp$shp$secc_21_dgo
 # df_21 -------------------------------------------------------------------
 
 bd <- Electoral$new(eleccion = "df_21", entidad = "dgo",llaves = c("distritof", "municipio"))
-bd$partido("distritof_21",eleccion = "df_21")
-bd$candidato(al_df_21, nivel = "distritof_21",eleccion = "df_21")
+bd$coalicion("distritof_21",eleccion = "df_21")
 
 bd$bd %>% summarise(sum(ele_total_df_21,na.rm = T))
 bd$bd_partido$df_21 %>% summarise(sum(ele_total_df_21,na.rm = T))
@@ -64,7 +63,7 @@ bd$bd_candidato$df_21 %>%
 # df_18 -------------------------------------------------------------------
 
 bd$agregar_bd("df_18","dgo")
-bd$partido("distritof_18",eleccion = "df_18")
+bd$coalicion("distritof_18",eleccion = "df_18")
 al_df_18 <- readr::read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/federales/df_18.csv")
 al_df_18 <- al_df_18 %>% transmute(distritof_18 = paste(stringr::str_pad(estado, width = 2, pad = "0"),
                                                         stringr::str_pad(distritof_18, width = 2, pad = "0"),sep = "_"
@@ -81,48 +80,20 @@ bd$bd_candidato$df_18 %>% ganador("distritof_18", "df_18") %>% count(ganador_df_
 
 # pm_19 -------------------------------------------------------------------
 bd$agregar_bd("pm_19","dgo")
-bd$partido("municipio_19",eleccion = "pm_19")
-al_pm_19 <- readr::read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_19_durango.csv")
-al_pm_19 <- al_pm_19 %>% transmute(municipio_19 = paste("10", stringr::str_pad(string = municipio_19, width = 3, pad = "0"), sep = "_"),
-                                   coalicion = coaliciones)
-
-bd$candidato(al_pm_19, "municipio_19",eleccion = "pm_19")
+bd$coalicion("municipio_19",eleccion = "pm_19")
 
 
 bd$bd_partido$pm_19 %>% summarise(sum(ele_pan_pm_19))
 
 # pm_16 -------------------------------------------------------------------
-# no tiene prd
-# solo tiene un municipio
 bd$agregar_bd("pm_16","dgo")
-bd$bd_partido <- bd$bd_partido[-c(4,5)]
+bd$coalicion("municipio_16", eleccion = "pm_16")
 
-bd$bd <- bd$bd %>% mutate(ele_pri_pvem_pd_panal_pm_16 = if_else(is.na(ele_pri_pvem_pd_panal_pm_16),
-                                                                ele_pvem_pri_pd_panal_pm_16,
-                                                                ele_pri_pvem_pd_panal_pm_16
-                                                                )) %>% select(-ele_pvem_pri_pd_panal_pm_16)
-bd$partido("municipio_16", eleccion = "pm_16")
-al_pm_16 <- readr::read_rds("inst/alianzas/alianzas_durango/alianzas_dgo_pm_16.rda") %>%
-  transmute(municipio_16 = paste(estado, stringr::str_pad(municipio_16,width = 3,pad = "0"),sep = "_"),
-            coalicion = gsub(replacement = "_",pattern = "__",x = coaliciones),
-            coalicion = gsub(replacement = "pri_pvem_pd_panal",pattern = "pvem_pri_pd_panal",x = coalicion,fixed = T))
-
-bd$candidato(al_pm_16,nivel = "municipio_16","pm_16")
 bd$bd_partido$pm_16
 bd$todas$pm_16 %>% count(municipio_16)
 bd$bd_partido$pm_16 %>% View
 
-debug(repartir_coalicion)
-bd$bd %>% filter(municipio_16 == "10_015") %>% repartir_coalicion("municipio_16", eleccion = "pm_16") %>%
-  tidyr::pivot_longer(-municipio_16)
 # gb_16 -------------------------------------------------------------------
-# no esta el prd
 bd$agregar_bd("gb_16","dgo")
-bd$partido("estado",eleccion = "gb_16")
-al_gb_16 <- readr::read_rds("inst/alianzas/alianzas_durango/alianzas_dgo_gb_16.rda") %>%
-  count(estado,coalicion = coaliciones) %>% select(-n)
-
-bd$candidato(al_gb_16,nivel = "estado", eleccion = "gb_16")
-
-bd$bd_partido$gb_16 %>% tidyr::pivot_longer(-estado)
+bd$coalicion("estado",eleccion = "gb_16")
 

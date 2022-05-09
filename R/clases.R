@@ -70,6 +70,13 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                               entidad = self$entidad,
                                                               tipo_eleccion = self$tipo_eleccion)
                                        },
+                                       coalicion = function(nivel, eleccion){
+                                         self$partido(nivel, eleccion)
+
+                                         al <- leer_alianza(nivel, eleccion, self$entidad)
+
+                                         self$candidato(al, nivel, eleccion)
+                                       },
                                        partido = function(nivel, eleccion){
                                          aux_c <- self$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)
 

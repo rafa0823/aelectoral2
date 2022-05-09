@@ -39,14 +39,8 @@ devtools::load_all()
 
 shp <- ElectoralSHP$new("secc_21","dgo")
 
-shp$shp$secc_21_dgo %>%
-  left_join(
-    bd$bd
-  )
-
-join_shp_bd <- function(shp, bd){
-
-}
+shp$juntar_bd(nivel = "secc_21_dgo",bd = bd$bd)
+shp$shp$secc_21_dgo
 # df_21 -------------------------------------------------------------------
 
 bd <- Electoral$new(eleccion = "df_21", entidad = "dgo",llaves = c("distritof", "municipio"))

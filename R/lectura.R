@@ -70,3 +70,7 @@ leer_shp <- function(unidad, entidad){
                                      mustWork = TRUE)) %>% sf::st_transform(sf::st_crs(4326))
     }) %>% bind_rows()
 }
+
+join_shp_bd <- function(shp, bd){
+  shp %>% left_join(bd)
+}

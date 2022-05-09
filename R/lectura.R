@@ -26,6 +26,39 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
   return(res)
 }
 
+
+leer_alianza <- function(nivel, eleccion, entidad){
+  estado <- if_else(grepl("df_|pr_",eleccion), "nacional",entidad)
+
+  if(estado == "nacional") {
+    res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{eleccion}.rda"),
+                                       package = "aelectoral2",
+                                       mustWork = TRUE)) %>% tibble::as_tibble()
+
+    if(entidad != "nacional"){
+      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
+      res <- res %>% filter(estado == !!nombre)
+    }} else{
+      res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{estado}_{eleccion}.rda"),
+                                         package = "aelectoral2",
+                                         mustWork = TRUE)) %>% tibble::as_tibble()
+    }
+
+  res <- res %>% select(-eleccion, -nombre_estado, coaliciones)
+
+  nivel_sep <- stringr::str_split(nivel, pattern = "_") %>% pluck(1,1)
+
+  w <- switch(nivel_sep, municipio = 3, distritof = 2, distritol = 2)
+
+  alianzas <- res %>% transmute(
+    !!rlang::sym(nivel) := paste(stringr::str_pad(estado, width = 2, pad = "0"),
+                                 stringr::str_pad(!!rlang::sym(nivel), width = w, pad = "0"),
+                                 sep = "_"),
+    coalicion = coaliciones
+  )
+
+  return(alianzas)
+}
 #' Title
 #'
 #' @param bd
@@ -66,7 +99,11 @@ leer_shp <- function(unidad, entidad){
 
   res <- id %>% purrr::map(~{
     readr::read_rds(system.file(glue::glue("shp/{unidad}/{.x}.rda"),
-                                     package = "aelectoral2",
-                                     mustWork = TRUE)) %>% st_transform(st_crs(4326))
-    }) %>% bind_rows()
+                                package = "aelectoral2",
+                                mustWork = TRUE)) %>% sf::st_transform(sf::st_crs(4326))
+  }) %>% bind_rows()
+}
+
+join_shp_bd <- function(shp, bd){
+  shp %>% left_join(bd)
 }

@@ -74,3 +74,16 @@ alianzas_chis_gb_18 %>% write_rds("inst/alianzas/chis/chis_gb_18.rda")
 
 alianzas_chis_gb_18 %>% count(coaliciones)
 
+alianzas_chis_pm_18 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_18_chiapas.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(estado = "07",
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
+         nombre_estado = "CHIAPAS") %>%
+  rename(municipio_18 = municipio_21,
+         coaliciones = coaliaciones)
+
+alianzas_chis_pm_18 %>% write_rds("inst/alianzas/chis/chis_pm_18.rda")
+
+alianzas_chis_pm_18 %>% count(coaliciones)
+

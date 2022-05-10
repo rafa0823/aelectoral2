@@ -63,6 +63,13 @@ bd_pm_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
 # # prueba lista nominal
 # bd_dl_16_dgo %>% summarise(sum(l_nominal,na.rm = T))
 
+# dl 16
+
+bd_dl_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/durango_dl_16_normal_casilla.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble()
+
+
 ## PM 19 DURANGO ------------------------------------------------------------------------------------------------------
 
 pm19 <- bd_pm_19_dgo   %>%
@@ -227,6 +234,73 @@ dgo_pm_16 <- final_pm16_dgo
 dgo_pm_16 %>% write_rds("inst/electoral/dgo_pm_16.rda")
 
 rm(pm16)
+
+## DL 16 DURANGO ------------------------------------------------------------------------------------------------------
+
+dl16 <- bd_pm_16_dgo  %>%
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio),
+         prd = 0,
+         pan = 0)
+
+
+# revisar nombres de varianles
+
+colnames(dl16)
+
+dl16 <- dl16 %>%
+  rename("municipio_16" = municipio,
+         "nombre_municipio_16" = nombre_municipio,
+         distritol_16 = distrito,
+         nombre_distritol_16 = nombre_distrito
+  )%>%
+  mutate(across(pan_prd:pan, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
+         distritol_16 = formatC(distritol_16, width = 2, flag = "0"))
+
+
+
+dl16 <- dl16 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan_prd:pan)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(dl16)
+
+# sufijo para join
+
+final_dl16_dgo <- insertar_sufijo(bd=dl16, "pm", "16")
+
+final_dl16_dgo <- final_dl16_dgo  %>%
+  mutate(tipo_casilla = substr(casilla,1,1),
+         id_casilla = case_when(nchar(casilla) == 1 ~ "0100",
+                                nchar(casilla) == 3 ~  paste0(gsub("[[:alpha:]]","",casilla),"00"),
+                                nchar(casilla) == 5 ~  paste0(gsub("[[:alpha:]]","",casilla),"00"),
+                                nchar(casilla) == 6 ~  gsub("[[:alpha:]]","",casilla)),
+         estado = "10",
+         nombre_estado = "DURANGO",
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla),
+         mr_rp = "MR")
+
+# prubas casillas
+
+final_dl16_dgo %>% count(casilla) %>% view()
+
+#especiales solo hay SMR01 por lpo que se asume que en esta base no se contemplan los diputados de RP
+
+
+
+final_dl16_dgo %>% count(nchar(clave_casilla))
+
+
+# guardar rda
+
+dgo_dl_16 <- final_dl16_dgo
+
+dgo_dl_16 %>% write_rds("inst/electoral/dgo_dl_16.rda")
+
+rm(dl16)
+
 
 ################################## PRUEBAS
 

@@ -32,3 +32,15 @@ alianzas_df_15 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Est
 
 alianzas_df_15 %>% write_rds("inst/alianzas/nacional/df_15.rda")
 
+
+## DF 18
+
+alianzas_pr_18 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/federales/pr_18.csv") %>%
+  mutate(estado = formatC(estado, width = 2, flag = "0"),
+         distritof_18 = formatC(distritof_18, width = 2, flag = "0"),
+         eleccion = "df_18")
+
+alianzas_pr_18 %>% count(coaliciones)
+
+alianzas_df_18 %>% write_rds("inst/alianzas/nacional/df_18.rda")
+

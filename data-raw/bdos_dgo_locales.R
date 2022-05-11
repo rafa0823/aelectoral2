@@ -12,6 +12,33 @@ bd_dl_18_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
   janitor::clean_names() %>%
   as_tibble()
 
+#dl21
+
+path <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2021/Distrito local/durango_normal_21_casilla.xlsx"
+
+prueba <- read_excel(path,
+                     sheet = 1)
+
+bd_dl_21_dgo <- path %>%
+  excel_sheets() %>%
+  set_names() %>%
+  map_df(~ read_excel(path = path, sheet = .x)%>%
+           janitor::clean_names() %>%
+           filter(!str_detect("[[:alpha:]]",string = numero)) %>%
+           as_tibble() %>%
+           mutate(across(pan:nominal,~as.double(.x)),
+                  seccion = as.double(seccion),
+                  distrito = as.double(distrito)),
+         .id = "Sheet") %>%
+  select(!c(x28,x29,x30,x31,x24)) %>%
+  select(Sheet:morena_pt_pvem,independiente_1,no_reg:participacion) %>%
+  rename(pan_pri_prd_total = pan_pri_prd_cc,
+         morena_pt_pvem_total = morena_pt_pvem)
+
+
+
+bd_dl_21_dgo %>% filter(Sheet == "01. D. DURANGO") %>% summarise(sum(nominal))
+
 # extraer dtos y mpos de durango 2016
 
 dto_mpo_16 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/durango_dl_16_normal_casilla.csv") %>%
@@ -22,7 +49,7 @@ dto_mpo_16 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadi�
 
 # GB 16
 
-path <- "~/Downloads/Tabla Gobernador Municipio.xlsx"
+path <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/durango_normal_16_casilla.xlsx"
 
 bd_gb_16_dgo <- path %>%
   excel_sheets() %>%
@@ -120,8 +147,61 @@ dgo_pm_19 %>% write_rds("inst/electoral/dgo_pm_19.rda")
 
 rm(pm19)
 
+## DL 21 DURANGO  ------------------------------------------------------------------------------------------------------
 
-## gb 16 DURANGO  ------------------------------------------------------------------------------------------------------
+dl21 <- bd_dl_21_dgo %>%
+  mutate(nombre_municipio_21 = str_squish(gsub(pattern = "[[:digit:]]|[[:punct:]]",replacement = "",x = Sheet)),
+         municipio_21 = str_squish(gsub(pattern = "[[:alpha:]]|[[:punct:]]",replacement = "",x = Sheet))) %>%
+  mutate(nombre_municipio_21 = str_squish(gsub(pattern = "D ",replacement = "",x = nombre_municipio_21)))
+
+# revisar nombres de varianles
+
+colnames(dl21)
+
+dl21 <- dl21 %>%
+  rename(distritol_21 = distrito,
+         noreg = no_reg) %>%
+  select(municipio_21,
+         nombre_municipio_21,seccion:participacion) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         distritol_21 = formatC(distritol_21,width = 2, flag = "0"))
+
+
+dl21 <- dl21 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(dl21)
+
+# sufijo para join
+
+final_dl21_dgo <- insertar_sufijo(bd=dl21, "dl", "21")
+
+final_dl21_dgo <- final_dl21_dgo  %>%
+  mutate(tipo_casilla = substr(casilla,1,1),
+         id_casilla = case_when(nchar(casilla) == 2 ~  paste0(gsub("[[:alpha:]]","0",casilla),"00"),
+                                nchar(casilla) == 3 ~  paste0(gsub("[[:alpha:]]","",casilla),"00"),
+                                nchar(casilla) == 5 ~  gsub("E1 C","010",casilla)),
+         estado = "10",
+         nombre_estado = "DURANGO",
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla))
+
+final_dl21_dgo %>% count(nchar(clave_casilla)) %>% view
+
+final_dl21_dgo %>% filter(casilla == 3)
+
+# guardar rda
+
+dgo_dl_21 <- final_dl21_dgo
+
+dgo_dl_21 %>% write_rds("inst/electoral/dgo_dl_21.rda")
+
+rm(dl21)
+
+
+## GB 16 DURANGO  ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_dgo %>%
   mutate(nombre_municipio_16 = str_squish(gsub(pattern = "[[:digit:]]|[[:punct:]]",replacement = "",x = Sheet)),
@@ -287,7 +367,6 @@ final_dl16_dgo <- final_dl16_dgo  %>%
 final_dl16_dgo %>% count(casilla) %>% view()
 
 #especiales solo hay SMR01 por lpo que se asume que en esta base no se contemplan los diputados de RP
-
 
 
 final_dl16_dgo %>% count(nchar(clave_casilla))

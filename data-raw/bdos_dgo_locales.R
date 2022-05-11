@@ -235,7 +235,8 @@ final_dl18_dgo <- insertar_sufijo(bd=dl18, "dl", "18")
 
 final_dl18_dgo <- final_dl18_dgo  %>%
   mutate(tipo_casilla = substr(casilla,1,1),
-         id_casilla = case_when(nchar(casilla) == 2 ~  paste0(gsub("[[:alpha:]]","0",casilla),"00"),
+         id_casilla = case_when(nchar(casilla) == 1 ~  gsub(pattern = "[[:alpha:]]","0100", casilla),
+                                nchar(casilla) == 2 ~  paste0(gsub("[[:alpha:]]","0",casilla),"00"),
                                 nchar(casilla) == 3 ~  paste0(gsub("[[:alpha:]]","",casilla),"00"),
                                 nchar(casilla) == 5 ~  gsub("E1 C","010",casilla)),
          estado = "10",

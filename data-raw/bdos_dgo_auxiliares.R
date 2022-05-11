@@ -56,6 +56,8 @@ alianzas_dgo_dl_18 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría
          distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
          eleccion = "dl_18")
 
+alianzas_dgo_dl_18 %>% count(coaliciones)
+
 alianzas_dgo_dl_18 %>% write_rds("inst/alianzas/dgo/dgo_dl_18.rda")
 
 alianzas_dgo_dl_16 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/dl_16_durango.csv") %>%

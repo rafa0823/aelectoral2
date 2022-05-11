@@ -4,20 +4,22 @@
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
+#pm19
+
 bd_pm_19_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2019/Municipio/durango_normal_casilla.csv") %>%
   janitor::clean_names() %>%
   as_tibble()
 
+#dl18
+
 bd_dl_18_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2018/Distrito local/durango_dl_normal_casilla.csv") %>%
   janitor::clean_names() %>%
-  as_tibble()
+  as_tibble() %>%
+  select(distrito:pt_morena,independiente_1,no_reg:nominal)
 
 #dl21
 
 path <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2021/Distrito local/durango_normal_21_casilla.xlsx"
-
-prueba <- read_excel(path,
-                     sheet = 1)
 
 bd_dl_21_dgo <- path %>%
   excel_sheets() %>%
@@ -47,7 +49,8 @@ dto_mpo_16 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadi�
   select(estado,distrito,nombre_distrito, municipio, nombre_municipio,seccion) %>%
   unique()
 
-# GB 16
+
+# GB 16 DURANGO
 
 path <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/durango_normal_16_casilla.xlsx"
 
@@ -150,9 +153,8 @@ rm(pm19)
 ## DL 21 DURANGO  ------------------------------------------------------------------------------------------------------
 
 dl21 <- bd_dl_21_dgo %>%
-  mutate(nombre_municipio_21 = str_squish(gsub(pattern = "[[:digit:]]|[[:punct:]]",replacement = "",x = Sheet)),
-         municipio_21 = str_squish(gsub(pattern = "[[:alpha:]]|[[:punct:]]",replacement = "",x = Sheet))) %>%
-  mutate(nombre_municipio_21 = str_squish(gsub(pattern = "D ",replacement = "",x = nombre_municipio_21)))
+  mutate(nombre_distritol_21 = str_squish(gsub(pattern = "[[:digit:]]|[[:punct:]]",replacement = "",x = Sheet))) %>%
+  mutate(nombre_distritol_21 = str_squish(gsub(pattern = "D ",replacement = "",x = nombre_distritol_21)))
 
 # revisar nombres de varianles
 
@@ -161,8 +163,8 @@ colnames(dl21)
 dl21 <- dl21 %>%
   rename(distritol_21 = distrito,
          noreg = no_reg) %>%
-  select(municipio_21,
-         nombre_municipio_21,seccion:participacion) %>%
+  select(distritol_21,
+         nombre_distritol_21,seccion:participacion) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_21 = formatC(distritol_21,width = 2, flag = "0"))
@@ -186,7 +188,8 @@ final_dl21_dgo <- final_dl21_dgo  %>%
                                 nchar(casilla) == 5 ~  gsub("E1 C","010",casilla)),
          estado = "10",
          nombre_estado = "DURANGO",
-         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla))
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla),
+         mr_rp = "MR")
 
 final_dl21_dgo %>% count(nchar(clave_casilla)) %>% view
 
@@ -199,6 +202,58 @@ dgo_dl_21 <- final_dl21_dgo
 dgo_dl_21 %>% write_rds("inst/electoral/dgo_dl_21.rda")
 
 rm(dl21)
+
+# DL 18 DURANGO ----------------------------------------------------------------------------------------------------
+
+dl18 <- bd_dl_18_dgo
+
+# revisar nombres de varianles
+
+colnames(dl18)
+
+dl18 <- dl18 %>%
+  mutate(prd = 0,
+         pd = 0,
+         pan = 0) %>%
+  rename(distritol_18 = distrito,
+         noreg = no_reg) %>%
+  mutate(across(pan_prd_pd:pan, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         distritol_18 = formatC(distritol_18,width = 2, flag = "0"))
+
+
+dl18 <- dl18 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan_prd_pd:pan)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(dl18)
+
+# sufijo para join
+
+final_dl18_dgo <- insertar_sufijo(bd=dl18, "dl", "18")
+
+final_dl18_dgo <- final_dl18_dgo  %>%
+  mutate(tipo_casilla = substr(casilla,1,1),
+         id_casilla = case_when(nchar(casilla) == 2 ~  paste0(gsub("[[:alpha:]]","0",casilla),"00"),
+                                nchar(casilla) == 3 ~  paste0(gsub("[[:alpha:]]","",casilla),"00"),
+                                nchar(casilla) == 5 ~  gsub("E1 C","010",casilla)),
+         estado = "10",
+         nombre_estado = "DURANGO",
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla),
+         mr_rp = "MR")
+
+final_dl18_dgo %>% count(nchar(clave_casilla)) %>% view
+
+
+# guardar rda
+
+dgo_dl_18 <- final_dl18_dgo
+
+dgo_dl_18 %>% write_rds("inst/electoral/dgo_dl_18.rda")
+
+rm(dl18)
+
 
 
 ## GB 16 DURANGO  ------------------------------------------------------------------------------------------------------

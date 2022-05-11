@@ -44,7 +44,7 @@ leer_alianza <- function(nivel, eleccion, entidad){
                                          mustWork = TRUE)) %>% tibble::as_tibble()
     }
 
-  res <- res %>% select(-eleccion, -nombre_estado, coaliciones)
+  res <- res %>% select(-any_of(c("eleccion", "nombre_estado", "candidatura_comun")))
 
   nivel_sep <- stringr::str_split(nivel, pattern = "_") %>% pluck(1,1)
 

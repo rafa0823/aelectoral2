@@ -154,3 +154,135 @@ coah_dl_20 %>% write_rds("inst/electoral/coah_dl_20.rda")
 
 rm(dl20)
 
+# PM 18 COAHUILA ---------------------------------------------------------------------------------------------
+
+
+pm18 <- bd_pm_18_coah   %>%
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+
+# revisar nombres de varianles
+
+colnames(pm18)
+
+pm18 <- pm18 %>%
+  rename(seccion = secc,
+         nombre_municipio_18 = municipio,
+         municipio_18 = mun,
+         pes = es,
+         pt_morena_pes = pt_morena_es,
+         pt_pes = pt_es,
+         morena_pes = morena_es,
+         total = total_votos,
+         nominal = lista_nominal,
+         noreg = cand_nreg,
+         panal = nva_alianza,
+         pri_pvem_panal = pri_pvem_nva_alianza,
+         pri_panal = pri_nva_alianza,
+         pvem_panal = pvem_nva_alianza) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         municipio_18 = formatC(municipio_18, width = 3, flag = "0"))
+
+# HOMOLOGAR EXTRANJERO
+## agregar claves 00 voto extranjero y nombre de estado si es necesario
+
+
+pm18 <- pm18 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(pm18)
+
+# sufijo para join
+
+final_pm18_coah <- insertar_sufijo(bd=pm18, "pm", "18")
+
+final_pm18_coah <- final_pm18_coah  %>%
+  mutate(id_casilla = case_when(nchar(casilla) == 1 ~  gsub(pattern = "[[:alpha:]]","0100", casilla),
+                                nchar(casilla) == 2 ~ paste0(gsub(pattern = "[[:alpha:]]","0", casilla),"00"),
+                                   nchar(casilla) == 3 ~ paste0(gsub(pattern = "[[:alpha:]]","", casilla),"00"),
+                                   nchar(casilla) == 4 ~ gsub(pattern = "[[:alpha:]]","0", casilla)),
+
+
+         estado = "05",
+         nombre_estado = "COAHUILA",
+         tipo_casilla = substr(casilla,1,1),
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla))
+
+final_pm18_coah %>% count(casilla) %>% view()
+
+final_pm18_coah %>% count(nchar(id_casilla))
+
+
+# guardar rda
+
+coah_pm_18 <- final_pm18_coah
+
+coah_pm_18 %>% write_rds("inst/electoral/coah_pm_18.rda")
+
+rm(pm18)
+
+# GB 17 COAHUILA ---------------------------------------------------------------------------------------------
+
+
+gb17 <- bd_gb_17_coah
+
+colnames(gb17) <- sub("pna", "panal", colnames(gb17))
+colnames(gb17) <- sub("es", "pes", colnames(gb17))
+
+# revisar nombres de varianles
+
+colnames(gb17)
+
+gb17 <- gb17 %>%
+  rename(municipio_17 = municipio,
+         distritol_17 = dtto_loc,
+         nominal = lista_nominal,
+         noreg = cand_nreg) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         municipio_17 = formatC(municipio_17, width = 3, flag = "0"),
+         distritol_17 = formatC(distritol_17, width = 2, flag = "0"))
+
+# HOMOLOGAR EXTRANJERO
+## agregar claves 00 voto extranjero y nombre de estado si es necesario
+
+
+gb17 <- gb17 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(gb17)
+
+# sufijo para join
+
+final_gb17_coah <- insertar_sufijo(bd=gb17, "gb", "17")
+
+final_gb17_coah <- final_gb17_coah  %>%
+  mutate(casilla = substr(folio,8,nchar(folio)),
+         id_casilla = case_when(nchar(casilla) == 1 ~  gsub(pattern = "[[:alpha:]]","0100", casilla),
+                                nchar(casilla) == 2 ~ paste0(gsub(pattern = "[[:alpha:]]","0", casilla),"00"),
+                                nchar(casilla) == 3 ~ paste0(gsub(pattern = "[[:alpha:]]","", casilla),"00"),
+                                nchar(casilla) == 4 ~ gsub(pattern = "[[:alpha:]]","0", casilla)),
+         estado = "05",
+         nombre_estado = "COAHUILA",
+         tipo_casilla = substr(cve_cas2,5,5),
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla))
+
+final_gb17_coah %>% count(id_casilla) %>% view()
+
+final_gb17_coah %>% count(nchar(clave_casilla))
+
+
+# guardar rda
+
+coah_gb_17 <- final_gb17_coah
+
+coah_gb_17 %>% write_rds("inst/electoral/coah_gb_17.rda")
+
+rm(gb17)
+
+

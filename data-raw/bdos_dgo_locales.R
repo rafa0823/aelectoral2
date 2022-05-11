@@ -35,7 +35,7 @@ bd_dl_21_dgo <- path %>%
   select(!c(x28,x29,x30,x31,x24)) %>%
   select(Sheet:morena_pt_pvem,independiente_1,no_reg:participacion) %>%
   rename(pan_pri_prd_total = pan_pri_prd_cc,
-         morena_pt_pvem_total = morena_pt_pvem)
+         morena_pt_total = morena_pt_pvem)
 
 
 

@@ -251,53 +251,52 @@ rm(pmext_18)
 
 # PM 15 CHIAPAS ------------------------------------------
 
-pm15 <- bd_pm_15_chis   %>%
-  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
-
-# revisar nombres de varianles
-
-colnames(pm15)
-
-pm15 <- pm15 %>%
-  rename("estado" = estado,
-         "noreg"= no_registrados,
-         "id_municipio_15" = id_municipio,
-         "municipio_15" = municipio,
-         "nombre_municipio_pm_15" = nombre_municipio,
-         "nominal" = lista_nominal,
-         "id_distritol_15" = distrito)%>%
-  mutate(across(pan:nominal, ~as.numeric(.x)),
-         seccion = formatC(seccion, width = 4,flag = "0"),
-         seccion = if_else(casilla == "P","9999",seccion),
-         municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
-         id_casilla = formatC(id_casilla, width = 2, flag = "0"),
-         ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
-
-
-pm15 <- pm15 %>%
-  rename_with.(~paste0('ele_', .x),
-               .cols = pan:nominal)
-
-# Identificar los partidos de la elecccion
-detectar_partidos(pm15)
-
-# sufijo para join
-
-final_pm15_chis <- insertar_sufijo(bd=pm15, "pm", "15")
-
-final_pm15_chis <- final_pm15_chis %>%
-  mutate(estado = "07",
-         nombre_estado = "CHIAPAS",
-         clave_casilla = paste0(id_estado,seccion,tipo_casilla,id_casilla,ext_contigua))
-
-
-# guardar rda
-
-chis_pm_15 <- final_pm15_chis
-
-chis_pm_15 %>% write_rds("inst/electoral/chis_pm_15.rda")
-
-rm(pm15)
+# pm15 <- bd_pm_15_chis   %>%
+#   mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))
+#
+# # revisar nombres de varianles
+#
+# colnames(pm15)
+#
+# pm15 <- pm15 %>%
+#   rename("noreg"= no_registrados,
+#          "id_municipio_15" = id_municipio,
+#          "municipio_15" = municipio,
+#          "nombre_municipio_pm_15" = nombre_municipio,
+#          "nominal" = lista_nominal,
+#          "id_distritol_15" = distrito)%>%
+#   mutate(across(pan:nominal, ~as.numeric(.x)),
+#          seccion = formatC(seccion, width = 4,flag = "0"),
+#          seccion = if_else(casilla == "P","9999",seccion),
+#          municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
+#          id_casilla = formatC(id_casilla, width = 2, flag = "0"),
+#          ext_contigua = formatC(ext_contigua, width = 2, flag = "0"))
+#
+#
+# pm15 <- pm15 %>%
+#   rename_with.(~paste0('ele_', .x),
+#                .cols = pan:nominal)
+#
+# # Identificar los partidos de la elecccion
+# detectar_partidos(pm15)
+#
+# # sufijo para join
+#
+# final_pm15_chis <- insertar_sufijo(bd=pm15, "pm", "15")
+#
+# final_pm15_chis <- final_pm15_chis %>%
+#   mutate(estado = "07",
+#          nombre_estado = "CHIAPAS",
+#          clave_casilla = paste0(id_estado,seccion,tipo_casilla,id_casilla,ext_contigua))
+#
+#
+# # guardar rda
+#
+# chis_pm_15 <- final_pm15_chis
+#
+# chis_pm_15 %>% write_rds("inst/electoral/chis_pm_15.rda")
+#
+# rm(pm15)
 
 # GB 18 CHIAPAS ------------------------------------------
 

@@ -7,6 +7,7 @@
 #' @details
 #' Este conjunto de bases electorales pueden ser de distintas elecciones, candidatos, años, tipos de eleccion; se puede decidir la forma en la se reparten los votos en el extranjero y las casillas especiales; así como agregar distintas variables geográficas como el municipio o el estado.
 
+
 Electoral <- R6::R6Class("Electoral",
                          public = list(bd = NA,
                                        todas = NULL,

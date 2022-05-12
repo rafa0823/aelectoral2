@@ -43,7 +43,7 @@ alianzas_chis_pm_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultorí
          municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
          candidatura_comun = NA)
 
-alianzas_chis_pm_21 %>% write_rds("inst/alianzas/alianzas_chiapas/alianzas_chis_pm_21.rda")
+alianzas_chis_pm_21 %>% write_rds("inst/alianzas/chis/chis_pm_21.rda")
 
 alianzas_chis_pm_15 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_15_chiapas.csv") %>%
   janitor::clean_names() %>%
@@ -53,14 +53,37 @@ alianzas_chis_pm_15 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultorí
          municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
          candidatura_comun = NA)
 
-alianzas_chis_pm_15 %>% write_rds("inst/alianzas/alianzas_chiapas/alianzas_chis_pm_15.rda")
+alianzas_chis_pm_15 %>% write_rds("inst/alianzas/chis/chis_pm_15.rda")
 
 alianzas_chis_dl_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/dl_21_chiapas.csv") %>%
   janitor::clean_names() %>%
   as_tibble() %>%
   mutate(estado = "07",
          nombre_estado = "CHIAPAS",
-         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
-         candidatura_comun = NA)
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0"))
 
-alianzas_chis_dl_21 %>% write_rds("inst/alianzas/alianzas_chiapas/alianzas_chis_dl_21.rda")
+alianzas_chis_dl_21 %>% write_rds("inst/alianzas/chis/chis_dl_21.rda")
+
+alianzas_chis_gb_18 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/gob_18_chiapas.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(estado = "07",
+         nombre_estado = "CHIAPAS")
+
+alianzas_chis_gb_18 %>% write_rds("inst/alianzas/chis/chis_gb_18.rda")
+
+alianzas_chis_gb_18 %>% count(coaliciones)
+
+alianzas_chis_pm_18 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_18_chiapas.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(estado = "07",
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
+         nombre_estado = "CHIAPAS") %>%
+  rename(municipio_18 = municipio_21,
+         coaliciones = coaliaciones)
+
+alianzas_chis_pm_18 %>% write_rds("inst/alianzas/chis/chis_pm_18.rda")
+
+alianzas_chis_pm_18 %>% count(coaliciones)
+

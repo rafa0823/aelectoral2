@@ -99,7 +99,19 @@ Partido Duranguense - PD
 
 ### dgo_pm_16.rda
 
+### dgo_dl_18.rda
+
+en dl18 de durango solo hay tipo de casilla especial S1, por lo que asumimos que solo registran mr
+
 ### dgo_pm_19.rda
+
+### dgo_dl_21.rda
+
+en dl21 de durango la variable pan_pri_prd_total es la suma de los votos de los tres partidos y las combinaciones de alianzas entre ellos
+
+en dl 21 de durango la variable morena_pt_total es la suma de los votos de morena, pt y morena_pt
+
+en dl21 de durango solo hay tipo de casilla especial S1, por lo que asumimos que solo registran mr
 
 ## México
 

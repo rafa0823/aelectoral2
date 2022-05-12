@@ -36,7 +36,7 @@ alianzas_edomex_dl_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultori
          distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
          eleccion = "dl_21")
 
-alianzas_edomex_dl_21 %>% write_rds("inst/alianzas/mex/21.rda")
+alianzas_edomex_dl_21 %>% write_rds("inst/alianzas/mex/dl_21.rda")
 
 #dl18
 

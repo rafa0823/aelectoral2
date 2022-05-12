@@ -57,14 +57,16 @@ test_that("alianzas completas",{
 })
 
 test_that("catalogo completo", {
-  cat <- catalogo %>% mutate(carpeta = sample(c("electoral", "shp", "alianzas","auxiliares"), size = 193,replace = T)) %>%
-    transmute(carpeta, archivo = paste(carpeta,bd, sep = "/"))
+  carpetas <- c("shp", "electoral", "auxiliares", "alianzas")
+  cat <- catalogo %>%
+    transmute(archivo = paste(carpeta1, capeta,bd, sep = "/"))
 
   expect_identical(cat %>% pull(archivo) %>% sort,
-                   list.files(paste0("inst/", cat$carpeta %>% unique()), full.names = T) %>%
+                   list.files(paste0("inst/",carpetas), full.names = T) %>%
                      map(~{
-                       prefijo <- stringr::str_split(.x,pattern = "/") %>% pluck(1,3)
-                       paste(prefijo, list.files(.x),sep = "/")
+                       prefijo <- stringr::str_split(.x,pattern = "/") %>% pluck(1,2)
+                       prefijo2 <- stringr::str_split(.x,pattern = "/") %>% pluck(1,3)
+                       paste(prefijo, prefijo2, list.files(.x),sep = "/")
                        }) %>% do.call(base::c,.) %>% sort()
   )
 

@@ -3,3 +3,5 @@
 export(Electoral)
 export(leer_base)
 import(dplyr)
+import(sf)
+import(purrr)

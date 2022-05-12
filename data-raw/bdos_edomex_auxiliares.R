@@ -13,7 +13,7 @@ alianzas_edomex_pm_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultori
          nombre_estado = "MÉXICO",
          municipio_21 = formatC(municipio_21, width = 3, flag = "0"))
 
-alianzas_edomex_pm_21 %>% write_rds("inst/alianzas/mex/mex_pm_19.rda")
+alianzas_edomex_pm_21 %>% write_rds("inst/alianzas/mex/mex_pm_21.rda")
 
 #pm18
 
@@ -60,3 +60,4 @@ alianzas_edomex_gb_17 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultori
          nombre_estado = "MÉXICO")
 
 alianzas_edomex_gb_17 %>% write_rds("inst/alianzas/mex/mex_gb_17.rda")
+

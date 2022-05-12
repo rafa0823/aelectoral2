@@ -70,4 +70,17 @@ test_that("catalogo completo", {
   expect_identical(catalogo %>% filter(tipo == "electoral") %>% pull(bd) %>% sort,
                    list.files("inst/electoral")
   )
+
+  #shp
+  expect_identical(catalogo %>% filter(tipo == "shp") %>% pull(bd) %>% sort,
+                   list.files("inst/shp", full.names = T) %>%
+                     map2(list.files("inst/shp"), ~paste(.y, list.files(.x), sep = "/")) %>% reduce(c) %>% sort()
+  )
+
+  #auxiliares
+
+  expect_identical(catalogo %>% filter(tipo == "auxiliares") %>% pull(bd) %>% sort,
+                   list.files("inst/auxiliares", full.names = T) %>%
+                     map2(list.files("inst/auxiliares"), ~paste(.y, list.files(.x), sep = "/")) %>% reduce(c) %>% sort()
+  )
 })

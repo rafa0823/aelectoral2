@@ -8,7 +8,6 @@
 #' @return
 #' @export
 #'
-#' @import sf
 #' @examples
 leer_base <- function(eleccion, entidad, tipo_eleccion){
   estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nac",entidad)

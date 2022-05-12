@@ -10,7 +10,7 @@
 #'
 #' @return
 #' @export
-#' @import dplyr
+#' @import dplyr purrr sf
 #' @examples
 
 Electoral <- R6::R6Class("Electoral",

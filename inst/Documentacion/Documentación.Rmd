@@ -80,8 +80,9 @@ Partido Popular Chiapaneco - PPCH
 ### chis_dl_21.rda
 ### chis_gb_18.rda
 ### chis_pm_18.rda
+pm_18_chis contiene extraordinaria 18 chiapas
 ### chis_pm_21.rda
-### chis_pmext_22.rda
+pm_21_chis contiene extraordinaria 22 de chiapas
 
 ### Elecciones extraordinarias 
 
@@ -124,6 +125,7 @@ mex_dl_21.rda
 mex_gb_17.rda
 mex_pm_18.rda
 mex_pm_21.rda
+pm_21_mex contiene extraordinaria 21 edomex
 
 ### mex_pmext_21.rda
 Estas elecciones fueron en el municipio de Nextlalpan.

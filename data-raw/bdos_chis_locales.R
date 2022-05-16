@@ -86,11 +86,7 @@ final_pm21_chis <- final_pm21_chis %>%
 
 # guardar rda
 
-chis_pm_21 <- final_pm21_chis
-
-chis_pm_21 %>% write_rds("inst/electoral/chis_pm_21.rda")
-
-rm(pm21)
+final_pm21_chis
 
 
 ## EXT PM 22 CHIAPAS -------------------------------------
@@ -135,11 +131,18 @@ final_pmext22_chis
 
 # guardar rda
 
-chis_pmext_22 <- final_pmext22_chis
-
-chis_pmext_22 %>% write_rds("inst/electoral/chis_pmext_22.rda")
+final_pmext22_chis
 
 rm(pmext22)
+
+
+# BIND PM 21 Y PMEXT22 ----------------------------------------------------------------------------------------
+
+chis_pm_21 <- final_pm21_chis %>% anti_join(final_pmext22_chis, by = "seccion")
+
+chis_pm_21 <- chis_pm_21 %>% rbind(final_pmext22_chis,fill = T)
+
+chis_pm_21%>% write_rds("inst/electoral/chis/pm_21.rda")
 
 
 # PM 18 CHIAPAS ------------------------------------------
@@ -200,9 +203,7 @@ final_pm18_chis <- final_pm18_chis %>%
 
 # guardar rda
 
-chis_pm_18 <- final_pm18_chis
-
-chis_pm_18 %>% write_rds("inst/electoral/chis_pm_18.rda")
+final_pm18_chis
 
 rm(pm18)
 
@@ -241,11 +242,19 @@ final_pmext_18_chis <- insertar_sufijo(bd=pmext_18, "pm", "18")
 
 # guardar rda
 
-chis_pm_18 <- final_pmext_18_chis
+ final_pmext_18_chis
 
-chis_pm_18 %>% write_rds("inst/electoral/chis_pm_18.rda")
 
 rm(pmext_18)
+
+# BIND PM 18 Y PMEXT18 ----------------------------------------------------------------------------------------
+
+chis_pm_18 <- final_pm18_chis %>% anti_join(final_pmext_18_chis, by = "seccion")
+
+
+chis_pm_18 <- chis_pm_18 %>% rbind(final_pmext_18_chis,fill = T)
+
+chis_pm_18 %>% write_rds("inst/electoral/chis/pm_18.rda")
 
 
 
@@ -347,7 +356,7 @@ final_gb_18_chis <- final_gb_18_chis %>% mutate(clave_casilla = substr(clave_cas
 
 chis_gb_18 <- final_gb_18_chis
 
-chis_gb_18 %>% write_rds("inst/electoral/chis_gb_18.rda")
+chis_gb_18 %>% write_rds("inst/electoral/chis/gb_18.rda")
 
 rm(gb_18)
 
@@ -404,7 +413,7 @@ final_dl21_chis <- final_dl21_chis %>%
 
 chis_dl_21 <- final_dl21_chis
 
-chis_dl_21 %>% write_rds("inst/electoral/chis_dl_21.rda")
+chis_dl_21 %>% write_rds("inst/electoral/chis/dl_21.rda")
 
 rm(dl21)
 

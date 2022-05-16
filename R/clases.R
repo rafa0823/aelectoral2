@@ -137,7 +137,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #'Agrega una base de datos de la elección señalada y se la pega a la elección que se haya leído con obtener_bd.
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
                                        #' @param entidad Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".
-                                       #' @param extraordinaria Vector nombreado de dos dimesiones, el primer elemento es eleccion y el segundo es entidad
                                        #'
                                        #' @return Tibble de la base de datos con la nueva elección resumidas por sección
                                        #' @examples

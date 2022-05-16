@@ -143,49 +143,20 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @examples
                                        #'  bd$agregar_bd(eleccion = "pm_21",entidad = "mex", extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
 
-                                       agregar_bd = function(eleccion, entidad, extraordinaria = NULL){
+                                       agregar_bd = function(eleccion, entidad){
 
                                          add <- leer_base(eleccion = eleccion,
                                                           entidad = entidad, tipo_eleccion = self$tipo_eleccion)
 
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
-                                         if(!is.null(extraordinaria)){
-                                           ext <- leer_base(eleccion = extraordinaria[["eleccion"]],
-                                                            entidad = extraordinaria[["entidad"]])
-
-                                           self$todas <- self$todas %>% append(list(ext) %>%
-                                                                                 purrr::set_names(extraordinaria[["eleccion"]]))
-                                         }
-
-
                                          add <- add %>% self$accion_especiales(self$especiales)
-
-                                         if(!is.null(extraordinaria)){
-                                           ext <- ext %>% self$accion_especiales(self$especiales)
-                                         }
 
                                          if(!self$extranjero){
                                            add <- add %>% eliminar_votoExtranjero()
-                                           if(!is.null(extraordinaria)){
-                                             ext <- ext %>% eliminar_votoExtranjero()
-                                           }
                                          }
 
-                                         if(!is.null(extraordinaria)){
-                                           ext_r <- ext %>% reducir(self$bd, self$llaves) %>%
-                                             mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := T)
-
-                                           add <- add %>% reducir(self$bd, self$llaves) %>% mutate(!!rlang::sym(glue::glue("extraordinaria_{extraordinaria[['eleccion']]}")) := F) %>%
-                                             anti_join(
-                                               ext_r, by = "seccion"
-                                             ) %>%
-                                             bind_rows(
-                                               ext_r
-                                             )
-                                         } else{
-                                           add <- add %>% reducir(self$bd, self$llaves)
-                                         }
+                                         add <- add %>% reducir(self$bd, self$llaves)
 
                                          self$bd <- self$bd %>% full_join(
                                            add, by = c("estado", "seccion")

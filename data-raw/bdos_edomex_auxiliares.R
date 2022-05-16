@@ -11,9 +11,26 @@ alianzas_edomex_pm_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultori
   as_tibble() %>%
   mutate(estado = "15",
          nombre_estado = "MÉXICO",
-         municipio_21 = formatC(municipio_21, width = 3, flag = "0"))
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
+         tipo_eleccion = "ORDINARIA",
+         año = "2021")
 
-alianzas_edomex_pm_21 %>% write_rds("inst/alianzas/mex/pm_21.rda")
+#pmext21
+
+alianzas_edomex_pmext_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_extra_21_edomex.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(eleccion = "pm_21",
+         estado = "15",
+         nombre_estado = "MÉXICO",
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
+         candidatura_comun = NA,
+         tipo_eleccion = "EXTRAORDINARIA",
+         año = "2021")%>%
+  rename(coaliciones = coaliaciones)
+
+
+alianzas_edomex_pm_21 %>% rbind(alianzas_edomex_pmext_21) %>% write_rds("inst/alianzas/mex/pm_21.rda")
 
 #pm18
 

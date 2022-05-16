@@ -41,9 +41,29 @@ alianzas_chis_pm_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultorí
   mutate(estado = "07",
          nombre_estado = "CHIAPAS",
          municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
-         candidatura_comun = NA)
+         candidatura_comun = NA,
+         tipo_eleccion = "ORDINARIA",
+         año = "2021")
 
-alianzas_chis_pm_21 %>% write_rds("inst/alianzas/chis/chis_pm_21.rda")
+# extraordinarias chiapas 22
+
+alianzas_chis_pmextra_22 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_extra_22_chiapas.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  mutate(eleccion = "pm_21",
+         estado = "07",
+         nombre_estado = "CHIAPAS",
+         municipio_22 = formatC(municipio_22, width = 3, flag = "0"),
+         candidatura_comun = NA,
+         tipo_eleccion = "EXTRAORDINARIA",
+         año = "2022") %>%
+  rename(municipio_21 = municipio_22)
+
+# nuntar alianzas pm 21 y pm extra 22
+
+alianzas_chis_pm_21 %>% rbind(alianzas_chis_pmextra_22) %>% write_rds("inst/alianzas/chis/pm_21.rda")
+
+
 
 alianzas_chis_pm_15 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_15_chiapas.csv") %>%
   janitor::clean_names() %>%
@@ -53,7 +73,7 @@ alianzas_chis_pm_15 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultorí
          municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
          candidatura_comun = NA)
 
-alianzas_chis_pm_15 %>% write_rds("inst/alianzas/chis/chis_pm_15.rda")
+alianzas_chis_pm_15 %>% write_rds("inst/alianzas/chis/pm_15.rda")
 
 alianzas_chis_dl_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/dl_21_chiapas.csv") %>%
   janitor::clean_names() %>%
@@ -62,7 +82,7 @@ alianzas_chis_dl_21 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultorí
          nombre_estado = "CHIAPAS",
          distritol_21 = formatC(distritol_21, width = 2, flag = "0"))
 
-alianzas_chis_dl_21 %>% write_rds("inst/alianzas/chis/chis_dl_21.rda")
+alianzas_chis_dl_21 %>% write_rds("inst/alianzas/chis/dl_21.rda")
 
 alianzas_chis_gb_18 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/gob_18_chiapas.csv") %>%
   janitor::clean_names() %>%
@@ -70,7 +90,7 @@ alianzas_chis_gb_18 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultorí
   mutate(estado = "07",
          nombre_estado = "CHIAPAS")
 
-alianzas_chis_gb_18 %>% write_rds("inst/alianzas/chis/chis_gb_18.rda")
+alianzas_chis_gb_18 %>% write_rds("inst/alianzas/chis/gb_18.rda")
 
 alianzas_chis_gb_18 %>% count(coaliciones)
 
@@ -83,7 +103,7 @@ alianzas_chis_pm_18 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultorí
   rename(municipio_18 = municipio_21,
          coaliciones = coaliaciones)
 
-alianzas_chis_pm_18 %>% write_rds("inst/alianzas/chis/chis_pm_18.rda")
+alianzas_chis_pm_18 %>% write_rds("inst/alianzas/chis/pm_18.rda")
 
 alianzas_chis_pm_18 %>% count(coaliciones)
 

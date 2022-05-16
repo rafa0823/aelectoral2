@@ -53,7 +53,7 @@ pm21 <- pm21 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_pm_21 = formatC(municipio_pm_21, width = 2, flag = "0"))
+         municipio_pm_21 = formatC(municipio_pm_21, width = 3, flag = "0"))
 
 
 pm21 <- pm21 %>%
@@ -80,9 +80,8 @@ final_pm21_mex <- final_pm21_mex %>%
 
 # guardar rda
 
-mex_pm_21 <- final_pm21_mex
+final_pm21_mex
 
-mex_pm_21 %>% write_rds("inst/electoral/mex_pm_21.rda")
 
 rm(pm21)
 
@@ -133,13 +132,19 @@ final_pmext21_mex <- final_pmext21_mex %>%
 
 # guardar rda
 
-mex_pmext_21 <- final_pmext21_mex
+final_pmext21_mex
 
-mex_pmext_21 %>% write_rds("inst/electoral/mex_pmext_21.rda")
 
 rm(pmext21)
 
+# BIND PM 21 Y PMEXT21 ----------------------------------------------------------------------------------------
 
+mex_pm_21 <- final_pm21_mex %>% anti_join(final_pmext21_mex, by = "seccion")
+
+
+mex_pm_21 <- mex_pm_21 %>% rbind(final_pmext21_mex,fill = T) %>% select(!c(distritol_21,nombre_distritol_21,ele_votos_validos_pm_21))
+
+mex_pm_21 %>% write_rds("inst/electoral/mex/pm_21.rda")
 
 ## PM 18 EDOMEX -------------------------------------------------------------------------------------
 
@@ -192,7 +197,7 @@ final_pm18_mex <-  final_pm18_mex %>%
 
 mex_pm_18 <- final_pm18_mex
 
-mex_pm_18 %>% write_rds("inst/electoral/mex_pm_18.rda")
+mex_pm_18 %>% write_rds("inst/electoral/mex/pm_18.rda")
 
 rm(pm18)
 
@@ -250,7 +255,7 @@ final_dl21_mex <-  final_dl21_mex %>%
 
 mex_dl_21 <- final_dl21_mex
 
-mex_dl_21 %>% write_rds("inst/electoral/mex_dl_21.rda")
+mex_dl_21 %>% write_rds("inst/electoral/mex/dl_21.rda")
 
 rm(dl21)
 
@@ -306,7 +311,7 @@ final_dl18_mex <-  final_dl18_mex %>%
 
 mex_dl_18 <- final_dl18_mex
 
-mex_dl_18 %>% write_rds("inst/electoral/mex_dl_18.rda")
+mex_dl_18 %>% write_rds("inst/electoral/mex/dl_18.rda")
 
 
 rm(dl18)
@@ -362,7 +367,7 @@ final_gb17_mex <-  final_gb17_mex %>%
 
 mex_gb_17 <- final_gb17_mex
 
-mex_gb_17 %>% write_rds("inst/electoral/mex_gb_17.rda")
+mex_gb_17 %>% write_rds("inst/electoral/mex/gb_17.rda")
 
 rm(gb17)
 

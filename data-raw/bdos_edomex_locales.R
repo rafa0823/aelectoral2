@@ -75,7 +75,8 @@ final_pm21_mex <- final_pm21_mex %>%
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00")))%>%
   mutate(estado = "15",
          nombre_estado = "MÉXICO",
-         clave_casilla = paste0(estado,seccion,clave_casilla))
+         clave_casilla = paste0(estado,seccion,clave_casilla),
+         tipo_eleccion = "ORDINARIA")
 
 
 # guardar rda
@@ -127,7 +128,8 @@ final_pmext21_mex <- final_pmext21_mex %>%
                                    nchar(casilla) == 2 ~ paste0(gsub(pattern = "S", "S0",casilla), "00"))) %>%
   mutate(estado = "15",
          nombre_estado = "MÉXICO",
-         clave_casilla = paste0(estado,seccion,clave_casilla))
+         clave_casilla = paste0(estado,seccion,clave_casilla),
+         tipo_eleccion = "EXTRAORDINARIA")
 
 
 # guardar rda

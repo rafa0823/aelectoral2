@@ -99,7 +99,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                                          self$partido(nivel, eleccion)
 
-                                         al <- leer_alianza(nivel, eleccion, self$entidad)
+                                         al <- leer_alianza(nivel, eleccion, self$entidad, self$bd)
 
                                          self$candidato(al, nivel, eleccion)
                                        },

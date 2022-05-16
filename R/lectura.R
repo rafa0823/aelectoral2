@@ -10,11 +10,11 @@
 #'
 #' @examples
 leer_base <- function(eleccion, entidad, tipo_eleccion){
-  estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nac",entidad)
-  res <- readr::read_rds(system.file(glue::glue("electoral/{estado}_{eleccion}.rda"),
+  estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nacional",entidad)
+  res <- readr::read_rds(system.file(glue::glue("electoral/{estado}/{eleccion}.rda"),
                                      package = "aelectoral2",
                                      mustWork = TRUE)) %>% tibble::as_tibble()
-  if(estado == "nac") {
+  if(estado == "nacional") {
     if(entidad != "nacional"){
       nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
       res <- res %>% filter(estado == !!nombre)

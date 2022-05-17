@@ -38,7 +38,7 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
       nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
       res <- res %>% filter(estado == !!nombre)
     }} else{
-      res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{estado}_{eleccion}.rda"),
+      res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{eleccion}.rda"),
                                          package = "aelectoral2",
                                          mustWork = TRUE)) %>% tibble::as_tibble()
     }

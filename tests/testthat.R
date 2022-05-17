@@ -1,12 +1,14 @@
 library(testthat)
+library(dplyr)
+library(purrr)
 library(aelectoral2)
 
 test_check("aelectoral2")
 
 test_that("bdos completas",{
   nac <- paste0("nacional/",c("df_21", "df_18", "df_15", "pr_18", "cp_22") %>% sort(), ".rda")
-  mex <- paste0("mex/",c("pmext_21", "pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(),".rda")
-  chis <- paste0("chis/",c("pm_21", "pm_18", "gb_18", "dl_21", "pmext_22") %>% sort(),".rda")
+  mex <- paste0("mex/",c("pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(),".rda")
+  chis <- paste0("chis/",c("pm_21", "pm_18", "gb_18", "dl_21") %>% sort(),".rda")
   dgo <- paste0("dgo/",c("dl_21", "pm_19", "pm_16", "gb_16", "dl_16", "dl_18") %>% sort(),".rda")
   coah <- paste0("coah/",c("pm_21", "dl_20", "pm_18", "gb_17", "pm_17", "dl_17") %>% sort(),".rda")
 
@@ -27,8 +29,8 @@ test_that("shp completo",{
 
 test_that("alianzas completas",{
   nac <- paste0(c("df_21", "df_18", "df_15", "pr_18") %>% sort(), ".rda")
-  mex <- paste0(c("pmext_21", "pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(), ".rda")
-  chis <- paste0(c("pm_21", "pm_18", "gb_18", "dl_21", "pmext_22") %>% sort(), ".rda")
+  mex <- paste0(c("pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(), ".rda")
+  chis <- paste0(c("pm_21", "pm_18", "gb_18", "dl_21") %>% sort(), ".rda")
   dgo <- paste0(c("dl_21", "pm_19", "pm_16", "gb_16", "dl_16", "dl_18") %>% sort(), ".rda")
   coah <- paste0(c("pm_21", "dl_20", "pm_18", "gb_17", "pm_17", "dl_17") %>% sort(), ".rda")
 

@@ -219,7 +219,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 ElectoralSHP <- R6::R6Class("ElectoralSHP",
                             public = list(
                               shp = list(),
-
+                              entidad = NULL,
                               #'@description
                               #'Lee un shapefile
                               #' @param unidad si es de municipio, estado, distrito, seccion, etc.
@@ -228,11 +228,14 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               #' @return Una lista con shapefiles
                               #' @examples
                               initialize = function(unidad, entidad){
-
+                                self$entidad <- entidad
                                 aux <- leer_shp(unidad, entidad)
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
-
+                              agregar_shp = function(unidad){
+                                aux <- leer_shp(unidad, self$entidad)
+                                self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, self$entidad, sep = "_")))
+                              },
                               #'@description
                               #' Junta shapefiles
                               #' @param nivel Si la base que se va a juntar es por seccion, municipio, distrito, etc

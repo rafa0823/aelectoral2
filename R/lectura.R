@@ -1,9 +1,9 @@
 
 #' Title
 #'
-#' @param eleccion
-#' @param entidad
-#' @param tipo_eleccion
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
+#' @param entidad Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".
+#' @param tipo_eleccion Por default es "MR" refiriéndose a mayoría relativa.
 #'
 #' @return
 #' @export
@@ -26,6 +26,16 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
 }
 
 
+#' Title
+#'
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
+#' @param entidad Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".
+#'
+#' @return
+#' @export
+#'
+#' @examples
 leer_alianza <- function(nivel, eleccion, entidad){
   estado <- if_else(grepl("df_|pr_",eleccion), "nacional",entidad)
 
@@ -62,7 +72,7 @@ leer_alianza <- function(nivel, eleccion, entidad){
 #'
 #' @param bd
 #' @param completa
-#' @param llaves
+#' @param llaves Son las claves cartográficas de los niveles. Por default la unidad mínima es sección y está acompañada de estado.
 #'
 #' @return
 #' @export
@@ -103,6 +113,13 @@ leer_shp <- function(unidad, entidad){
   }) %>% bind_rows()
 }
 
+#' Para juntar un shapefile con otra base de datos
+#' Funcion basada en left_join
+#' @param shp Base de datos de tipo shp
+#' @param bd Base de datos que se va a unir con el shapefile
+#'
+#' @return Un shp unido con bd
+#' @examples join_shp_bd(secc_21, df_21)
 join_shp_bd <- function(shp, bd){
   shp %>% left_join(bd)
 }

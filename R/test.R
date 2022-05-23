@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param bd
+#' @param tipo
+#' @param patron
+#'
+#' @return
+#' @export
+#'
+#' @examples
 t_nac <- function(bd, tipo, patron){
   tipo <- match.arg(tipo, c("candidato","partido"))
 
@@ -20,6 +30,19 @@ t_nac <- function(bd, tipo, patron){
   return(res)
 }
 
+#' Title
+#'
+#' @param bd
+#' @param tipo
+#' @param patron
+#' @param estado
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param seleccion
+#'
+#' @return
+#' @export
+#'
+#' @examples
 t_nivel <- function(bd, tipo, patron, estado, nivel, seleccion){
   tipo <- match.arg(tipo, c("candidato","partido"))
 

@@ -1,8 +1,8 @@
 #' Title
 #'
 #' @param bd
-#' @param nivel
-#' @param eleccion
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
 #' @return
 #' @export
@@ -58,8 +58,8 @@ repartir_coalicion <- function(bd, nivel, eleccion){
 #'
 #' @param bd
 #' @param al
-#' @param nivel
-#' @param eleccion
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
 #' @return
 #' @export
@@ -100,8 +100,8 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
 #' Title
 #'
 #' @param bd
-#' @param nivel
-#' @param eleccion
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
 #' @return
 #' @export

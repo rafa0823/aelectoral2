@@ -10,11 +10,11 @@
 #'
 #' @examples
 leer_base <- function(eleccion, entidad, tipo_eleccion){
-  estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nac",entidad)
-  res <- readr::read_rds(system.file(glue::glue("electoral/{estado}_{eleccion}.rda"),
+  estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nacional",entidad)
+  res <- readr::read_rds(system.file(glue::glue("electoral/{estado}/{eleccion}.rda"),
                                      package = "aelectoral2",
                                      mustWork = TRUE)) %>% tibble::as_tibble()
-  if(estado == "nac") {
+  if(estado == "nacional") {
     if(entidad != "nacional"){
       nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
       res <- res %>% filter(estado == !!nombre)
@@ -24,6 +24,7 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
 
   return(res)
 }
+
 
 
 #' Title
@@ -36,7 +37,8 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
 #' @export
 #'
 #' @examples
-leer_alianza <- function(nivel, eleccion, entidad){
+
+leer_alianza <- function(nivel, eleccion, entidad, bd_e){
   estado <- if_else(grepl("df_|pr_",eleccion), "nacional",entidad)
 
   if(estado == "nacional") {
@@ -55,16 +57,22 @@ leer_alianza <- function(nivel, eleccion, entidad){
 
   res <- res %>% select(-any_of(c("eleccion", "nombre_estado", "candidatura_comun")))
 
-  nivel_sep <- stringr::str_split(nivel, pattern = "_") %>% pluck(1,1)
+  nivel_sep <- stringr::str_split(names(res)[2], pattern = "_") %>% pluck(1,1)
 
   w <- switch(nivel_sep, municipio = 3, distritof = 2, distritol = 2)
 
   alianzas <- res %>% transmute(
-    !!rlang::sym(nivel) := paste(stringr::str_pad(estado, width = 2, pad = "0"),
-                                 stringr::str_pad(!!rlang::sym(nivel), width = w, pad = "0"),
+    !!rlang::sym(names(res)[2]) := paste(stringr::str_pad(estado, width = 2, pad = "0"),
+                                 stringr::str_pad(!!rlang::sym(names(res)[2]), width = w, pad = "0"),
                                  sep = "_"),
     coalicion = coaliciones
   )
+
+  if(!nivel %in% names(alianzas)) {
+
+    alianzas <- alianzas %>% left_join(bd_e %>% distinct(!!rlang::sym(names(alianzas)[1]), !!rlang::sym(nivel)))
+  }
+
 
   return(alianzas)
 }

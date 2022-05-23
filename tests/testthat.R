@@ -1,22 +1,21 @@
 library(testthat)
+library(dplyr)
+library(purrr)
 library(aelectoral2)
 
 test_check("aelectoral2")
 
 test_that("bdos completas",{
-  nac <- paste0("nac_", c("df_21", "df_18", "df_15", "pr_18", "cp_22") %>% sort(), ".rda")
-  mex <- paste0("mex_", c("pmext_21", "pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(),".rda")
-  chis <- paste0("chis_", c("pm_21", "pm_18", "gb_18", "dl_21", "pmext_22") %>% sort(),".rda")
-  dgo <- paste0("dgo_", c("dl_21", "pm_19", "pm_16", "gb_16", "dl_16", "dl_18") %>% sort(),".rda")
-  coah <- paste0("coah_", c("pm_21", "dl_20", "pm_18", "gb_17", "pm_17", "dl_17") %>% sort(),".rda")
+  nac <- paste0("nacional/",c("df_21", "df_18", "df_15", "pr_18", "cp_22") %>% sort(), ".rda")
+  mex <- paste0("mex/",c("pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(),".rda")
+  chis <- paste0("chis/",c("pm_21", "pm_18", "gb_18", "dl_21") %>% sort(),".rda")
+  dgo <- paste0("dgo/",c("dl_21", "pm_19", "pm_16", "gb_16", "dl_16", "dl_18") %>% sort(),".rda")
+  coah <- paste0("coah/",c("pm_21", "dl_20", "pm_18", "gb_17", "pm_17", "dl_17") %>% sort(),".rda")
 
-  expect_identical(list.files("inst/electoral",pattern = "nac_") %>% sort(), nac)
-  expect_identical(list.files("inst/electoral",pattern = "mex_") %>% sort(), mex)
-  expect_identical(list.files("inst/electoral",pattern = "chis_") %>% sort(), chis)
-  expect_identical(list.files("inst/electoral",pattern = "dgo_") %>% sort(), dgo)
-  expect_identical(list.files("inst/electoral",pattern = "coah_") %>% sort(), coah)
-
-  expect_identical(list.files("inst/electoral") %>% sort(), c(nac,mex,chis,dgo, coah) %>% sort)
+  expect_identical(
+    list.files("inst/electoral", full.names = T) %>% map2(list.files("inst/electoral"), ~{
+      paste(.y, list.files(.x), sep = "/")})%>% reduce(c) %>% sort() ,
+    c(nac,mex,chis,dgo, coah) %>% sort)
 })
 
 test_that("shp completo",{
@@ -30,8 +29,8 @@ test_that("shp completo",{
 
 test_that("alianzas completas",{
   nac <- paste0(c("df_21", "df_18", "df_15", "pr_18") %>% sort(), ".rda")
-  mex <- paste0(c("pmext_21", "pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(), ".rda")
-  chis <- paste0(c("pm_21", "pm_18", "gb_18", "dl_21", "pmext_22") %>% sort(), ".rda")
+  mex <- paste0(c("pm_21", "pm_18", "gb_17", "dl_21", "dl_18") %>% sort(), ".rda")
+  chis <- paste0(c("pm_21", "pm_18", "gb_18", "dl_21") %>% sort(), ".rda")
   dgo <- paste0(c("dl_21", "pm_19", "pm_16", "gb_16", "dl_16", "dl_18") %>% sort(), ".rda")
   coah <- paste0(c("pm_21", "dl_20", "pm_18", "gb_17", "pm_17", "dl_17") %>% sort(), ".rda")
 
@@ -60,27 +59,17 @@ test_that("alianzas completas",{
 })
 
 test_that("catalogo completo", {
+  carpetas <- c("shp", "electoral", "auxiliares", "alianzas")
+  cat <- catalogo %>%
+    transmute(archivo = paste(carpeta1, capeta,bd, sep = "/"))
 
-  #alianzas
-  expect_identical(catalogo %>% filter(tipo == "alianzas") %>% pull(bd) %>% sort,
-                   list.files("inst/alianzas", full.names = T) %>%
-                     map2(list.files("inst/alianzas"), ~paste(.y, list.files(.x), sep = "/")) %>% reduce(c) %>% sort()
-                   )
-  #electoral
-  expect_identical(catalogo %>% filter(tipo == "electoral") %>% pull(bd) %>% sort,
-                   list.files("inst/electoral")
+  expect_identical(cat %>% pull(archivo) %>% sort,
+                   list.files(paste0("inst/",carpetas), full.names = T) %>%
+                     map(~{
+                       prefijo <- stringr::str_split(.x,pattern = "/") %>% pluck(1,2)
+                       prefijo2 <- stringr::str_split(.x,pattern = "/") %>% pluck(1,3)
+                       paste(prefijo, prefijo2, list.files(.x),sep = "/")
+                       }) %>% do.call(base::c,.) %>% sort()
   )
 
-  #shp
-  expect_identical(catalogo %>% filter(tipo == "shp") %>% pull(bd) %>% sort,
-                   list.files("inst/shp", full.names = T) %>%
-                     map2(list.files("inst/shp"), ~paste(.y, list.files(.x), sep = "/")) %>% reduce(c) %>% sort()
-  )
-
-  #auxiliares
-
-  expect_identical(catalogo %>% filter(tipo == "auxiliares") %>% pull(bd) %>% sort,
-                   list.files("inst/auxiliares", full.names = T) %>%
-                     map2(list.files("inst/auxiliares"), ~paste(.y, list.files(.x), sep = "/")) %>% reduce(c) %>% sort()
-  )
 })

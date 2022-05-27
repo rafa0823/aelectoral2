@@ -48,12 +48,12 @@ colnames(pm21)
 
 pm21 <- pm21 %>%
   rename("noreg"="no_reg",
-         "municipio_pm_21" = municipio,
-         "nombre_municipio_pm_21" = nombre_municipio)%>%
+         "municipio_21" = municipio,
+         "nombre_municipio_21" = nombre_municipio)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_pm_21 = formatC(municipio_pm_21, width = 3, flag = "0"))
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"))
 
 
 pm21 <- pm21 %>%
@@ -100,14 +100,14 @@ pmext21 <- pmext21 %>%
          "seccion" = id_seccion,
          "distritol_21" = id_distrito,
          "nombre_distritol_21" = distrito,
-         "municipio_pm_21" = id_municipio,
-         "nombre_municipio_pm_21" = municipio,
+         "municipio_21" = id_municipio,
+         "nombre_municipio_21" = municipio,
          "panal" = naem,
          "nominal" = lista_nominal)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_pm_21 = formatC(municipio_pm_21, width = 3, flag = "0"))
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"))
 
 
 pmext21 <- pmext21 %>%
@@ -160,13 +160,13 @@ colnames(pm18)
 
 pm18 <- pm18 %>%
   rename("noreg"=no_reg,
-         "municipio_pm_18" = municipio,
-         "nombre_municipio_pm_18" = nombre_municipio,
+         "municipio_18" = municipio,
+         "nombre_municipio_18" = nombre_municipio,
          "distritol_18" = distrito)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
-         municipio_pm_18 = formatC(municipio_pm_18, width = 3, flag = "0"),
+         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 
@@ -209,8 +209,8 @@ dl21 <- bd_dl_21_mex  %>%
   mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))  %>%
   rename("noreg"=no_registrados,
          "nominal" = lista_nominal,
-         "municipio_dl_21" = id_municipio,
-         "nombre_municipio_dl_21" = municipio,
+         "municipio_21" = id_municipio,
+         "nombre_municipio_21" = municipio,
          "seccion" = id_seccion,
          "distritol_21"=id_distrito,
          "nombre_distritol_21" = distrito,
@@ -222,7 +222,7 @@ dl21 <- bd_dl_21_mex  %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
-         municipio_dl_21 = formatC(municipio_dl_21, width = 3, flag = "0"),
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 
@@ -273,13 +273,13 @@ colnames(dl18)
 
 dl18 <- dl18 %>%
   rename("noreg"=no_reg,
-         "municipio_dl_18" = municipio,
-         "nombre_municipio_dl_18" = nombre_municipio,
+         "municipio_18" = municipio,
+         "nombre_municipio_18" = nombre_municipio,
          "distritol_18" = distrito)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
-         municipio_dl_18 = formatC(municipio_dl_18, width = 3, flag = "0"),
+         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 
@@ -332,13 +332,13 @@ colnames(gb17)
 
 gb17 <- gb17 %>%
   rename("noreg"=no_reg,
-         "municipio_gb_17" = municipio,
-         "nombre_municipio_gb_17" = nombre_municipio,
+         "municipio_17" = municipio,
+         "nombre_municipio_17" = nombre_municipio,
          "distritol_17" = distrito)%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          distritol_17 = formatC(distritol_17, width = 2, flag = "0"),
-         municipio_gb_17 = formatC(municipio_gb_17, width = 3, flag = "0"),
+         municipio_17 = formatC(municipio_17, width = 3, flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion))
 
 
@@ -372,6 +372,8 @@ mex_gb_17 <- final_gb17_mex
 mex_gb_17 %>% write_rds("inst/electoral/mex/gb_17.rda")
 
 rm(gb17)
+
+
 
 
 

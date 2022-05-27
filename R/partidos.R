@@ -1,13 +1,11 @@
-#' Title
+#' Para repartir votos por coalición
 #'
-#' @param bd
-#' @param nivel
-#' @param eleccion
+#' @param bd Base de datos que se quiere repartir
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return Base de datos repartida
+#' @examples elf$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)
 repartir_coalicion <- function(bd, nivel, eleccion){
 
   if(sum(is.na(bd[[nivel]]))>0) bd <- bd %>% mutate(!!rlang::sym(nivel) := tidyr::replace_na(!!rlang::sym(nivel),"E"))
@@ -54,17 +52,15 @@ repartir_coalicion <- function(bd, nivel, eleccion){
   return(total)
 }
 
-#' Title
+#' Reparte los votos por candidato tomando en cuenta si los candidatos fueron con alianzas o en candidatura común con más de un partido o no.
 #'
-#' @param bd
-#' @param al
-#' @param nivel
-#' @param eleccion
+#' @param bd base de datos electoral que se quiere repartir por candidatos (tomando en cuenta alianzas)
+#' @param al alianzas
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return Base de datos repartida por candidato
+#' @examples repartir_candidato(bd = self$bd_partido[[eleccion]], alianzas, nivel, eleccion)
 repartir_candidato <- function(bd, al, nivel, eleccion){
   partidos_alianza <- al %>% distinct(coalicion) %>% pull(coalicion)
   res <-  partidos_alianza %>%
@@ -97,15 +93,13 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
   return(res)
 }
 
-#' Title
+#' Función para señalae quién fue el ganador por eleccion por nivel
 #'
-#' @param bd
-#' @param nivel
-#' @param eleccion
+#' @param bd Base de datos electoral de la que se quiere sacar el ganador
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
-#' @return
-#' @export
-#'
+#' @return tibble con la columna de ganador con los ganadores por nivel
 #' @examples
 ganador <- function(bd, nivel, eleccion){
   aux <- bd %>% group_by(across(all_of(nivel))) %>% summarise(across(c(starts_with("ele_"),starts_with("cand_")), ~sum(.x,na.rm = T))) %>%

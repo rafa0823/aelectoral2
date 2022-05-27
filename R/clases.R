@@ -89,7 +89,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                                        #' @description
                                        #' Esta función te indica cuales fueron las alianzas de la eleccion indicada
-                                       #' @param nivel Nivel en el que se determinan las alianzas
+                                       #' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
                                        #'
                                        #' @return La lista de coaliciones que hubieron en la elección señalada.

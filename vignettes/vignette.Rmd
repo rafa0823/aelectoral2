@@ -1,0 +1,159 @@
+---
+title: "vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+# library(aelectoral2)
+library(aelectoral)
+devtools::load_all()
+```
+
+La forma más sencilla de cargar una base de datos electoral es indicando la elección y la entidad
+
+```{r}
+bd <- Electoral$new(eleccion = "df_21", entidad = "dgo")
+```
+
+Por defecto, bd$bd está agregada por sección y se agregan las columnas de estado (id y nombre), el tipo de elección es mayoría relativa, se mantiene el voto en el extranjero y ninguna acción es realizada con las casillas especiales. Observe la descripción:
+
+```{r}
+bd
+```
+
+Es posible agregar más elecciones a bd$bd con el siguiente código
+
+```{r, eval = FALSE}
+bd$agregar_bd(eleccion = "df_18", entidad = "dgo")
+```
+
+Es posible que se requieran más variables cartográficas como distritos locales, federales o municipios. Para eso existe el comando llaves.
+
+```{r}
+bd <- Electoral$new("df_21", entidad = "dgo",
+                    llaves = c("distritof", "distritol", "municipio")
+)
+
+```
+
+Si queremos eliminar el voto en el extranjero se indica con el parámetro extranjero = F
+
+```{r, eval = FALSE}
+bd <- Electoral$new("df_21", entidad = "dgo",
+                    llaves = c("distritof", "distritol", "municipio"), extranjero = F
+)
+```
+
+Se pueden eliminar las casillas especiales o agregar a las casillas especiales una lista nominal de 750 y hacer un ajuste en todas las demás casillas. Con las opciones eliminar o repartir. Por defecto no hace ninguna acción.
+
+```{r, eval = FALSE}
+bd <- Electoral$new("df_21", entidad = "dgo",
+                    llaves = c("distritof", "distritol", "municipio"), extranjero = F, especiales = "eliminar"
+)
+
+bd <- Electoral$new("df_21", entidad = "dgo",
+                    llaves = c("distritof", "distritol", "municipio"), extranjero = F, especiales = "repartir"
+)
+```
+
+Adicionalmente se pueden agregar más elecciones a $bd. Podemos hacer uso de la función walk para agregar varias eleccciones.
+
+```{r}
+c("df_18", "pr_18","gb_16", "pm_16", "pm_19") %>% purrr::walk(~{
+  bd$agregar_bd(.x, "dgo")
+})
+```
+
+
+Otra función importante es repartir coalición. Para ello se utiliza el siguiente código.
+
+```{r}
+bd$coalicion(nivel = "distritof_21", eleccion = "df_21")
+```
+
+Como resultado construye una base de datos por nivel repartiendo los votos de las coaliciones a cada partido. Y además genera una segunda base de datos de candidato en donde indica el total de votos del candidato.
+
+```{r}
+bd$bd_partido
+```
+
+```{r}
+bd$bd_candidato
+```
+
+#Información cartográfica
+
+Sólo es necesario indicar la unidad y la entidad. En dado caso que se quiera del todo el país entonces habrá que escribir "nacional".
+
+```{r}
+shp <- ElectoralSHP$new(unidad = "secc_21",entidad =  "dgo")
+```
+ 
+
+# Analizando los datos
+
+```{r}
+calcular_diferencias(bd = bd$bd, partido = c("morena", "pri"), 
+                     eleccion_referencia =  "df_21", eleccion_contraste = c("df_18", "pr_18")) %>% 
+  select(contains("dif_"))
+```
+
+```{r}
+calcular_votos_relativos(bd = bd$bd, partido = "morena",eleccion =  "df_21", grupo= distritof_21)
+```
+
+```{r}
+colores_partidos <- c("morena"="#BF3722","pvem"="#AEF359","pri"="#23A95D",
+                      "pt"="#FFF200", "pes"="#7A4988")
+
+calcular_votos_totales(bd = bd$bd, partido =c("morena", "pri", "pvem", "pt", "pes"), 
+                       eleccion = c("df_21", "df_18", "pr_18")) %>% 
+  graficar_totales_eleccion(colores_nombrados = colores_partidos,
+                            eleccion = c("df_21", "df_18", "pr_18"),
+                            grupo = seccion)
+```
+
+```{r}
+colorear_ganador_degradado(
+  bd = bd$bd_partido$df_21,
+  eleccion = "df_21",
+  colores_nombrados = c(morena = "red", pan = "blue"),
+  grupo = distritof_21,
+  saturacion = 0.9
+) 
+```
+
+```{r}
+crear_mapa_electoral(bd = bd$bd, eleccion = "df_21", año = "2021", grupo = seccion, 
+                     partido = c("morena", "pan", "pri", "prd"))
+```
+
+```{r}
+ganador_eleccion(bd$bd, "df_21") %>% select(ganador_df_21)
+```
+
+```{r}
+colores_partidos <- c("morena"="#BF3722", "pri"="#23A95D")
+
+graficar_cloropeta(bd$bd, shp = shp$shp$secc_21_dgo, 
+                   colores_nombrados = colores_partidos,
+                   eleccion = "df_21",grupo = seccion)
+```
+
+```{r}
+aux <- bd$bd %>% select(seccion, contains("df_21"), contains("df_18"), contains("pr_18"))
+graficar_sankey_ganadores(aux, c("df_21", "df_18", "pr_18"), seccion)
+```
+
+

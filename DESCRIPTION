@@ -11,3 +11,20 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/morant-consultores/aelectoral2
 BugReports: https://github.com/morant-consultores/aelectoral2/issues
+Imports: 
+    dplyr,
+    glue,
+    janitor,
+    R6,
+    readr,
+    sf,
+    stringr
+RoxygenNote: 7.1.2
+Depends: 
+    R (>= 2.10)
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr

@@ -1,14 +1,13 @@
 
-#' Title
+#' Función para leer una base de datos
+#' Basada en la funcion read_rds del paquete readr
 #'
-#' @param eleccion
-#' @param entidad
-#' @param tipo_eleccion
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
+#' @param entidad Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".
+#' @param tipo_eleccion Por default es "MR" refiriéndose a mayoría relativa.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return tibble de la base electoral
+#' @examples leer_base(eleccion = eleccion,entidad = entidad, tipo_eleccion = self$tipo_eleccion)
 leer_base <- function(eleccion, entidad, tipo_eleccion){
   estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nacional",entidad)
   res <- readr::read_rds(system.file(glue::glue("electoral/{estado}/{eleccion}.rda"),
@@ -25,6 +24,18 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
   return(res)
 }
 
+
+
+#' Función para leer la base de datos de alianzas por partido y por nivel
+#' También transforma la bd de alianzas al nivel de la base electoral.
+#'
+#' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
+#' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
+#' @param entidad Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".
+#' @param bd_e Base de datos electoral a la ue se le van a pegar las coaliciones por partido.
+#'
+#' @return Regresa un data frame de alianzas
+#' @examples leer_alianza(nivel, eleccion, self$entidad, self$bd)
 
 leer_alianza <- function(nivel, eleccion, entidad, bd_e){
   estado <- if_else(grepl("df_|pr_",eleccion), "nacional",entidad)
@@ -64,16 +75,15 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
 
   return(alianzas)
 }
-#' Title
+#' Base de datos que resume agrupando por las llaves
+#'Basada en la función summarise
 #'
-#' @param bd
-#' @param completa
-#' @param llaves
+#' @param bd Base de datos que se quiere reducir
+#' @param completa base de datos electoral
+#' @param llaves Son las claves cartográficas de los niveles. Por default la unidad mínima es sección y está acompañada de estado.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return Data frame
+#' @examples add %>% reducir(self$bd, self$llaves)
 reducir <- function(bd, completa, llaves){
 
   llaves_bd <- NULL
@@ -97,6 +107,12 @@ reducir <- function(bd, completa, llaves){
     mutate(across(all_of(grep(pattern = "nombre_", invert = T, value = T, llaves_bd[is.na(match(llaves_bd, "estado"))])), ~paste(estado,.x,sep = "_")))
 }
 
+#' Lee un shapefile
+#' @param unidad si es de municipio, estado, distrito, seccion, etc.
+#' @param entidad el estado de donde es
+#'
+#' @return shp
+#' @examples leer_shp(unidad, entidad)
 leer_shp <- function(unidad, entidad){
   if(entidad == "nacional") id <- diccionario %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0") else{
     id <- diccionario %>% filter(abreviatura %in% entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
@@ -109,6 +125,13 @@ leer_shp <- function(unidad, entidad){
   }) %>% bind_rows()
 }
 
+#' Para juntar un shapefile con otra base de datos
+#' Funcion basada en left_join
+#' @param shp Base de datos de tipo shp
+#' @param bd Base de datos que se va a unir con el shapefile
+#'
+#' @return Un shp unido con bd
+#' @examples join_shp_bd(secc_21, df_21)
 join_shp_bd <- function(shp, bd){
   shp %>% left_join(bd)
 }

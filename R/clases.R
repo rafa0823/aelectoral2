@@ -89,7 +89,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                                        #' @description
                                        #' Esta función te indica cuales fueron las alianzas de la eleccion indicada
-                                       #' @param nivel Nivel en el que se determinan las alianzas
+                                       #' @param nivel Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
                                        #'
                                        #' @return La lista de coaliciones que hubieron en la elección señalada.
@@ -219,7 +219,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 ElectoralSHP <- R6::R6Class("ElectoralSHP",
                             public = list(
                               shp = list(),
-
+                              entidades = NULL,
                               #'@description
                               #'Lee un shapefile
                               #' @param unidad si es de municipio, estado, distrito, seccion, etc.
@@ -228,11 +228,18 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               #' @return Una lista con shapefiles
                               #' @examples
                               initialize = function(unidad, entidad){
-
+                                self$entidades <- entidad
                                 aux <- leer_shp(unidad, entidad)
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
-
+                              print = function(){
+                                cat(glue::glue("Entidad(es): {paste(self$entidades, collapse = ', ')} \n\n Shps agregados: {paste(names(self$shp), collapse = ', ')}"))
+                              },
+                              agregar_shp = function(unidad, entidad = NULL){
+                                if(!entidad %in% self$entidades) self$entidades <- self$entidades %>% append(entidad)
+                                aux <- leer_shp(unidad, entidad)
+                                self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
+                              },
                               #'@description
                               #' Junta shapefiles
                               #' @param nivel Si la base que se va a juntar es por seccion, municipio, distrito, etc

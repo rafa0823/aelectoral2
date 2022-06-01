@@ -251,7 +251,7 @@ final_dl18_dgo %>% count(nchar(clave_casilla)) %>% view
 
 dgo_dl_18 <- final_dl18_dgo
 
-dgo_dl_18 %>% write_rds("inst/electoral/dgo_dl_18.rda")
+dgo_dl_18 %>% write_rds("inst/electoral/dgo/dl_18.rda")
 
 rm(dl18)
 
@@ -280,7 +280,7 @@ gb16 <- gb16 %>%
          nombre_municipio_16,seccion, casilla,pan_prd:pan) %>%
   mutate(across(pan_prd:pan, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         municipio_16 = formatC(municipio_16,width = 3, flag = "0"))
+         municipio_16 = formatC(as.double(municipio_16),width = 3, flag = "0"))
 
 
 gb16 <- gb16 %>%
@@ -312,7 +312,7 @@ final_gb16_dgo <- final_gb16_dgo  %>%
 
 dgo_gb_16 <- final_gb16_dgo
 
-dgo_gb_16 %>% write_rds("inst/electoral/dgo_gb_16.rda")
+dgo_gb_16 %>% write_rds("inst/electoral/dgo/gb_16.rda")
 
 rm(gb16)
 

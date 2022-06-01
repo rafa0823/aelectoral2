@@ -12,6 +12,7 @@ map_df(~{
       mutate(pan = as.numeric(pan))
   }) %>% filter(!is.na(casilla))
 
+
 bd_gb_16_tamps <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/tamaulipas_normal_casilla.csv") %>%
   janitor::clean_names() %>%
   as_tibble()
@@ -46,6 +47,7 @@ gb16 <- gb16 %>%
                .cols = pan:nominal)
 
 # Identificar los partidos de la elecccion
+
 detectar_partidos(gb16)
 
 # sufijo para join
@@ -60,13 +62,15 @@ final_gb16_tamps <- final_gb16_tamps  %>%
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
-         estado = "10",
-         nombre_estado = "DURANGO",
+         estado = "28",
+         nombre_estado = "TAMAULIPAS",
          tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,id_casilla))
 
 
+
 # guardar rda
+
 
 tamps_gb_16 <- final_gb16_tamps
 

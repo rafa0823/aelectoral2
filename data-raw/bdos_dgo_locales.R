@@ -103,7 +103,8 @@ bd_dl_16_dgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
 ## PM 19 DURANGO ------------------------------------------------------------------------------------------------------
 
 pm19 <- bd_pm_19_dgo   %>%
-  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))
+  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio)) %>%
+  select(!validos)
 
 # revisar nombres de varianles
 

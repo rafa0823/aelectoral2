@@ -280,7 +280,7 @@ gb16 <- gb16 %>%
          nombre_municipio_16,seccion, casilla,pan_prd:pan) %>%
   mutate(across(pan_prd:pan, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         municipio_16 = formatC(municipio_16,width = 3, flag = "0"))
+         municipio_16 = formatC(as.double(municipio_16),width = 3, flag = "0"))
 
 
 gb16 <- gb16 %>%

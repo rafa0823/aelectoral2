@@ -22,7 +22,8 @@ bd_gb_16_tamps <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Est
 ## GB 21 TAMAULIPAS ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_tamps   %>%
-  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio)) %>%
+  select(!validos)
 
 # revisar nombres de varianles
 

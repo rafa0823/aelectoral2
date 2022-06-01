@@ -12,55 +12,69 @@ map_df(~{
       mutate(pan = as.numeric(pan))
   }) %>% filter(!is.na(casilla))
 
-bd_gb_16_tamps <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/tamaulipas_normal_casilla.csv")
+
+bd_gb_16_tamps <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/tamaulipas_normal_casilla.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble()
 
 
-## PM 21 TAMAULIPAS ------------------------------------------------------------------------------------------------------
 
-pm21 <- bd_pm_21_tamps   %>%
-  mutate(nombre_municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = nombre_municipio))
+## GB 21 TAMAULIPAS ------------------------------------------------------------------------------------------------------
+
+gb16 <- bd_gb_16_tamps   %>%
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
 
 # revisar nombres de varianles
 
-colnames(pm21)
+colnames(gb16)
 
-pm21 <- pm21 %>%
-  rename(noreg = candidatos_no_registrados,
-         nulos = votos_nulos
+gb16 <- gb16 %>%
+  rename(noreg = no_reg,
+         distritol_16 = id_distrito,
+         nombre_distritol_16 = cabecera_distrital,
+         municipio_16 = id_municipio,
+         nombre_municipio_16 = municipio
   )%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_21 = formatC(municipio_21, width = 3, flag = "0"))
+         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
+         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
 
 
-pm21 <- pm21 %>%
+gb16 <- gb16 %>%
   rename_with.(~paste0('ele_', .x),
                .cols = pan:nominal)
 
 # Identificar los partidos de la elecccion
-detectar_partidos(pm21)
+
+detectar_partidos(gb16)
 
 # sufijo para join
 
-final_pm21_tamps <- insertar_sufijo(bd=pm21, "pm", "21")
+final_gb16_tamps <- insertar_sufijo(bd=gb16, "gb", "16")
 
-final_pm21_tamps <- final_pm21_tamps  %>%
-  mutate(clave_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+#agregar clave casillas
+
+final_gb16_tamps <- final_gb16_tamps  %>%
+  mutate(id_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
                                    nchar(casilla) == 3 ~ paste0(casilla,"00"),
-                                   nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla)),
+                                   nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                   nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
          estado = "10",
          nombre_estado = "DURANGO",
          tipo_casilla = substr(casilla,1,1),
-         clave_casilla = paste0(estado,seccion,clave_casilla))
+         clave_casilla = paste0(estado,seccion,id_casilla))
+
 
 
 # guardar rda
 
-tamps_pm_21 <- final_pm21_tamps
 
-tamps_pm_21 %>% write_rds("inst/electoral/tamps_pm_21.rda")
+tamps_gb_16 <- final_gb16_tamps
 
-rm(pm21)
+tamps_gb_16 %>% write_rds("inst/electoral/tamps/gb_16.rda")
+
+rm(gb16)
 

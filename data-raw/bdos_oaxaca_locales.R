@@ -13,7 +13,8 @@ bd_gb_16_oaxaca <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Es
 ## GB 21 OAXACA ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_oaxaca   %>%
-  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))%>%
+  select(!validos)
 
 # revisar nombres de varianles
 

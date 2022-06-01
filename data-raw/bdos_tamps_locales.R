@@ -62,8 +62,8 @@ final_gb16_tamps <- final_gb16_tamps  %>%
                                    nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                    nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
-         estado = "10",
-         nombre_estado = "DURANGO",
+         estado = "28",
+         nombre_estado = "TAMAULIPAS",
          tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,id_casilla))
 

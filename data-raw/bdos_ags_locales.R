@@ -13,7 +13,8 @@ bd_gb_16_ags <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
 ## GB 21 AGUASCALIENTES ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_ags   %>%
-  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))%>%
+  select(!validos)
 
 # revisar nombres de varianles
 

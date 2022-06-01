@@ -54,7 +54,7 @@ final_gb16_q_roo <- final_gb16_q_roo  %>%
                                 nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
          estado = "20",
-         nombre_estado = "q_roo",
+         nombre_estado = "QUINTANA ROO",
          tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,id_casilla))
 

@@ -4,9 +4,28 @@
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
+#GB16
 bd_gb_16_hgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/hidalgo_normal_casilla.csv") %>%
   janitor::clean_names() %>%
   as_tibble()
+
+#PM20
+path <- "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2020/Municipio/hgo_normal_casilla.xlsx"
+
+bd_pm_20_hgo <- path %>%
+  excel_sheets() %>%
+  set_names() %>%
+  map_df(~ read_excel(path = path, sheet = .x)%>%
+           janitor::clean_names(),
+           .id = "Sheet") %>%
+  select(!c(x28,x29,x30,x31,x24)) %>%
+  select(Sheet:morena_pt_pvem,independiente_1,no_reg:participacion) %>%
+  rename(pan_pri_prd_total = pan_pri_prd_cc,
+         morena_pt_total = morena_pt_pvem)
+
+
+
+bd_dl_21_dgo %>% filter(Sheet == "01. D. DURANGO") %>% summarise(sum(nominal))
 
 
 

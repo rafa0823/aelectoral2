@@ -53,7 +53,7 @@ final_gb16_q_roo <- final_gb16_q_roo  %>%
                                 nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                 nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
-         estado = "20",
+         estado = "23",
          nombre_estado = "QUINTANA ROO",
          tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,id_casilla))

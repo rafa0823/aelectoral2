@@ -10,7 +10,8 @@ map_df(~{
     print(.x)
     read_csv(.x,skip = 6) %>% janitor::clean_names() %>%
       mutate(pan = as.numeric(pan))
-  }) %>% filter(!is.na(casilla))
+  }) %>% filter(!is.na(casilla)) %>%
+  select(casilla:pt_morena,miguel_rodriguez_salazar:monica_margot_de_leon,votos_nulos,candidatos_no_registrados)
 
 
 bd_gb_16_tamps <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/tamaulipas_normal_casilla.csv") %>%
@@ -19,7 +20,7 @@ bd_gb_16_tamps <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Est
 
 
 
-## GB 21 TAMAULIPAS ------------------------------------------------------------------------------------------------------
+## GB 16 TAMAULIPAS ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_tamps   %>%
   mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio)) %>%
@@ -78,4 +79,57 @@ tamps_gb_16 <- final_gb16_tamps
 tamps_gb_16 %>% write_rds("inst/electoral/tamps/gb_16.rda")
 
 rm(gb16)
+
+## PM 21 TAMAULIPAS ------------------------------------------------------------------------------------------------------
+
+pm21 <- bd_pm_21_tamps
+
+# revisar nombres de varianles
+
+colnames(pm21)
+
+pm21 <- pm21 %>%
+  rename(noreg = candidatos_no_registrados,
+         nulos = votos_nulos
+  )%>%
+  mutate(across(pan:noreg, ~as.numeric(.x)))
+
+
+pm21 <- pm21 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:noreg)
+
+# Identificar los partidos de la elecccion
+
+detectar_partidos(pm21)
+
+# sufijo para join
+
+final_pm21_tamps <- insertar_sufijo(bd=pm21, "pm", "21")
+
+#agregar clave casillas
+
+final_pm21_tamps <- final_pm21_tamps  %>%
+  mutate(id_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
+
+         estado = "28",
+         nombre_estado = "TAMAULIPAS",
+         tipo_casilla = substr(casilla,1,1),
+         clave_casilla = paste0(estado,seccion,id_casilla))
+
+
+
+# guardar rda
+
+
+tamps_pm_21 <- final_pm21_tamps
+
+tamps_pm_21 %>% write_rds("inst/electoral/tamps/pm_21.rda")
+
+rm(pm21)
+
+
 

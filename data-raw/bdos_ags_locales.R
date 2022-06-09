@@ -22,6 +22,8 @@ bd_dl_21_ags <- list.files(full.names = T) %>%
                          distrito)) %>%
   filter(!casillas %in% c("TOTAL",NA))
 
+setwd("~/Documents/Git/aelectoral2")
+
 
 
 ## GB 21 AGUASCALIENTES ------------------------------------------------------------------------------------------------------

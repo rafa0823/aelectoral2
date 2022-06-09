@@ -8,6 +8,20 @@ bd_gb_16_ags <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
   janitor::clean_names() %>%
   as_tibble()
 
+setwd("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2021/Distrito local/Aguascalientes 2021")
+
+bd_dl_21_ags <- list.files(full.names = T) %>%
+  map_dfr(~{
+    print(.x)
+    read_csv(.x,skip = 2) %>%
+      janitor::clean_names() %>%
+      mutate(distrito = .x)
+  }) %>%
+  mutate(distrito = gsub(pattern = "[[:alpha:]]|[[:punct:]]",
+                         replacement = "",
+                         distrito)) %>%
+  filter(!casillas %in% c("TOTAL",NA))
+
 
 
 ## GB 21 AGUASCALIENTES ------------------------------------------------------------------------------------------------------
@@ -70,3 +84,69 @@ ags_gb_16 <- final_gb16_ags
 ags_gb_16 %>% write_rds("inst/electoral/ags/gb_16.rda")
 
 rm(gb16)
+
+### DL 21 AGUASCALIENTES -------------------------------------------------------------------------------------
+
+
+dl21 <- bd_dl_21_ags %>%
+  select(casillas,distrito,pan:total)
+
+# revisar nombres de varianles
+
+colnames(dl21)
+
+dl21 <- dl21 %>%
+  rename(casilla = casillas,
+         distritol_21 = distrito,
+         panal = naa,
+         pan_prd = co_pan_prd,
+         pt_morena_panal = co_pt_morena_naa,
+         pt_panal = pt_naa,
+         morena_panal = morena_naa,
+         noreg = num_votos_can_nreg,
+         nulos = num_votos_nulos
+  )%>%
+  mutate(across(pan:total, ~as.numeric(.x)),
+         distritol_21 = formatC(as.numeric(distritol_21), width = 3, flag = "0"))
+
+
+dl21 <- dl21 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:total)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(dl21)
+
+# sufijo para join
+
+final_dl21_ags <- insertar_sufijo(bd=dl21, "dl", "21")
+
+#agregar clave casillas
+
+final_dl21_ags <- final_dl21_ags  %>%
+  separate(casilla,c("seccion","casilla", "ext_con")," ", fill = "right") %>%
+  mutate(seccion = formatC(as.numeric(seccion),width = 4,flag = "0"),
+         tipo_casilla = substr(casilla,1,1),
+         id_casilla = if_else(casilla == "B","01",
+                           formatC(as.numeric(gsub("[[:alpha:]]","",casilla)),width = 2,flag = "0")),
+         ext_con = if_else(is.na(ext_con),"00",gsub("C","0",ext_con)),
+         estado = "01",
+         nombre_estado = "AGUASCALIENTES",
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla,ext_con))
+
+#pruebas
+
+final_dl21_ags %>% count(nchar(clave_casilla))
+final_dl21_ags %>% count(casilla)
+
+# guardar rda
+
+ags_dl_21 <- final_dl21_ags
+
+ags_dl_21 %>% write_rds("inst/electoral/ags/dl_21.rda")
+
+rm(dl21)
+
+
+
+

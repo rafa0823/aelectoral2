@@ -90,7 +90,20 @@ colnames(pm21)
 
 pm21 <- pm21 %>%
   rename(noreg = candidatos_no_registrados,
-         nulos = votos_nulos
+         nulos = votos_nulos,
+         miguelrodriguezsalazar = miguel_rodriguez_salazar,
+         josemunozporras = jose_munoz_porras,
+         elisapatriciaquintanilla = elisa_patricia_quintanilla,
+         victormanuelvergara = victor_manuel_vergara,
+         patriciogarzatapia = patricio_garza_tapia,
+         julianalejandrocaraveo =  julian_alejandro_caraveo,
+         monicamargotdeleon = monica_margot_de_leon,
+         arnoldojavierrodriguez = arnoldo_javier_rodriguez,
+         joseluisgallardo_flores = jose_luis_gallardo_flores ,
+         hirampenagomez = hiram_pena_gomez,
+         carloslaramacias = carlos_lara_macias,
+         carlosalbertoguerrero = carlos_alberto_guerrero,
+         marggidantoniorodriguez = marggid_antonio_rodriguez
   )%>%
   mutate(across(pan:noreg, ~as.numeric(.x)))
 
@@ -109,17 +122,18 @@ final_pm21_tamps <- insertar_sufijo(bd=pm21, "pm", "21")
 
 #agregar clave casillas
 
-final_pm21_tamps <- final_pm21_tamps  %>%
-  mutate(id_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
-                                nchar(casilla) == 3 ~ paste0(casilla,"00"),
-                                nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
-                                nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
-
+final_pm21_tamps <- final_pm21_tamps %>%
+  separate(casilla,c("seccion","tipo_casilla", "id_casilla", "ext_con")," ", fill = "right") %>%
+  mutate(tipo_casilla = substr(tipo_casilla,1,1),
+         id_casilla = if_else( nchar(id_casilla) == 1, paste0('0',id_casilla), id_casilla  ),
+         ext_con = if_else(is.na(ext_con),"00",
+                           if_else( nchar(ext_con) == 2, gsub('C',"0",ext_con),
+                                    gsub('C',"",ext_con))),
          estado = "28",
          nombre_estado = "TAMAULIPAS",
-         tipo_casilla = substr(casilla,1,1),
-         clave_casilla = paste0(estado,seccion,id_casilla))
+         clave_casilla = paste0(estado,seccion,tipo_casilla,id_casilla,ext_con))
 
+final_pm21_tamps %>% count(nchar(clave_casilla))
 
 
 # guardar rda

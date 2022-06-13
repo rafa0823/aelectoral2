@@ -4,6 +4,20 @@
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
+#lista nominal 21
+
+lista_nominal_21 <- read_delim("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/2021/Computos Distritales/diputaciones.csv",
+                               delim = "|", escape_double = FALSE, trim_ws = TRUE,  locale = locale(encoding = "CP1252"),
+                               skip = 5) %>%
+  janitor::clean_names() %>%
+  as_tibble() %>%
+  select(nombre_estado,clave_casilla, lista_nominal_casilla) %>%
+  filter(nombre_estado == "TAMAULIPAS") %>%
+  mutate(clave_casilla = gsub("[[:punct:]]","",clave_casilla))
+
+# pm 21
+
+
 bd_pm_21_tamps <- list.files("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2021/Municipio/Tamaulipas",
                              full.names = T) %>%
 map_df(~{
@@ -124,8 +138,8 @@ final_pm21_tamps <- insertar_sufijo(bd=pm21, "pm", "21")
 
 final_pm21_tamps <- final_pm21_tamps %>%
   separate(casilla,c("seccion","tipo_casilla", "id_casilla", "ext_con")," ", fill = "right") %>%
-  mutate(tipo_casilla = substr(tipo_casilla,1,1),
-         id_casilla = if_else( nchar(id_casilla) == 1, paste0('0',id_casilla), id_casilla  ),
+  mutate(tipo_casilla = if_else(tipo_casilla == "ESPECIAL","S",substr(tipo_casilla,1,1)),
+         id_casilla = if_else(nchar(id_casilla) == 1, paste0('0',id_casilla), id_casilla),
          ext_con = if_else(is.na(ext_con),"00",
                            if_else( nchar(ext_con) == 2, gsub('C',"0",ext_con),
                                     gsub('C',"",ext_con))),
@@ -135,6 +149,9 @@ final_pm21_tamps <- final_pm21_tamps %>%
 
 final_pm21_tamps %>% count(nchar(clave_casilla))
 
+#agregar lista nominal
+
+final_pm21_tamps <- final_pm21_tamps %>% left_join(lista_nominal_21)
 
 # guardar rda
 

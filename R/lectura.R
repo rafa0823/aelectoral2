@@ -15,7 +15,7 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
                                      mustWork = TRUE)) %>% tibble::as_tibble()
   if(estado == "nacional") {
     if(entidad != "nacional"){
-      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
+      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
       res <- res %>% filter(estado == !!nombre)
     }}
 
@@ -58,7 +58,7 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
 
   nivel_sep <- stringr::str_split(names(res)[2], pattern = "_") %>% pluck(1,1)
 
-  w <- switch(nivel_sep, municipio = 3, distritof = 2, distritol = 2)
+  w <- switch(nivel_sep, municipio = 3, distritof = 2, distritol = 2, estado = 2)
 
   alianzas <- res %>% transmute(
     !!rlang::sym(names(res)[2]) := paste(stringr::str_pad(estado, width = 2, pad = "0"),

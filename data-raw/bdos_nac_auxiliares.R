@@ -46,19 +46,19 @@ alianzas_pr_18 %>% write_rds("inst/alianzas/nacional/pr_18.rda")
 
 #### sacar alianzas del documento del ife de resultados por candidato
 
-alianza_pri_pven <- candidatos_df_12 %>% janitor::clean_names()  %>%
-  mutate(candidatura_comun = if_else(is.na(pri), TRUE,FALSE),
-         coaliciones = if_else(is.na(pri_pvem),"NA","pri_pvem")) %>%
-  select(id_estado,id_distrito,coaliciones, candidatura_comun) %>%
-  filter(coaliciones != "NA")
-
-alianza_prd_pt_mc <- candidatos_df_12 %>% janitor::clean_names()  %>%
-  mutate(candidatura_comun = !is.na(prd_pt_mc),
-         coaliciones = if_else(is.na(prd_pt_mc),"NA","prd_pt_mc")) %>%
-  select(id_estado,id_distrito,coaliciones, candidatura_comun) %>%
-  filter(coaliciones != "NA")
-
-alianza_pri_pven %>% full_join(alianza_prd_pt_mc) %>% write_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/federales/df_12.csv")
+# alianza_pri_pven <- candidatos_df_12 %>% janitor::clean_names()  %>%
+#   mutate(candidatura_comun = if_else(is.na(pri), TRUE,FALSE),
+#          coaliciones = if_else(is.na(pri_pvem),"NA","pri_pvem")) %>%
+#   select(id_estado,id_distrito,coaliciones, candidatura_comun) %>%
+#   filter(coaliciones != "NA")
+#
+# alianza_prd_pt_mc <- candidatos_df_12 %>% janitor::clean_names()  %>%
+#   mutate(candidatura_comun = !is.na(prd_pt_mc),
+#          coaliciones = if_else(is.na(prd_pt_mc),"NA","prd_pt_mc")) %>%
+#   select(id_estado,id_distrito,coaliciones, candidatura_comun) %>%
+#   filter(coaliciones != "NA")
+#
+# alianza_pri_pven %>% full_join(alianza_prd_pt_mc) %>% write_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/federales/df_12.csv")
 
 # subir alianzas df 12 al paquete
 

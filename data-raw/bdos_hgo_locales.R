@@ -24,7 +24,8 @@ bd_dl_18_hgo <- list.files(full.names = T) %>%
     print(.x)
     read_csv(.x) %>%
       janitor::clean_names() %>%
-      mutate(id_municipio = as.double(id_municipio))
+      mutate(id_municipio = as.double(id_municipio),
+             mr_rp = toupper(substr(gsub("./hidalgo_normal_casilla_","",.x),1,2)))
   })
 
 
@@ -45,30 +46,23 @@ bd_dl_16_hgo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
 
 
 
-## GB 21 HIDALGO ------------------------------------------------------------------------------------------------------
+## GB 16 HIDALGO ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_hgo   %>%
   mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))%>%
-  select(!num_votos_validos)
+  select(!validos)
 
 # revisar nombres de varianles
 
 colnames(gb16)
 
 gb16 <- gb16 %>%
-  rename(noreg = num_votos_can_nreg,
+  rename(noreg = no_reg,
          distritol_16 = id_distrito,
          nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = id_municipio,
-         nombre_municipio_16 = municipio,
-         panal = nva_alianza,
-         pri_pvem_panal = pri_pvem_nva_alianza,
-         pri_panal = pri_nva_alianza,
-         pvem_panal = pvem_nva_alianza,
-         nulos = num_votos_nulos,
-         total = total_votos,
-         nominal = lista_nominal
-  )%>%
+         municipio_16 = municipio,
+         nombre_municipio_16 = nombre_municipio,
+  ) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
@@ -247,8 +241,8 @@ final_dl18_hgo <- final_dl18_hgo  %>%
                                 nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                 nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
-         estado = "01",
-         nombre_estado = "hidalgo",
+         estado = "13",
+         nombre_estado = "HIDALGO",
          tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,id_casilla))
 
@@ -321,8 +315,8 @@ final_pm16_hgo <- final_pm16_hgo  %>%
                                 nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                 nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
-         estado = "01",
-         nombre_estado = "hidalgo",
+         estado = "13",
+         nombre_estado = "HIDALGO",
          tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,id_casilla))
 
@@ -395,8 +389,8 @@ final_dl16_hgo <- final_dl16_hgo  %>%
                                 nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
                                 nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
 
-         estado = "01",
-         nombre_estado = "hidalgo",
+         estado = "13",
+         nombre_estado = "HIDALGO",
          tipo_casilla = substr(casilla,1,1),
          clave_casilla = paste0(estado,seccion,id_casilla))
 

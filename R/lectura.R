@@ -46,7 +46,8 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
                                        mustWork = TRUE)) %>% tibble::as_tibble()
 
     if(entidad != "nacional"){
-      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado)
+      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado) %>%
+        stringr::str_pad(width = 2, pad = "0")
       res <- res %>% filter(estado == !!nombre)
     }} else{
       res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{eleccion}.rda"),

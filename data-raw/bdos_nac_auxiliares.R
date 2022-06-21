@@ -81,3 +81,4 @@ alianzas_df_12 %>% count(coaliciones)
 
 alianzas_df_12 %>% write_rds("inst/alianzas/nacional/df_12.rda")
 
+

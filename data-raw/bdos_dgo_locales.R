@@ -147,7 +147,7 @@ final_pm19_dgo <- final_pm19_dgo  %>%
 
 dgo_pm_19 <- final_pm19_dgo
 
-dgo_pm_19 %>% write_rds("inst/electoral/dgo_pm_19.rda")
+dgo_pm_19 %>% write_rds("inst/electoral/dgo/pm_19.rda")
 
 rm(pm19)
 

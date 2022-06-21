@@ -40,5 +40,8 @@ alianzas_pr_18 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Est
 
 alianzas_pr_18 %>% count(coaliciones)
 
-alianzas_pr_18 %>% write_rds("inst/alianzas/nacional/pr_18.rda")
+alianzas_pr_18 <- alianzas_pr_18 %>% select(-nombre_estado)
+stringr::str_pad(1:32,width = 2, pad = "0") %>%
+  map_df(~alianzas_pr_18 %>% mutate(estado = .x,.after = eleccion))%>%
+  write_rds("inst/alianzas/nacional/pr_18.rda")
 

@@ -36,6 +36,16 @@ bd_gb_17_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
   janitor::clean_names() %>%
   as_tibble()
 
+# pm 15
+bd_pm_15_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2015/Municipio/edomex_normal_casilla.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble()
+
+# dl 15
+bd_dl_15_mex <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2015/Distrito local/edomex_normal_casilla.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble()
+
 
 # PM 21 EDOMEX ------------------------------------------------------------------
 
@@ -371,6 +381,137 @@ mex_gb_17 <- final_gb17_mex
 mex_gb_17 %>% write_rds("inst/electoral/mex/gb_17.rda")
 
 rm(gb17)
+
+## PM 15 EDOMEX ------------
+
+
+bd_pm_15_mex %>% colnames
+
+pm15 <- bd_pm_15_mex   %>%
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+
+# revisar nombres de varianles
+
+colnames(pm15)
+
+pm15 <- pm15 %>%
+  rename(noreg = no_reg,
+         distritol_15 = id_distrito,
+         nombre_distritol_15 = cabecera_distrital,
+         municipio_15 = municipio,
+         nombre_municipio_15 = nombre_municipio
+  )%>%
+  rename_with( ~ gsub("independiente_", "independiente", .x, fixed = TRUE)) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
+         distritol_15 = formatC(distritol_15, width = 3, flag = "0"))
+
+
+pm15 <- pm15 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(pm15)
+
+# sufijo para join
+
+final_pm15_mex <- insertar_sufijo(bd=pm15, "pm", "15")
+
+#agregar clave casillas
+
+
+final_pm15_mex <- final_pm15_mex  %>%
+  mutate(id_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
+
+         estado = "15",
+         nombre_estado = "MÉXICO",
+         tipo_casilla = substr(casilla,1,1),
+         clave_casilla = paste0(estado,seccion,id_casilla))
+
+#pruebas
+
+final_pm15_mex %>% count(nchar(clave_casilla))
+final_pm15_mex %>% count(id_casilla)
+
+# guardar rda
+
+mex_pm_15 <- final_pm15_mex
+
+mex_pm_15 %>% write_rds("inst/electoral/mex/pm_15.rda")
+
+rm(pm15)
+
+## dl 15 EDOMEX ------------
+
+
+bd_dl_15_mex %>% colnames
+
+dl15 <- bd_dl_15_mex   %>%
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
+
+# revisar nombres de varianles
+
+colnames(dl15)
+
+dl15 <- dl15 %>%
+  rename(noreg = no_reg,
+         distritol_15 = id_distrito,
+         nombre_distritol_15 = cabecera_distrital,
+         municipio_15 = municipio,
+         nombre_municipio_15 = nombre_municipio
+  )%>%
+  rename_with( ~ gsub("independiente_", "independiente", .x, fixed = TRUE)) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         seccion = if_else(casilla == "P","9999",seccion),
+         municipio_15 = formatC(municipio_15, width = 3, flag = "0"),
+         distritol_15 = formatC(distritol_15, width = 3, flag = "0"))
+
+
+dl15 <- dl15 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# Identificar los partidos de la elecccion
+detectar_partidos(dl15)
+
+# sufijo para join
+
+final_dl15_mex <- insertar_sufijo(bd=dl15, "dl", "15")
+
+#agregar clave casillas
+
+
+final_dl15_mex <- final_dl15_mex  %>%
+  mutate(id_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
+
+         estado = "15",
+         nombre_estado = "MÉXICO",
+         tipo_casilla = substr(casilla,1,1),
+         clave_casilla = paste0(estado,seccion,id_casilla))
+
+#pruebas
+
+final_dl15_mex %>% count(nchar(clave_casilla))
+final_dl15_mex %>% count(id_casilla)
+
+# guardar rda
+
+mex_dl_15 <- final_dl15_mex
+
+mex_dl_15 %>% write_rds("inst/electoral/mex/dl_15.rda")
+
+rm(dl15)
+
 
 
 

@@ -24,6 +24,10 @@ bd_df_15 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadís
   janitor::clean_names() %>%
   as_tibble()
 
+bd_df_12 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Federal/2012/Diputado_casilla.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble()
+
 
 # FEDERALES -----------------------------------------------------------------------
 
@@ -94,7 +98,7 @@ final_df21 <- insertar_sufijo(bd=df21, "df", "21") %>%
 # guardar rda
 nac_df_21 <- final_df21
 
-nac_df_21 %>% write_rds("inst/electoral/nac_df_21.rda")
+nac_df_21 %>% write_rds("inst/electoral/nacional/df_21.rda")
 
 rm(df21)
 
@@ -162,7 +166,7 @@ final_pr18 <- insertar_sufijo(bd=pr18, "pr", "18")
 
 nac_pr_18 <- final_pr18
 
-nac_pr_18 %>% write_rds("inst/electoral/nac_pr_18.rda")
+nac_pr_18 %>% write_rds("inst/electoral/nacional/pr_18.rda")
 
 rm(pr18)
 
@@ -232,7 +236,7 @@ final_df18 <- insertar_sufijo(bd=df18, "df", "18")
 # guardar rda
 nac_df_18 <- final_df18
 
-nac_df_18 %>% write_rds("inst/electoral/nac_df_18.rda")
+nac_df_18 %>% write_rds("inst/electoral/nacional/df_18.rda")
 
 rm(df18)
 
@@ -299,7 +303,79 @@ final_df15 <- insertar_sufijo(bd=df15, "df", "15")
 # guardar rda
 nac_df_15 <- final_df15
 
-nac_df_15 %>% write_rds("inst/electoral/nac_df_15.rda")
+nac_df_15 %>% write_rds("inst/electoral/nacional/df_15.rda")
 
 rm(df15)
 
+
+## DIPFED 12 --------------------------------------------------------------------------
+
+
+# Identificar nombres de variables y nombres de partidos
+
+df12 <- bd_df_12
+
+df12[df12 == "NA"] <- NA
+
+
+colnames(df12)
+
+# Homogenizar nombres de variables partidos
+
+df12 <- df12  %>%
+  select(clave_casilla:orden,
+         municipio,
+         pan:pt_mc,
+         no_reg,
+         nulos,
+         lista_nominal,
+         votos_reservados,
+         id_grupo,
+         tipo_recuento) %>%
+  rename("noreg" = no_reg,
+         "distritof_12" = distrito,
+         nominal = lista_nominal) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         estado = formatC(estado, width = 2,flag = "0"),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         id_casilla = formatC(id_casilla, width = 2,flag = "0"),
+         ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
+         distritof_12 = formatC(distritof_12, width = 2, flag = "0"),
+         seccion = if_else(tipo_casilla == "P","9999",seccion),
+         mr_rp = if_else(tipo_candidatura == 2, "MR", "RP"))
+
+
+
+df12 <- df12 %>%
+  rename_with.(~paste0('ele_', .x),
+               .cols = pan:nominal)
+
+# revisar nombres de partidos
+
+detectar_partidos(df12)
+
+# Agregar municipios del año
+
+# municipios_df_12 <- read_excel("data-raw/DatosAbiertos-derfe-pdln_edms_sexo_20120415.xlsx") %>%
+#   janitor::clean_names() %>%
+#   select("estado" = clave_entidad,
+#          seccion,
+#          "municipio_df_12" = clave_municipio,
+#          "nombre_municipio_df_12" = nombre_municipio) %>%
+#   mutate(seccion = formatC(seccion, width = 4,flag = "0")) %>%
+#   unique()
+#
+# df12 <- df12 %>%
+#   left_join(municipios_df_12)
+
+
+# sufijo para join
+
+final_df12 <- insertar_sufijo(bd=df12, "df", "12")
+
+# guardar rda
+nac_df_12 <- final_df12
+
+nac_df_12 %>% write_rds("inst/electoral/nacional/df_12.rda")
+
+rm(df12)

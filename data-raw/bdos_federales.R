@@ -98,7 +98,7 @@ final_df21 <- insertar_sufijo(bd=df21, "df", "21") %>%
 # guardar rda
 nac_df_21 <- final_df21
 
-nac_df_21 %>% write_rds("inst/electoral/nac_df_21.rda")
+nac_df_21 %>% write_rds("inst/electoral/nacional/df_21.rda")
 
 rm(df21)
 
@@ -166,7 +166,7 @@ final_pr18 <- insertar_sufijo(bd=pr18, "pr", "18")
 
 nac_pr_18 <- final_pr18
 
-nac_pr_18 %>% write_rds("inst/electoral/nac_pr_18.rda")
+nac_pr_18 %>% write_rds("inst/electoral/nacional/pr_18.rda")
 
 rm(pr18)
 
@@ -236,7 +236,7 @@ final_df18 <- insertar_sufijo(bd=df18, "df", "18")
 # guardar rda
 nac_df_18 <- final_df18
 
-nac_df_18 %>% write_rds("inst/electoral/nac_df_18.rda")
+nac_df_18 %>% write_rds("inst/electoral/nacional/df_18.rda")
 
 rm(df18)
 
@@ -303,7 +303,7 @@ final_df15 <- insertar_sufijo(bd=df15, "df", "15")
 # guardar rda
 nac_df_15 <- final_df15
 
-nac_df_15 %>% write_rds("inst/electoral/nac_df_15.rda")
+nac_df_15 %>% write_rds("inst/electoral/nacional/df_15.rda")
 
 rm(df15)
 
@@ -376,6 +376,6 @@ final_df12 <- insertar_sufijo(bd=df12, "df", "12")
 # guardar rda
 nac_df_12 <- final_df12
 
-nac_df_12 %>% write_rds("inst/electoral/nac_df_12.rda")
+nac_df_12 %>% write_rds("inst/electoral/nacional/df_12.rda")
 
 rm(df12)

@@ -69,7 +69,8 @@ bd_dl_18_ags <- list.files(full.names = T) %>%
     print(.x)
     read_csv(.x) %>%
       janitor::clean_names() %>%
-      mutate(id_municipio = as.double(id_municipio))
+      mutate(id_municipio = as.double(id_municipio),
+             mr_rp = toupper(substr(gsub("./aguascalientes_normal_casilla_","",.x),1,2)))
   })
 
 
@@ -86,6 +87,7 @@ bd_pm_16_ags <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estad
 bd_dl_16_ags <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/aguascalientes_normal_casilla.csv") %>%
   janitor::clean_names() %>%
   as_tibble()
+
 
 
 ## GB 16 AGUASCALIENTES ------------------------------------------------------------------------------------------------------

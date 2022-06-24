@@ -64,7 +64,6 @@ alianzas_chis_pmextra_22 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consult
 alianzas_chis_pm_21 %>% rbind(alianzas_chis_pmextra_22) %>% write_rds("inst/alianzas/chis/pm_21.rda")
 
 
-
 alianzas_chis_pm_15 <- read.csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/alianzas/locales/pm_15_chiapas.csv") %>%
   janitor::clean_names() %>%
   as_tibble() %>%

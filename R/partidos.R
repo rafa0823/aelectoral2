@@ -30,7 +30,7 @@ repartir_coalicion <- function(bd, nivel, eleccion){
     group_by(across(all_of(nivel)), alianza) %>%
     mutate(partido = partido + (residuo >= dense_rank(rango)) * (residuo > 0)) %>%
     group_by(across(all_of(nivel)), partidos, .drop = T) %>%
-    summarise(partido = sum(partido)) %>%
+    summarise(partido = sum(partido, na.rm = T)) %>%
     tidyr::pivot_wider(names_from = partidos, values_from = partido)
 
   total <- total %>% rename_with(.cols = -all_of(nivel),~glue::glue("ele_{.x}_{eleccion}")) %>% ungroup
@@ -48,7 +48,9 @@ repartir_coalicion <- function(bd, nivel, eleccion){
 #' @return Base de datos repartida por candidato
 #' @examples repartir_candidato(bd = self$bd_partido[[eleccion]], alianzas, nivel, eleccion)
 repartir_candidato <- function(bd, al, nivel, eleccion){
+  al <- al %>% na.omit
   partidos_alianza <- al %>% distinct(coalicion) %>% pull(coalicion)
+
   res <-  partidos_alianza %>%
     purrr::map(~{
       aux_n <- al %>% filter(coalicion == .x) %>% pull(nivel)
@@ -67,14 +69,14 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
           if(nrow(sin_c)> 0) full_join(., sin_c) else .
         }
 
-    }) %>% purrr::reduce(full_join)
+    }) %>% purrr::reduce(full_join, by = nivel)
 
 
   res <- res %>% left_join(
     bd %>% select(-matches(partidos_alianza %>% stringr::str_split("_") %>% do.call(c,.)))
   ) %>%
     rename_with(~stringr::str_replace(.x, "ele_", "cand_"), starts_with("ele_")) %>%
-    mutate(across(c(starts_with("cand_")), ~tidyr::replace_na(.x,0))) %>%
+    mutate(across(c(starts_with("cand_")), ~tidyr::replace_na(.x,0)))# %>%
 
   return(res)
 }

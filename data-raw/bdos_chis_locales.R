@@ -60,7 +60,8 @@ pm21 <- pm21 %>%
          "nombre_distritol_21" = distrito_loc,
          "nominal" = lista_nominal,
          "total" = total_votos,
-         fxm = fsm
+         fxm = fsm,
+         panal = pna
   )%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),

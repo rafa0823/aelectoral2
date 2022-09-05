@@ -107,19 +107,19 @@ colnames(pmext22)
 pmext22 <- pmext22 %>%
   rename("estado" = estado,
          "noreg"= no_reg,
-         "municipio_22" = municipio,
-         "nombre_municipio_22" = nombre_municipio,
+         "municipio_21" = municipio,
+         "nombre_municipio_21" = nombre_municipio,
          "total" = votos,
          "noreg" = no_reg,
-         "distritol_22" = distritol,
-         "nombre_distritol_22" = nombre_distritol,
+         "distritol_21" = distritol,
+         "nombre_distritol_21" = nombre_distritol,
          fxm = fsm)%>%
   mutate(seccion = substr(clave_casilla, 3,6)) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          estado = formatC(estado, width = 2, flag = "0"),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         municipio_22 = formatC(municipio_22, width = 3, flag = "0"),
-         distritol_22 = formatC(distritol_22, width = 2, flag = "0"),
+         municipio_22 = formatC(municipio_21, width = 3, flag = "0"),
+         distritol_22 = formatC(distritol_21, width = 2, flag = "0"),
          tipo_eleccion = "EXTRAORDINARIA")
 
 
@@ -132,7 +132,7 @@ detectar_partidos(pmext22)
 
 # sufijo para join
 
-final_pmext22_chis <- insertar_sufijo(bd=pmext22, "pm", "22")
+final_pmext22_chis <- insertar_sufijo(bd=pmext22, "pm", "21")
 
 final_pmext22_chis
 

@@ -48,20 +48,20 @@ df21 <- df21  %>%
          "nulos" = votos_nulos,
          "total" = total_votos_calculados,
          "nominal" = lista_nominal_casilla,
-         "distritof_21" = id_distrito,
-         "nombre_distritof_21" = nombre_distrito,
+         "distritof" = id_distrito,
+         "nombre_distritof" = nombre_distrito,
          "estado" = id_estado) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          estado = formatC(estado, width = 2,flag = "0"),
          seccion = formatC(seccion, width = 4,flag = "0"),
          id_casilla = formatC(id_casilla, width = 2,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
-         distritof_21 = formatC(distritof_21, width = 2, flag = "0"),
+         distritof = formatC(distritof, width = 2, flag = "0"),
          mr_rp = gsub(pattern = "[[:digit:]]","",num_acta_impreso),
          mr_rp = gsub(pattern = "E","",mr_rp),
          mr_rp = if_else(mr_rp == "","MR",mr_rp),
          seccion = if_else(tipo_casilla == "P","9999",seccion),
-         nombre_distritof_21 = if_else(tipo_casilla == "P","PREVENTIVA",nombre_distritof_21))
+         nombre_distritof = if_else(tipo_casilla == "P","PREVENTIVA",nombre_distritof))
 
 
 df21 <- df21 %>%
@@ -119,8 +119,8 @@ colnames(pr18)
 
 pr18 <- pr18  %>%
   rename("noreg" = no_reg,
-         "distritof_18" = distrito,
-         "nombre_distritof_18" = nombre_distrito,
+         "distritof" = distrito,
+         "nombre_distritof" = nombre_distrito,
          "pes" = es,
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
@@ -129,9 +129,9 @@ pr18 <- pr18  %>%
          estado = formatC(estado, width = 2,flag = "0"),
          seccion = formatC(seccion, width = 4,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
-         distritof_18 = formatC(distritof_18, width = 2, flag = "0"),
+         distritof = formatC(distritof, width = 2, flag = "0"),
          seccion = if_else(tipo_casilla == "P","9999",seccion),
-         nombre_distritof_18 = if_else(seccion == "0000","EXTRANJERO",distritof_18))
+         nombre_distritof = if_else(seccion == "0000","EXTRANJERO",distritof))
 
 pr18 <- pr18 %>%
   rename_with.(~paste0('ele_', .x),
@@ -188,7 +188,7 @@ colnames(df18)
 
 df18 <- df18  %>%
   rename("noreg" = no_reg,
-         "distritof_18" = distrito,
+         "distritof" = distrito,
          "pes" = es,
          "pt_morena_pes" = pt_morena_es,
          "pt_pes" = pt_es,
@@ -198,7 +198,7 @@ df18 <- df18  %>%
          seccion = formatC(seccion, width = 4,flag = "0"),
          id_casilla = formatC(id_casilla, width = 2,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
-         distritof_18 = formatC(distritof_18, width = 2, flag = "0"),
+         distritof = formatC(distritof, width = 2, flag = "0"),
          seccion = if_else(tipo_casilla == "P","9999",seccion),
          mr_rp = gsub(pattern = "7","MR",num_acta_impreso),
          mr_rp = gsub(pattern = "8","PR",mr_rp),
@@ -259,14 +259,14 @@ colnames(df15)
 
 df15 <- df15  %>%
   rename("noreg" = no_reg,
-         "distritof_15" = distrito,
+         "distritof" = distrito,
          "pes" = ps) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          estado = formatC(estado, width = 2,flag = "0"),
          seccion = formatC(seccion, width = 4,flag = "0"),
          id_casilla = formatC(id_casilla, width = 2,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
-         distritof_15 = formatC(distritof_15, width = 2, flag = "0"),
+         distritof = formatC(distritof, width = 2, flag = "0"),
          seccion = if_else(tipo_casilla == "P","9999",seccion),
          mr_rp = if_else(tipo_acta == 2, "MR", ""),
          mr_rp = if_else(tipo_acta == 3, "MR",mr_rp),
@@ -340,7 +340,7 @@ df12 <- df12  %>%
          seccion = formatC(seccion, width = 4,flag = "0"),
          id_casilla = formatC(id_casilla, width = 2,flag = "0"),
          ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
-         distritof_12 = formatC(distritof_12, width = 2, flag = "0"),
+         distritof = formatC(distritof, width = 2, flag = "0"),
          seccion = if_else(tipo_casilla == "P","9999",seccion),
          mr_rp = if_else(tipo_candidatura == 2, "MR", "RP"))
 

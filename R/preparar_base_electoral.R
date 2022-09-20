@@ -1,29 +1,31 @@
-#' Title
+#' #' Title
+#' #'
+#' #' @param bd base de datos de cualquier elección en crudo (sin ningún procesamiento)
+#' #' @param identificadores nivel de observación para el que se aplica el análisis
+#' #' @param partido los partidos identificados para cada elección. Calculados con la función detectar partidos
+#' #'
+#' #' @return
+#' #' @export
+#' #'
+#' #' @examples
 #'
-#' @param bd base de datos de cualquier elección en crudo (sin ningún procesamiento)
-#' @param identificadores nivel de observación para el que se aplica el análisis
-#' @param partido los partidos identificados para cada elección. Calculados con la función detectar partidos
 #'
-#' @return
-#' @export
+#' repartir_coalicion <- function(bd, identificadores, partido){
+#'   # names(tempo %>% select(matches("e{1,}")))
+#'   res <- bd %>%
+#'     select(any_of({{identificadores}}),
+#'            matches(glue::glue("_{partido}\\b")) | matches(glue::glue("_{partido}_"))) %>%
+#'     pivot_longer(!any_of({{identificadores}}),
+#'                  names_to="partido_coalicion",
+#'                  values_to="nvotos") %>%
 #'
-#' @examples
-repartir_coalicion <- function(bd, identificadores, partido){
-  # names(tempo %>% select(matches("e{1,}")))
-  res <- bd %>%
-    select(any_of({{identificadores}}),
-           matches(glue::glue("_{partido}\\b")) | matches(glue::glue("_{partido}_"))) %>%
-    pivot_longer(!any_of({{identificadores}}),
-                 names_to="partido_coalicion",
-                 values_to="nvotos") %>%
-
-    mutate(npartidos=stringr::str_count(partido_coalicion, pattern = "_"),
-           votos_repartidos=nvotos/npartidos) %>%
-    group_by(across({{identificadores}})) %>%
-    summarise("ele_{partido}":=sum(votos_repartidos, na.rm=T))
-
-  return(res)
-}
+#'     mutate(npartidos=stringr::str_count(partido_coalicion, pattern = "_"),
+#'            votos_repartidos=nvotos/npartidos) %>%
+#'     group_by(across({{identificadores}})) %>%
+#'     summarise("ele_{partido}":=sum(votos_repartidos, na.rm=T))
+#'
+#'   return(res)
+#' }
 
 #' Title
 #'

@@ -6,6 +6,7 @@
 #'
 #' @return Base de datos repartida
 #' @examples elf$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)
+#'
 repartir_coalicion <- function(bd, nivel, eleccion){
   if(sum(is.na(bd[[nivel]]))>0) bd <- bd %>% mutate(!!rlang::sym(nivel) := tidyr::replace_na(!!rlang::sym(nivel),"E"))
 

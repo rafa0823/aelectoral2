@@ -4,9 +4,18 @@
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
+# GB 16
+
 bd_gb_16_oaxaca <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/oaxaca_normal_casilla.csv") %>%
   janitor::clean_names() %>%
   as_tibble()
+
+#DL 16
+
+bd_dl_16_oaxaca <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Distrito local/oaxaca_normal_casilla.csv") %>%
+  janitor::clean_names() %>%
+  as_tibble()
+
 
 
 

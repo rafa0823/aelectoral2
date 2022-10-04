@@ -85,16 +85,16 @@ colnames(gb16)
 
 gb16 <- gb16 %>%
   rename(noreg = no_reg,
-         distritol_16 = id_distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = id_municipio,
-         nombre_municipio_16 = municipio
+         distritol = id_distrito,
+         nombre_distritol = cabecera_distrital,
+         municipio = id_municipio,
+         nombre_municipio = municipio
   )%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 gb16 <- gb16 %>%
@@ -215,10 +215,10 @@ colnames(dl19)
 
 dl19 <- dl19 %>%
   rename(noreg = num_votos_can_nreg,
-         distritol_19 = id_distrito_local,
-         nombre_distritol_19 = cabecera_distrital_local,
-         municipio_19 = id_municipio,
-         nombre_municipio_19 = municipio,
+         distritol = id_distrito_local,
+         nombre_distritol = cabecera_distrital_local,
+         municipio = id_municipio,
+         nombre_municipio = municipio,
          nominal = lista_nominal,
          nulos = num_votos_nulos,
          total = total_votos
@@ -227,8 +227,8 @@ dl19 <- dl19 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_19 = formatC(municipio_19, width = 3, flag = "0"),
-         distritol_19 = formatC(distritol_19, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 dl19 <- dl19 %>%
@@ -284,10 +284,10 @@ colnames(pm18)
 
 pm18 <- pm18 %>%
   rename(noreg = num_votos_can_nreg,
-         distritol_18 = id_distrito_local,
-         nombre_distritol_18 = cabecera_distrital_local,
-         municipio_18 = id_municipio,
-         nombre_municipio_18 = municipio,
+         distritol = id_distrito_local,
+         nombre_distritol = cabecera_distrital_local,
+         municipio = id_municipio,
+         nombre_municipio = municipio,
          nulos = num_votos_nulos,
          total = total_votos,
          nominal = lista_nominal,
@@ -299,8 +299,8 @@ pm18 <- pm18 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
-         distritol_18 = formatC(distritol_18, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 pm18 <- pm18 %>%
@@ -356,17 +356,17 @@ colnames(pm16)
 
 pm16 <- pm16 %>%
   rename(noreg = no_reg,
-         distritol_16 = id_distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = id_municipio,
-         nombre_municipio_16 = municipio,
+         distritol = id_distrito,
+         nombre_distritol = cabecera_distrital,
+         municipio = id_municipio,
+         nombre_municipio = municipio,
   )%>%
   rename_with( ~ gsub("independiente_", "independiente", .x, fixed = TRUE)) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 pm16 <- pm16 %>%
@@ -423,17 +423,17 @@ colnames(dl16)
 
 dl16 <- dl16 %>%
   rename(noreg = no_reg,
-         distritol_16 = id_distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = municipio,
-         nombre_municipio_16 = nombre_municipio
+         distritol = id_distrito,
+         nombre_distritol = cabecera_distrital,
+         municipio = municipio,
+         nombre_municipio = nombre_municipio
   )%>%
   rename_with( ~ gsub("independiente_", "independiente", .x, fixed = TRUE)) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 dl16 <- dl16 %>%

@@ -4,13 +4,32 @@
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#gb 16
+
 bd_gb_16_q_roo <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Local/2016/Gobernador/quintanaroo_normal_casilla.csv") %>%
   janitor::clean_names() %>%
   as_tibble()
 
 
 
-## GB 21 QUINTANA ROO ------------------------------------------------------------------------------------------------------
+
+
+## GB 16 QUINTANA ROO ------------------------------------------------------------------------------------------------------
 
 gb16 <- bd_gb_16_q_roo   %>%
   mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))%>%
@@ -22,16 +41,16 @@ colnames(gb16)
 
 gb16 <- gb16 %>%
   rename(noreg = no_reg,
-         distritol_16 = id_distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = id_municipio,
-         nombre_municipio_16 = municipio
+         distritol = id_distrito,
+         nombre_distritol = cabecera_distrital,
+         municipio = id_municipio,
+         nombre_municipio = municipio
   )%>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 gb16 <- gb16 %>%

@@ -6,7 +6,7 @@
 
 pacman::p_load(tidyverse,janitor, readxl, tidytable, here,edomex)
 
-bd_pr_18 <- pr_18 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Federal/2018/Presidente_casilla.csv")%>%
+bd_pr_18 <- pr_18 <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Federal/2018/Presidente_casilla.xlsx")%>%
   janitor::clean_names() %>%
   as_tibble()
 
@@ -107,68 +107,86 @@ rm(df21)
 
 # Identificar nombres de variables y nombres de partidos
 
-pr18 <- bd_pr_18 %>%
-  clean_names() %>%
-  mutate(clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1))
+pr18 <- bd_pr_18
 
 
 colnames(pr18)
 
+pr18 <- bd_pr_18   %>%
+  mutate(municipio = gsub(pattern = "( |)[0-9]",replacement = "",x = municipio))
 
-# Homogenizar nombres de variables partidos
+# revisar nombres de varianles
 
-pr18 <- pr18  %>%
-  rename("noreg" = no_reg,
-         "distritof" = distrito,
-         "nombre_distritof" = nombre_distrito,
-         "pes" = es,
-         "pt_morena_pes" = pt_morena_es,
-         "pt_pes" = pt_es,
-         "morena_pes" = morena_es) %>%
+colnames(pr18)
+
+pr18 <- pr18 %>%
+  rename(noreg = num_votos_can_nreg,
+         distritof = id_distrito,
+         nombre_distritof = cabecera_distrital,
+         panal =  na,
+         nombre_municipio = municipio,
+         municipio = id_municipio,
+         panal = na,
+         pes = es,
+         pri_pvem_panal = pri_pvem_na,
+         pt_morena_pes = pt_morena_es,
+         pvem_panal = pvem_na,
+         pri_panal = pri_na,
+         pt_pes = pt_es,
+         morena_pes = morena_es,
+         pt_pes = pt_es,
+         ind1 = cand_ind1,
+         ind2 = cand_ind2,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal
+  ) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
-         estado = formatC(estado, width = 2,flag = "0"),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         ext_contigua = formatC(ext_contigua, width = 2,flag = "0"),
-         distritof = formatC(distritof, width = 2, flag = "0"),
-         seccion = if_else(tipo_casilla == "P","9999",seccion),
-         nombre_distritof = if_else(seccion == "0000","EXTRANJERO",distritof))
+         seccion = if_else(casilla == "P","9999",seccion),
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritof = formatC(distritof, width = 3, flag = "0"),
+         id_estado = formatC(id_estado, width = 2, flag = "0"))
+
 
 pr18 <- pr18 %>%
   rename_with.(~paste0('ele_', .x),
                .cols = pan:nominal)
 
-# revisar nombres de partidos
-
+# Identificar los partidos de la elecccion
 detectar_partidos(pr18)
-
-# Agregar municipios del año
-
-# municipios_pr_18 <- read_excel("data_raw/DatosAbiertos-derfe-pdln_edms_sexo_20210415.xlsx") %>%
-#   janitor::clean_names() %>%
-#   select("estado" = clave_entidad,
-#          seccion,
-#          "municipio" = clave_municipio,
-#          nombre_municipio) %>%
-#   mutate(seccion = formatC(seccion, width = 4,flag = "0")) %>%
-#   unique()
-#
-# pr18 <- pr18 %>%
-#   left_join(municipios_pr_18)
-
-
 
 # sufijo para join
 
 final_pr18 <- insertar_sufijo(bd=pr18, "pr", "18")
 
+#agregar clave casillas
+
+final_pr18 <- final_pr18%>%
+  mutate(id_casilla = case_when(nchar(casilla) == 1 ~ paste0(casilla,"0100"),
+                                nchar(casilla) == 3 ~ paste0(casilla,"00"),
+                                nchar(casilla) == 6 ~ gsub(pattern = "C","",casilla),
+                                nchar(casilla) == 5 ~ paste0("S",substr(casilla,4,5),"00")),
+         tipo_casilla = substr(casilla,1,1),
+         clave_casilla = paste0(id_estado,seccion,id_casilla))
+
+# se va voto en el extranjero volver a poner cuando se pueda
+
+final_pr18 <- final_pr18 %>% filter(!grepl("MEC", casilla))
+
+#prueba
+
+final_pr18 %>% count(nchar(clave_casilla))
+
 
 # guardar rda
 
-nac_pr_18 <- final_pr18
+pr_18 <- final_pr18
 
-nac_pr_18 %>% write_rds("inst/electoral/nacional/pr_18.rda")
+pr_18 %>% write_rds("inst/electoral/nacional/pr_18.rda")
 
 rm(pr18)
+
 
 
 ## DIPFED 18 -------------------------------------------------------------

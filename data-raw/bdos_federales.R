@@ -90,22 +90,6 @@ df21 <- df21 %>%
 
 detectar_partidos(df21)
 
-# Agregar municipios del año
-
-# municipios_df_21 <- read_excel("data-raw/DatosAbiertos-derfe-pdln_edms_sexo_20210415.xlsx") %>%
-#   janitor::clean_names() %>%
-#   select("estado" = clave_entidad,
-#          seccion,
-#          "municipio_df_21" = clave_municipio,
-#          "nombre_municipio_df_21" = nombre_municipio) %>%
-#   mutate(seccion = formatC(seccion, width = 4,flag = "0"),
-#          estado = formatC(estado, width = 4,flag = "0"),
-#          municipio_df_21 = formatC(municipio_df_21, width = 4,flag = "0")) %>%
-#   unique()
-#
-# df21 <- df21 %>%
-#   left_join(municipios_df_21)
-
 
 
 # sufijo para join
@@ -113,7 +97,12 @@ detectar_partidos(df21)
 final_df21 <- insertar_sufijo(bd=df21, "df", "21") %>%
   mutate(clave_casilla = substr(clave_casilla,2,nchar(clave_casilla)-1))
 
+# nchar casillas
+
+final_df21 %>% count(nchar(clave_casilla))
+
 # guardar rda
+
 nac_df_21 <- final_df21
 
 nac_df_21 %>% write_rds("inst/electoral/nacional/df_21.rda")
@@ -212,7 +201,6 @@ rm(pr18)
 
 df18 <- bd_df_18
 
-
 colnames(df18)
 
 df18 <- bd_df_18   %>%
@@ -283,9 +271,9 @@ final_df18 %>% count(nchar(clave_casilla))
 
 # guardar rda
 
-df_18 <- final_df18
+df_18 <- final_df18 %>% as_tibble()
 
-df_18 %>% write_rds("inst/electoral/nacional/df_18.rda")
+df_18 %>% saveRDS("inst/electoral/nacional/df_18.rda")
 
 rm(df18)
 

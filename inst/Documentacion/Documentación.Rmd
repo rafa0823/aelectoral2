@@ -57,6 +57,7 @@ Los resultado están por unidad territorial la cual se indicaba con los votos po
 
 # Bases de datos locales
 ## Pérdida de registro
+
 2021: FXM, RSP, PES*
 
 2018: PES*, PANAL
@@ -64,6 +65,16 @@ Los resultado están por unidad territorial la cual se indicaba con los votos po
 2016: PH
 
 * El PES perdió su registro dos veces porque en 2018 lo perdió como Encuentro Social y en 2021 como Partido Encuentro Solidario.
+
+# Aguascalientes
+
+### inst/electoral/ags/dl_16
+### inst/electoral/ags/gb_16
+### inst/electoral/ags/pm_16
+### inst/electoral/ags/dl_18
+### inst/electoral/ags/pm_19
+### inst/electoral/ags/pm_21
+### inst/electoral/ags/dl_21
 
 ## Chiapas
 
@@ -77,16 +88,77 @@ Nueva alianza Chiapas - PANAL
 
 Partido Popular Chiapaneco - PPCH
 
-### chis_dl_21.rda
-### chis_gb_18.rda
-### chis_pm_18.rda
+### inst/electoral/chis/dl_21.rda
+### inst/electoral/chis/gb_18.rda
+### inst/electoral/chis/chis_pm_18.rda
 pm_18_chis contiene extraordinaria 18 chiapas
-### chis_pm_21.rda
+### inst/electoral/chis/pm_21.rda
 pm_21_chis contiene extraordinaria 22 de chiapas
 
-### Elecciones extraordinarias 
+### Elecciones extraordinarias Chiapas
 
 los municipios de siltepec, venustiano carranza, el parral y emiliano zapata
+
+# Coahuila
+
+### inst/electoral/coah/dl-17
+### inst/electoral/coah/pm_17
+### inst/electoral/coah/gb_17
+### inst/electoral/coah/pm_18
+### inst/electoral/coah/dl_20
+### inst/electoral/coah/pm_21
+
+# Durango
+
+### inst/electoral/dgo/dl_16
+### inst/electoral/dgo/gb_16
+### inst/electoral/dgo/pm_16
+### inst/electoral/dgo/dl_18
+### inst/electoral/dgo/pm_19
+### inst/electoral/dgo/dl_21
+
+# Hidalgo
+
+### inst/electoral/dgo/dl_16
+### inst/electoral/dgo/pm_16
+### inst/electoral/dgo/gb_16
+### inst/electoral/dgo/dl_18
+### inst/electoral/dgo/pm_20
+
+# México
+
+### inst/electoral/dgo/dl_15
+### inst/electoral/dgo/pm_15
+### inst/electoral/dgo/gb_17
+### inst/electoral/dgo/dl_18
+### inst/electoral/dgo/pm_18
+### inst/electoral/dgo/dl_21
+### inst/electoral/dgo/pm_21
+
+# Oaxaca
+
+### inst/electoral/dgo/dl_16
+### inst/electoral/dgo/dl_18
+### inst/electoral/dgo/gb_16
+### inst/electoral/dgo/pm_16
+### inst/electoral/dgo/pm_18
+
+# Quintana Roo
+
+### inst/electoral/dgo/dl_16
+### inst/electoral/dgo/gb_16
+### inst/electoral/dgo/pm_16
+### inst/electoral/dgo/pm_18
+### inst/electoral/dgo/dl_19
+
+# Tamaulipas
+
+### inst/electoral/dgo/dl_16
+### inst/electoral/dgo/gb_16
+### inst/electoral/dgo/pm_16
+### inst/electoral/dgo/pm_18
+### inst/electoral/dgo/dl_19
+### inst/electoral/dgo/pm_21
 
 ### Bases de datos auxiliares
 
@@ -96,17 +168,17 @@ Partidos políticos locales:
 
 Partido Duranguense - PD
 
-### dgo_gb_16.rda
+### gb_16.rda
 
-### dgo_pm_16.rda
+### pm_16.rda
 
-### dgo_dl_18.rda
+### dl_18.rda
 
 en dl18 de durango solo hay tipo de casilla especial S1, por lo que asumimos que solo registran mr
 
-### dgo_pm_19.rda
+### pm_19.rda
 
-### dgo_dl_21.rda
+### dl_21.rda
 
 en dl21 de durango la variable pan_pri_prd_total es la suma de los votos de los tres partidos y las combinaciones de alianzas entre ellos
 
@@ -120,13 +192,15 @@ en dl21 de durango solo hay tipo de casilla especial S1, por lo que asumimos que
 
 Nueva Alianza Estado de México - PANAL
 
-mex_dl_18.rda
-mex_dl_21.rda
-mex_gb_17.rda
-mex_pm_18.rda
-mex_pm_21.rda
+dl_18.rda
+dl_21.rda
+gb_17.rda
+pm_18.rda
+pm_21.rda
+
 pm_21_mex contiene extraordinaria 21 edomex
 
 ### mex_pmext_21.rda
+
 Estas elecciones fueron en el municipio de Nextlalpan.
 

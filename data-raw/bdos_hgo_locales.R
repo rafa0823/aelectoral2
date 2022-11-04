@@ -58,16 +58,16 @@ colnames(gb16)
 
 gb16 <- gb16 %>%
   rename(noreg = no_reg,
-         distritol_16 = id_distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = municipio,
-         nombre_municipio_16 = nombre_municipio,
+         distritol = id_distrito,
+         nombre_distritol = cabecera_distrital,
+         municipio = municipio,
+         nombre_municipio = nombre_municipio,
   ) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 gb16 <- gb16 %>%
@@ -122,10 +122,10 @@ colnames(pm20)
 pm20 <- pm20 %>%
   rename(estado = id_estado,
          noreg = num_votos_can_nreg,
-         distritol_20 = id_distrito_local,
-         nombre_distritol_20 = cabecera_distrital_local,
-         municipio_20 = id_municipio,
-         nombre_municipio_20 = municipio,
+         distritol = id_distrito_local,
+         nombre_distritol = cabecera_distrital_local,
+         municipio = id_municipio,
+         nombre_municipio = municipio,
          panal = nva_alianza,
          pes = esh,
          pvem_pt_morena_pes = pvem_pt_morena_esh,
@@ -143,8 +143,8 @@ pm20 <- pm20 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_20 = formatC(municipio_20, width = 3, flag = "0"),
-         distritol_20 = formatC(distritol_20, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 pm20 <- pm20 %>%
@@ -200,10 +200,10 @@ colnames(dl18)
 
 dl18 <- dl18 %>%
   rename(noreg = num_votos_can_nreg,
-         distritol_18 = id_distrito_local,
-         nombre_distritol_18 = cabecera_distrital_local,
-         municipio_18 = id_municipio,
-         nombre_municipio_18 = municipio,
+         distritol = id_distrito_local,
+         nombre_distritol = cabecera_distrital_local,
+         municipio = id_municipio,
+         nombre_municipio = municipio,
          nominal = lista_nominal,
          nulos = num_votos_nulos,
          total = total_votos,
@@ -217,8 +217,8 @@ dl18 <- dl18 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
-         distritol_18 = formatC(distritol_18, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 dl18 <- dl18 %>%
@@ -274,10 +274,10 @@ colnames(pm16)
 
 pm16 <- pm16 %>%
   rename(noreg = num_votos_can_nreg,
-         distritol_16 = id_distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = id_municipio,
-         nombre_municipio_16 = municipio,
+         distritol = id_distrito,
+         nombre_distritol = cabecera_distrital,
+         municipio = id_municipio,
+         nombre_municipio = municipio,
          nulos = num_votos_nulos,
          total = total_votos,
          nominal = lista_nominal,
@@ -291,8 +291,8 @@ pm16 <- pm16 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 pm16 <- pm16 %>%
@@ -348,10 +348,10 @@ colnames(dl16)
 
 dl16 <- dl16 %>%
   rename(noreg = num_votos_can_nreg,
-         distritol_16 = id_distrito,
-         nombre_distritol_16 = cabecera_distrital,
-         municipio_16 = id_municipio,
-         nombre_municipio_16 = municipio,
+         distritol = id_distrito,
+         nombre_distritol = cabecera_distrital,
+         municipio = id_municipio,
+         nombre_municipio = municipio,
          nulos = num_votos_nulos,
          total = total_votos,
          nominal = lista_nominal,
@@ -365,8 +365,8 @@ dl16 <- dl16 %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          seccion = if_else(casilla == "P","9999",seccion),
-         municipio_16 = formatC(municipio_16, width = 3, flag = "0"),
-         distritol_16 = formatC(distritol_16, width = 3, flag = "0"))
+         municipio = formatC(municipio, width = 3, flag = "0"),
+         distritol = formatC(distritol, width = 3, flag = "0"))
 
 
 dl16 <- dl16 %>%

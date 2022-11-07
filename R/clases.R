@@ -31,6 +31,7 @@ Electoral <- R6::R6Class("Electoral",
                                        #' @param especiales Las casillas especiales se pueden "eliminar", "repartir" o dejar como están es el parámetro default.
                                        #'
                                        #' @return Un data frame con la elección seleccionada
+                                       #' @export
                                        #' @examples
                                        #' bd <- Electoral$new("df_21", entidad = "dgo",
                                        #' llaves = c("seccion", "distritof", "distritol", "municipio"),
@@ -217,6 +218,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 #' @details
 #' @export
 #' Al shp leído se le pude agregar otrabase de datos
+
 ElectoralSHP <- R6::R6Class("ElectoralSHP",
                             public = list(
                               shp = list(),
@@ -227,6 +229,7 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               #' @param entidad el estado de donde es
                               #'
                               #' @return Una lista con shapefiles
+                              #' @export
                               #' @examples
                               initialize = function(unidad, entidad){
                                 self$entidades <- entidad

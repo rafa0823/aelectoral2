@@ -2,20 +2,49 @@
 % Please edit documentation in R/clases.R
 \name{Electoral}
 \alias{Electoral}
-\title{Title}
-\value{
-
-}
+\title{Clase R6 que construye un conjunto de bases electorales comparables}
 \description{
-Title
+Se inicia con la base de una elección en específico y a ella se le pueden ir agregando elecciones que se juntan por seccion
+}
+\details{
+Este conjunto de bases electorales pueden ser de distintas elecciones, candidatos, años, tipos de eleccion; se puede decidir la forma en la se reparten los votos en el extranjero y las casillas especiales; así como agregar distintas variables geográficas como el municipio o el estado.
+#' Initialize: Obtener base de datos electoral
+}
+\examples{
 
-Title
+## ------------------------------------------------
+## Method `Electoral$new`
+## ------------------------------------------------
+
+bd <- Electoral$new("df_21", entidad = "dgo",
+llaves = c("seccion", "distritof", "distritol", "municipio"),
+extranjero = T, especial = "repartir")
+
+## ------------------------------------------------
+## Method `Electoral$agregar_bd`
+## ------------------------------------------------
+
+ bd$agregar_bd(eleccion = "pm_21",entidad = "mex", extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
+
+## ------------------------------------------------
+## Method `Electoral$agregar_manual`
+## ------------------------------------------------
+
+bd \%>\%  agregar_manual(df_21, "seccion")
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Electoral$new()}}
+\item \href{#method-print}{\code{Electoral$print()}}
 \item \href{#method-obtener_bd}{\code{Electoral$obtener_bd()}}
+\item \href{#method-coalicion}{\code{Electoral$coalicion()}}
+\item \href{#method-partido}{\code{Electoral$partido()}}
+\item \href{#method-candidato}{\code{Electoral$candidato()}}
+\item \href{#method-agregar_bd}{\code{Electoral$agregar_bd()}}
+\item \href{#method-agregar_manual}{\code{Electoral$agregar_manual()}}
+\item \href{#method-accion_especiales}{\code{Electoral$accion_especiales()}}
+\item \href{#method-eliminar_votoExtranjero}{\code{Electoral$eliminar_votoExtranjero()}}
 \item \href{#method-clone}{\code{Electoral$clone()}}
 }
 }
@@ -23,35 +52,233 @@ Title
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+Lo que hace es leer una base de datos electoral, darle formato el formato documentado para unirla o compararla con otras elecciones y la resume por sección.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Electoral$new(
- 
-    inicial = "~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/Bases de datos/Resultados definitivos",
-  ano,
-  tipo,
   eleccion,
   entidad,
-  normal = T,
-  nivel = "seccion"
+  llaves = "seccion",
+  tipo_eleccion = "MR",
+  extranjero = T,
+  especiales = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{nivel}}{}
+\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}
+
+\item{\code{entidad}}{Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".}
+
+\item{\code{llaves}}{Son las claves cartográficas de los niveles. Por default la unidad mínima es sección y está acompañada de estado.}
+
+\item{\code{tipo_eleccion}}{Por default es "MR" refiriéndose a mayoría relativa.}
+
+\item{\code{extranjero}}{Se refiere a si se desea incluir los votos en el extrajero, entendidos como sección 0000. El default es TRUE}
+
+\item{\code{especiales}}{Las casillas especiales se pueden "eliminar", "repartir" o dejar como están es el parámetro default.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Un data frame con la elección seleccionada
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{bd <- Electoral$new("df_21", entidad = "dgo",
+llaves = c("seccion", "distritof", "distritol", "municipio"),
+extranjero = T, especial = "repartir")
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$print()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-obtener_bd"></a>}}
 \if{latex}{\out{\hypertarget{method-obtener_bd}{}}}
 \subsection{Method \code{obtener_bd()}}{
+Función basada en leer_base()
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Electoral$obtener_bd()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+tibble de la bd
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-coalicion"></a>}}
+\if{latex}{\out{\hypertarget{method-coalicion}{}}}
+\subsection{Method \code{coalicion()}}{
+Esta función te indica cuales fueron las alianzas de la eleccion indicada
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$coalicion(nivel, eleccion)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{nivel}}{Nivel en el que se determinan las alianzas dependiendo de la unidad en la que se realiza la elección.}
+
+\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+La lista de coaliciones que hubieron en la elección señalada.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-partido"></a>}}
+\if{latex}{\out{\hypertarget{method-partido}{}}}
+\subsection{Method \code{partido()}}{
+Reparte los voto de acuerdo con las coaliciones
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$partido(nivel, eleccion)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{nivel}}{En el que se determinan las alianzas}
+
+\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Elección con los votos repartidos por alianza
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-candidato"></a>}}
+\if{latex}{\out{\hypertarget{method-candidato}{}}}
+\subsection{Method \code{candidato()}}{
+Reparte los votos por candidato de la elección, para ello necesita saber qué candidatos fueron en alianza y cual fue.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$candidato(alianzas, nivel, eleccion)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{alianzas}}{Proviene de coalicion() en la que se indican las alianzas de la elección}
+
+\item{\code{nivel}}{En el que se determinan las alianzas}
+
+\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Una base datos con los votos repartidos por candidato.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-agregar_bd"></a>}}
+\if{latex}{\out{\hypertarget{method-agregar_bd}{}}}
+\subsection{Method \code{agregar_bd()}}{
+Agrega una base de datos de la elección señalada y se la pega a la elección que se haya leído con obtener_bd.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$agregar_bd(eleccion, entidad)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}
+
+\item{\code{entidad}}{Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Tibble de la base de datos con la nueva elección resumidas por sección
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{ bd$agregar_bd(eleccion = "pm_21",entidad = "mex", extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-agregar_manual"></a>}}
+\if{latex}{\out{\hypertarget{method-agregar_manual}{}}}
+\subsection{Method \code{agregar_manual()}}{
+Basada en la función full_join, se juntan bases de datos.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$agregar_manual(bd, by)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bd}}{base de datos que que se quiere juntar}
+
+\item{\code{by}}{variable por la que se une las bds}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{bd \%>\%  agregar_manual(df_21, "seccion")
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-accion_especiales"></a>}}
+\if{latex}{\out{\hypertarget{method-accion_especiales}{}}}
+\subsection{Method \code{accion_especiales()}}{
+Para dterminar lo que se va a hacer con las casillas especiales
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$accion_especiales(bd, accion)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bd}}{Base de datos electoral}
+
+\item{\code{accion}}{se puede dejar como están, repartir o eliminar}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Tibble de la bd
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-eliminar_votoExtranjero"></a>}}
+\if{latex}{\out{\hypertarget{method-eliminar_votoExtranjero}{}}}
+\subsection{Method \code{eliminar_votoExtranjero()}}{
+Elimina el voto en el extanjero. Esta función filtra las secciones que son 0000.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$eliminar_votoExtranjero()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Devuelve el tibble de la elección sin los votos en el extanjero
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

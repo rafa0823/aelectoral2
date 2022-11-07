@@ -2,19 +2,25 @@
 % Please edit documentation in R/lectura.R
 \name{leer_base}
 \alias{leer_base}
-\title{Title}
+\title{Función para leer una base de datos
+Basada en la funcion read_rds del paquete readr}
 \usage{
-leer_base(inicial, ano, tipo, eleccion, entidad, normal, nivel)
+leer_base(eleccion, entidad, tipo_eleccion)
 }
 \arguments{
-\item{inicial}{}
+\item{eleccion}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}
+
+\item{entidad}{Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".}
+
+\item{tipo_eleccion}{Por default es "MR" refiriéndose a mayoría relativa.}
 }
 \value{
-
+tibble de la base electoral
 }
 \description{
-Title
+Función para leer una base de datos
+Basada en la funcion read_rds del paquete readr
 }
 \examples{
-
+leer_base(eleccion = eleccion,entidad = entidad, tipo_eleccion = self$tipo_eleccion)
 }

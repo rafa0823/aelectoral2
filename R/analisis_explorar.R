@@ -234,7 +234,7 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
                  names_sep = "_"
     )
   valor_referencia <- max(bd$votos, na.rm = T)
-  bd <- aelectoral::degradar_color_partido(bd, nombre=partido, variable = votos, colores_nombrados = colores_nombrados,valor_maximo = valor_referencia)
+  bd <- degradar_color_partido(bd, nombre=partido, variable = votos, colores_nombrados = colores_nombrados,valor_maximo = valor_referencia)
   res <- bd %>%
     split(list(.$partido,.$eleccion, .$año)) %>%
     map(~{

@@ -216,7 +216,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 #' Se inicia leyendo un shp
 #'
 #' @details
-#' @export
 #' Al shp leído se le pude agregar otrabase de datos
 
 ElectoralSHP <- R6::R6Class("ElectoralSHP",

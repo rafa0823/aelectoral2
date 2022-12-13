@@ -30,8 +30,7 @@ Imports:
     stats,
     stringr,
     tibble,
-    tidyr,
-    tidytable
+    tidyr
 Suggests: 
     devtools,
     janitor,

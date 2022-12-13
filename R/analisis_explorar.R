@@ -172,7 +172,7 @@ crear_mapa_electoral <- function(bd,
 #' @param bd base de datos con resultados electorales
 #' @param eleccion elección o vector de elecciones de la cual se van a obtener los ganadores
 #' @param grupo nivel de observación de la gráfica (secciones, municipios, distritos)
-#' @import dplyr purrr ggplot2 tidytable
+#' @import dplyr purrr ggplot2
 #' @return Se obtiene una gráfica con el comparativo de las cantidades de secciones ganadas por cada uno de los partidos en cada elección.
 #' @export
 #'

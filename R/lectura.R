@@ -116,7 +116,7 @@ reducir <- function(bd, completa, llaves){
 #' @examples leer_shp(unidad, entidad)
 leer_shp <- function(unidad, entidad){
   if(entidad == "nacional") id <- aelectoral2::diccionario %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0") else{
-    id <- aelectoral2::diccionario %>% filter(abreviatura %in% entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
+    id <- aelectoral2::diccionario %>% filter(abreviatura %in% !!entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
   }
 
   res <- id %>% purrr::map(~{

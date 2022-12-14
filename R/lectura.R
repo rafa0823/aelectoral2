@@ -15,7 +15,7 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
                                      mustWork = TRUE)) %>% tibble::as_tibble()
   if(estado == "nacional") {
     if(entidad != "nacional"){
-      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
+      nombre <- aelectoral2::diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
       res <- res %>% filter(estado == !!nombre)
     }}
 
@@ -46,7 +46,7 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
                                        mustWork = TRUE)) %>% tibble::as_tibble()
 
     if(entidad != "nacional"){
-      nombre <- diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado) %>%
+      nombre <- aelectoral2::diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado) %>%
         stringr::str_pad(width = 2, pad = "0")
       res <- res %>% filter(estado == !!nombre)
     }} else{
@@ -115,8 +115,8 @@ reducir <- function(bd, completa, llaves){
 #' @return shp
 #' @examples leer_shp(unidad, entidad)
 leer_shp <- function(unidad, entidad){
-  if(entidad == "nacional") id <- diccionario %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0") else{
-    id <- diccionario %>% filter(abreviatura %in% entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
+  if(entidad == "nacional") id <- aelectoral2::diccionario %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0") else{
+    id <- aelectoral2::diccionario %>% filter(abreviatura %in% entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
   }
 
   res <- id %>% purrr::map(~{

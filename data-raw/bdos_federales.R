@@ -401,3 +401,13 @@ nac_df_12 <- final_df12
 nac_df_12 %>% write_rds("inst/electoral/nacional/df_12.rda")
 
 rm(df12)
+
+
+
+
+
+# Cambiar id_estado por estado --------------------------------------------
+library(tidyverse)
+
+df_18 <- read_rds("inst/electoral/nacional/df_18.rda")
+df_18 %>% rename(estado = id_estado) %>% saveRDS("inst/electoral/nacional/df_18.rda")

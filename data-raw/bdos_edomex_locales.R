@@ -154,7 +154,7 @@ rm(pmext21)
 mex_pm_21 <- final_pm21_mex %>% anti_join(final_pmext21_mex, by = "seccion")
 
 
-mex_pm_21 <- mex_pm_21 %>% rbind(final_pmext21_mex,fill = T) %>% select(!c(distritol_21,nombre_distritol_21,ele_votos_validos_pm_21))
+mex_pm_21 <- mex_pm_21 %>% rbind(final_pmext21_mex,fill = T) %>% select(!c(distritol,nombre_distritol,ele_votos_validos_pm_21))
 
 mex_pm_21 %>% write_rds("inst/electoral/mex/pm_21.rda")
 

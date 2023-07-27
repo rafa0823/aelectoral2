@@ -1,6 +1,7 @@
 library(dplyr)
 library(purrr)
-wd <- "/Users/emiliomorones/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/SHP/2021"
+library(sf)
+wd <- "/Users/emiliomorones/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/INE/SHP/2022"
 
 
 # Distrito Federal --------------------------------------------------------
@@ -11,10 +12,11 @@ wd %>% list.files(full.names = T) %>% map(~{
 
   aux <- substr(.x,112,113)
   terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
-
-  temp <- st_read(.x) %>% transmute(distritof_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
+  sf <- st_read(.x)
+  if("DISTRITO" %in% names(sf)) sf <- sf |> rename(DISTRITO_F = DISTRITO)
+  temp <- sf %>% transmute(distritof_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(DISTRITO_F, width = 2, flag = 0), sep = "_"))
-  readr::write_rds(temp,glue::glue("inst/shp/df_21/{aux}.rda"))
+  readr::write_rds(temp,glue::glue("inst/shp/df_22/{aux}.rda"))
 
 
 })
@@ -31,7 +33,7 @@ wd %>% list.files(full.names = T) %>% map(~{
 
   temp <- st_read(.x) %>% transmute(distritol_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(DISTRITO_L, width = 2, flag = 0), sep = "_"))
-  readr::write_rds(temp,glue::glue("inst/shp/dl_21/{aux}.rda"))
+  readr::write_rds(temp,glue::glue("inst/shp/dl_22/{aux}.rda"))
 
 })
 
@@ -47,7 +49,7 @@ wd %>% list.files(full.names = T) %>% map(~{
   temp <- st_read(.x) %>% transmute(municipio_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(MUNICIPIO, width = 3, flag = 0), sep = "_"),
                                     nombre_municipio_21 = NOMBRE)
-  readr::write_rds(temp,glue::glue("inst/shp/mun_21/{aux}.rda"))
+  readr::write_rds(temp,glue::glue("inst/shp/mun_22/{aux}.rda"))
 
 })
 
@@ -65,7 +67,7 @@ wd %>% list.files(full.names = T) %>% map(~{
                                     nombre_entidad = NOMBRE,
                                     circunscripcion = CIRCUNSCRI)
 
-  readr::write_rds(temp,glue::glue("inst/shp/ent_21/{aux}.rda"))
+  readr::write_rds(temp,glue::glue("inst/shp/ent_22/{aux}.rda"))
 
 })
 
@@ -93,6 +95,6 @@ wd %>% list.files(full.names = T) %>% map(~{
 
                                     )
 
-  readr::write_rds(temp,glue::glue("inst/shp/secc_21/{aux}.rda"))
+  readr::write_rds(temp,glue::glue("inst/shp/secc_22/{aux}.rda"))
 
 })

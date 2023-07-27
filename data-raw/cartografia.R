@@ -14,7 +14,7 @@ wd %>% list.files(full.names = T) %>% map(~{
   terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
   sf <- st_read(.x)
   if("DISTRITO" %in% names(sf)) sf <- sf |> rename(DISTRITO_F = DISTRITO)
-  temp <- sf %>% transmute(distritof_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
+  temp <- sf %>% transmute(distritof_22 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(DISTRITO_F, width = 2, flag = 0), sep = "_"))
   readr::write_rds(temp,glue::glue("inst/shp/df_22/{aux}.rda"))
 
@@ -31,7 +31,7 @@ wd %>% list.files(full.names = T) %>% map(~{
   aux <- substr(.x,112,113)
   terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
 
-  temp <- st_read(.x) %>% transmute(distritol_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
+  temp <- st_read(.x) %>% transmute(distritol_22 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(DISTRITO_L, width = 2, flag = 0), sep = "_"))
   readr::write_rds(temp,glue::glue("inst/shp/dl_22/{aux}.rda"))
 
@@ -46,9 +46,9 @@ wd %>% list.files(full.names = T) %>% map(~{
   aux <- substr(.x,112,113)
   terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
 
-  temp <- st_read(.x) %>% transmute(municipio_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
+  temp <- st_read(.x) %>% transmute(municipio_22 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(MUNICIPIO, width = 3, flag = 0), sep = "_"),
-                                    nombre_municipio_21 = NOMBRE)
+                                    nombre_municipio_22 = NOMBRE)
   readr::write_rds(temp,glue::glue("inst/shp/mun_22/{aux}.rda"))
 
 })
@@ -83,11 +83,11 @@ wd %>% list.files(full.names = T) %>% map(~{
   terminacion <- substr(.x, nchar(.x)-2, nchar(.x))
 
   temp <- st_read(.x) %>% transmute(entidad = formatC(ENTIDAD, width = 2, flag = 0),
-                                    distritof_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
+                                    distritof_22 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(DISTRITO, width = 2, flag = 0), sep = "_"),
-                                    distritol_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
+                                    distritol_22 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(DISTRITO_L, width = 2, flag = 0), sep = "_"),
-                                    municipio_21 = paste(formatC(ENTIDAD, width = 2, flag = 0),
+                                    municipio_22 = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(MUNICIPIO, width = 3, flag = 0), sep = "_"),
                                     seccion = paste(formatC(ENTIDAD, width = 2, flag = 0),
                                                          formatC(SECCION, width = 4, flag = 0), sep = "_")

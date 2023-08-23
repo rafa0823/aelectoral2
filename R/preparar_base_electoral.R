@@ -36,9 +36,10 @@
 #'
 #' @examples
 detectar_partidos <- function(bd){
-  res <- names(bd %>% select(contains("ele_")))[str_count(names(bd %>%
-                      select(contains("ele_"))), "_")==1] %>%
-    str_remove(pattern = "ele_")
+  res <- names(bd %>% dplyr::select(dplyr::contains("ele_")))[stringr::str_count(
+    names(bd %>%
+            dplyr::select(dplyr::contains("ele_"))), "_")==1] %>%
+    stringr::str_remove(pattern = "ele_")
   return(res)
 }
 

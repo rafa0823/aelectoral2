@@ -58,7 +58,7 @@ detectar_partidos <- function(bd){
 #' @examples
 insertar_sufijo <- function(bd, eleccion_nivel, eleccion_year){
   res <- bd %>%
-    rename_with.(~paste0(.x,(glue::glue("_{eleccion_nivel}_{eleccion_year}"))),
-                 .cols = contains("ele_"))
+    dplyr::rename_with(~paste0(.x,(glue::glue("_{eleccion_nivel}_{eleccion_year}"))),
+                 .cols = dplyr::contains("ele_"))
   return(res)
 }

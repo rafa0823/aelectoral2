@@ -18,7 +18,6 @@ homologar_bd <- function(bd, estado, nombre_estado){
     ) |>
     tidyr::unnest(cols = c(casilla:ext_contigua))
 }
-
 # Lista nominal 18 --------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Lista nominal/2018/guanajuato_18_nominal.xlsx"
 
@@ -66,3 +65,98 @@ final_gb18_gto |>
 gb_18 <- final_gb18_gto
 
 write_rds(gb_18, "inst/electoral/gto/gb_18.rda")
+
+
+# dl_18 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Distrito local/guanajuato_normal_casilla.csv"
+
+dl_18 <- read_csv(path) |>
+  janitor::clean_names()
+
+#Modificar los partidos que están escritos de manera distinta: pes, panal
+colnames(dl_18) <- sub("es", "pes", colnames(dl_18))
+
+colnames(dl_18) #Revisar que todo esté en orden
+
+## Hay que pegarle el municipio a partir de la lista nominal
+nom_mun <- ln_18 |>
+  distinct(municipio, nombre_municipio_18 = nom_municipio, seccion)
+
+dl_18 <- dl_18 |>
+  left_join(nom_mun) |>
+  rename(municipio_18 = municipio,
+         distritol_18 = ubicacion
+  ) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
+         distritol_18 = formatC(distritol_18, width = 2, flag = "0")) |>
+  rename_with(~paste0('ele_', .x, "_dl_18"),
+              .cols = pan:nominal)
+
+## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
+final_dl18_gto <- dl_18  %>%
+  homologar_bd(estado = "11", nombre_estado = "GUANAJUATO") |>
+  select(estado, nombre_estado, distritol_18, municipio_18, seccion, id_casilla:clave_casilla, everything())
+
+##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
+
+final_dl18_gto |>
+  count(nchar(clave_casilla))
+
+# guardar rda
+
+dl_18 <- final_dl18_gto
+
+write_rds(dl_18, "inst/electoral/gto/dl_18.rda")
+
+
+
+# pm_18 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Municipio/guanajuato_normal_casilla.csv"
+elec <- "pm_18"
+
+aux <- read_csv(path) |>
+  janitor::clean_names() |>
+  mutate(seccion = as.integer(seccion))
+
+#Modificar los partidos que están escritos de manera distinta: pes, panal
+colnames(aux) <- sub("es", "pes", colnames(aux))
+
+colnames(aux) #Revisar que todo esté en orden
+
+## Hay que pegarle el municipio a partir de la lista nominal
+nom_mun <- ln_18 |>
+  distinct(municipio, seccion, distritol_18 = distritacion_local_2016)
+
+aux <- aux |>
+  left_join(nom_mun) |>
+  rename(municipio_18 = municipio) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
+         distritol_18 = formatC(distritol_18, width = 2, flag = "0")) |>
+  rename_with(~paste0('ele_', .x, "_", elec),
+              .cols = pan:nominal)
+
+## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
+final <- aux  %>%
+  homologar_bd(estado = "11", nombre_estado = "GUANAJUATO") |>
+  select(estado, nombre_estado, distritol_18, municipio_18, seccion, id_casilla:clave_casilla, everything())
+
+##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
+
+final |>
+  count(nchar(clave_casilla))
+
+# guardar rda
+
+pm_18 <- final
+
+write_rds(pm_18, glue::glue("inst/electoral/gto/{elec}.rda"))
+
+
+
+# pm_21 -------------------------------------------------------------------
+
+

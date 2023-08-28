@@ -2,8 +2,6 @@
 library(readr)
 library(dplyr)
 library(stringr)
-
-
 # Funciones ---------------------------------------------------------------
 homologar_bd <- function(bd, estado, nombre_estado){
   bd |>
@@ -23,6 +21,27 @@ path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Lista 
 
 ln_18 <- readxl::read_excel(path, skip = 6) |>
   janitor::clean_names()
+
+# Relacion 21 -------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/guanajuato_normal_casilla.csv"
+dl_21 <- read_csv(path, skip = 6) |>
+  janitor::clean_names() |>
+  distinct(distritol_21 = distrito_local, seccion) |>
+  mutate(distritol_21 = as.numeric(as.roman(gsub("DISTRITO ", "", distritol_21))))
+
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/guanajuato_normal_casilla.csv"
+mun_21 <- read_csv(path, skip = 6) |>
+  janitor::clean_names() |>
+  distinct(municipio_21 = id_municipio, seccion)
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Federal/2021/Diputado_normal_casilla.csv"
+df_21 <- read_delim(path, skip = 5, delim = "|") |>
+  janitor::clean_names() |>
+  filter(id_estado == 11) |>
+  distinct(distritof_21 = id_distrito, nombre_distrito_21 = nombre_distrito, seccion = as.integer(seccion))
+
+relacion_21 <-  mun_21 |>
+  left_join(dl_21) |>
+  left_join(df_21)
 
 # gb_18 ------------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Gobernador/guanajuato_normal_casilla.csv"
@@ -158,5 +177,89 @@ write_rds(pm_18, glue::glue("inst/electoral/gto/{elec}.rda"))
 
 
 # pm_21 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/guanajuato_normal_casilla.csv"
+elec <- "pm_21"
 
+aux <- read_csv(path, skip = 6) |>
+  janitor::clean_names() |>
+  select(-id_municipio) |>
+  left_join(relacion_21, join_by(seccion))
+
+glimpse(aux) #Revisar que todo esté en orden
+
+aux <- aux |>
+  rename(nombre_municipio_21 = municipio,
+         nominal = lista_nominal,
+         nombre_estado = estado,
+         estado = id_estado,
+         total = total_votos_calculado) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
+         clave_casilla = gsub("'", "", clave_casilla)) |>
+  rename_with(~paste0('ele_', .x, "_", elec),
+              .cols = pan:nominal)
+
+colnames(aux) <- sub("_na", "_panal", names(aux))
+
+## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
+final <- aux  %>%
+  select(estado, nombre_estado, distritof_21, nombre_distrito_21, distritol_21, municipio_21, seccion, id_casilla:clave_casilla, everything())
+
+##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
+
+final |>
+  count(nchar(clave_casilla))
+
+# guardar rda
+
+pm_21 <- final
+glimpse(pm_21)
+
+write_rds(pm_21, glue::glue("inst/electoral/gto/{elec}.rda"))
+
+
+# dl_21 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/guanajuato_normal_casilla.csv"
+elec <- "dl_21"
+
+aux <- read_csv(path, skip = 6) |>
+  janitor::clean_names() |>
+  select(-c(id_distrito_local, distrito_local)) |>
+  left_join(relacion_21, join_by(seccion))
+
+glimpse(aux) #Revisar que todo esté en orden
+
+aux <- aux |>
+  rename(nominal = lista_nominal,
+         nombre_estado = estado,
+         estado = id_estado,
+         total = total_votos_calculado) %>%
+  mutate(across(pan:nominal, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
+         clave_casilla = gsub("'", "", clave_casilla)) |>
+  rename_with(~paste0('ele_', .x, "_", elec),
+              .cols = pan:nominal)
+
+colnames(aux) <- sub("_na", "_panal", names(aux))
+colnames(aux) <- sub("_gto", "", names(aux))
+
+## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
+final <- aux  %>%
+  select(estado, nombre_estado, distritof_21, nombre_distrito_21, distritol_21, municipio_21, seccion, id_casilla:clave_casilla, everything())
+
+##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
+
+final |>
+  count(nchar(clave_casilla))
+
+# guardar rda
+
+dl_21 <- final
+glimpse(dl_21)
+
+write_rds(dl_21, glue::glue("inst/electoral/gto/{elec}.rda"))
 

@@ -122,7 +122,7 @@ pm_18 <- final
 
 write_rds(pm_18, glue::glue("inst/electoral/pue/{elec}.rda"))
 # dl_18 -------------------------------------------------------------------
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Municipio/puebla_normal_casilla.csv"
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Distrito local/puebla_normal_casilla.csv"
 aux <- read_csv(path) |>
   janitor::clean_names() |>
   select(-c(distrito, nombre_municipio)) |>
@@ -135,7 +135,7 @@ aux <- read_csv(path) |>
   left_join(relacion_18, join_by(clave_casilla, seccion)) |>
   relocate(nominal, .after = total)
 
-elec <- "pm_18"
+elec <- "dl_18"
 
 glimpse(aux)
 
@@ -165,7 +165,7 @@ final <- aux  %>%
 final |>
   count(nchar(clave_casilla))
 
-pm_18 <- final
+dl_18 <- final
 
-write_rds(pm_18, glue::glue("inst/electoral/pue/{elec}.rda"))
+write_rds(dl_18, glue::glue("inst/electoral/pue/{elec}.rda"))
 

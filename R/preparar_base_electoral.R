@@ -36,9 +36,10 @@
 #'
 #' @examples
 detectar_partidos <- function(bd){
-  res <- names(bd %>% select(contains("ele_")))[str_count(names(bd %>%
-                      select(contains("ele_"))), "_")==1] %>%
-    str_remove(pattern = "ele_")
+  res <- names(bd %>% dplyr::select(dplyr::contains("ele_")))[stringr::str_count(
+    names(bd %>%
+            dplyr::select(dplyr::contains("ele_"))), "_")==1] %>%
+    stringr::str_remove(pattern = "ele_")
   return(res)
 }
 
@@ -57,7 +58,7 @@ detectar_partidos <- function(bd){
 #' @examples
 insertar_sufijo <- function(bd, eleccion_nivel, eleccion_year){
   res <- bd %>%
-    rename_with.(~paste0(.x,(glue::glue("_{eleccion_nivel}_{eleccion_year}"))),
-                 .cols = contains("ele_"))
+    dplyr::rename_with(~paste0(.x,(glue::glue("_{eleccion_nivel}_{eleccion_year}"))),
+                 .cols = dplyr::contains("ele_"))
   return(res)
 }

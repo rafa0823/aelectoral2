@@ -69,7 +69,8 @@ aux <- readxl::read_excel(path, skip = 1) |>
   homologar_bd_pue() |>
   rename(distritol_18 = distrito_local,
          nombre_distritol_18 = cabecera,
-         nombre_municipio_18 = municipio) |>
+         nombre_municipio_18 = municipio,
+         noreg = no_registrados) |>
   left_join(relacion_18, join_by(clave_casilla, seccion)) |>
   relocate(nominal, .after = total)
 
@@ -78,7 +79,6 @@ elec <- "gb_18"
 glimpse(aux)
 
 aux <- aux |>
-  rename(noreg = no_registrados) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
@@ -116,7 +116,8 @@ aux <- readxl::read_excel(path, skip = 1) |>
   rename(distritol_18 = distrito_local,
          nombre_distritol_18 = cabecera,
          nombre_municipio_18 = municipio,
-         noreg = no_registrados) |>
+         noreg = no_registrados,
+         candidatura_independiente2 = candidatura_independiente_2) |>
   left_join(relacion_18, join_by(clave_casilla, seccion)) |>
   relocate(nominal, .after = total)
 

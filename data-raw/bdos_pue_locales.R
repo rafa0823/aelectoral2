@@ -16,13 +16,13 @@ homologar_bd <- function(bd, estado){
 }
 homologar_bd_pue <- function(bd) {
   bd |>
-  mutate(casilla = if_else(grepl("EXTRAORDINARIA", casilla) & grepl("CONTIGUA", casilla),
-                           gsub("CONTIGUA ", "", casilla), casilla),
-         casilla = gsub("BASICA", "B", casilla),
-         casilla = gsub("CONTIGUA", "C", casilla),
-         casilla = gsub("EXTRAORDINARIA", "E", casilla),
-         casilla = gsub("ESPECIAL", "S", casilla)
-  )|>
+    mutate(casilla = if_else(grepl("EXTRAORDINARIA", casilla) & grepl("CONTIGUA", casilla),
+                             gsub("CONTIGUA ", "", casilla), casilla),
+           casilla = gsub("BASICA", "B", casilla),
+           casilla = gsub("CONTIGUA", "C", casilla),
+           casilla = gsub("EXTRAORDINARIA", "E", casilla),
+           casilla = gsub("ESPECIAL", "S", casilla)
+    )|>
     tidyr::separate(casilla, into = c("tipo_casilla", "id_casilla", "ext_contigua"), remove = FALSE) |>
     tidyr::replace_na(replace = list(ext_contigua = "00", id_casilla = "01")) |>
     mutate(clave_casilla = glue::glue("21{sprintf('%04s', seccion)}{tipo_casilla}{sprintf('%02s', id_casilla)}{sprintf('%02s',ext_contigua)}"))
@@ -196,49 +196,97 @@ final |>
 dl_18 <- final
 glimpse(dl_18)
 write_rds(dl_18, glue::glue("inst/electoral/pue/{elec}.rda"))
-
-
 # pm_21 -------------------------------------------------------------------
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/puebla_normal_casilla.csv"
-nombres <- colnames(relacion_21)
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/puebla_normal_casilla.xlsx"
+nombres_mun <- read_rds("inst/electoral/pue/pm_18.rda") |>
+  distinct(nombre_municipio_21 = nombre_municipio_18, municipio_21 = municipio_18)
 
-aux <- read_csv(path, skip = 2) |>
+aux <- readxl::read_excel(path, skip = 4) |>
   janitor::clean_names() |>
-  select(-c(id_distrito_local:municipio_local)) |>
-  mutate(casilla = paste0(tipo_casilla, id_casilla)) |>
-  select(-c(tipo_casilla, id_casilla)) |>
-  homologar_bd(estado = 21) |>
-  left_join(relacion_21, join_by(clave_casilla, seccion)) |>
-  select(all_of(nombres), pan:fxm, everything()) |>
-  relocate(lista_nominal_casilla, .after = total_votos)
+  mutate(
+    estado = "21",
+    seccion = sprintf('%04s', seccion),
+    clave_casilla = glue::glue("{estado}{seccion}{tipo_casilla}{sprintf('%02s', id_casilla)}{sprintf('%02s', ext_contigua)}"),
+  ) |>
+  rename(distritol_21 = id_distrito_local,
+         nombre_distritol_21 = cabecera_distrital_local,
+         nombre_municipio_21 = municipio_local,
+         nominal = lista_nominal_casilla,
+         nulos = num_votos_nulos,
+         noreg = no_registrados,
+         total = total_votos) |>
+  left_join(nombres_mun) |>
+  relocate(municipio_21, .after = nombre_municipio_21) |>
+  select(nombre_estado, estado, clave_casilla, distritol_21:id_tipo_candidatura, pan:cand_ind_2, nominal:total, -numero_votos_validos)
 
 elec <- "pm_21"
 
 glimpse(aux)
 
-aux <- aux |>
-  rename(total = total_votos,
-         nulos = num_votos_nulos) %>%
-  filter(!is.na(total)) |>
-  mutate(across(pan:nominal, ~as.numeric(.x)),
+colnames(aux) <- sub("cand_ind_", "ind", colnames(aux))
+
+final <- aux |>
+  mutate(across(pan:total, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
-         municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
-         distritol_18 = formatC(distritol_18, width = 2, flag = "0"),
-         distritof_18 = formatC(distritof_18, width = 2, flag = "0")) |>
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0")) |>
   rename_with(~paste0('ele_', .x, "_", elec),
-              .cols = pan:nominal)
-
-colnames(aux) <- sub("_es_", "_pes_", colnames(aux))
-
-final <- aux  %>%
-  select(estado, nombre_estado, distritof_18, nombre_distritof_18, distritol_18, nombre_distritol_18, municipio_18, nombre_municipio_18, seccion, clave_casilla, everything())
+              .cols = pan:total)
 
 ##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
 
 final |>
   count(nchar(clave_casilla))
 
-gb_18 <- final
-glimpse(gb_18)
+pm_21 <- final
+glimpse(pm_21)
 
-write_rds(gb_18, glue::glue("inst/electoral/pue/{elec}.rda"))
+write_rds(pm_21, glue::glue("inst/electoral/pue/{elec}.rda"))
+
+
+# dl_21 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/puebla_normal_casilla.xlsx"
+nombres_mun <- read_rds("inst/electoral/pue/pm_18.rda") |>
+  distinct(nombre_municipio_21 = nombre_municipio_18, municipio_21 = municipio_18)
+
+aux <- readxl::read_excel(path, skip = 4) |>
+  janitor::clean_names() |>
+  mutate(
+    estado = "21",
+    seccion = sprintf('%04s', seccion),
+    clave_casilla = glue::glue("{estado}{seccion}{tipo_casilla}{sprintf('%02s', id_casilla)}{sprintf('%02s', ext_contigua)}"),
+  ) |>
+  rename(distritol_21 = id_distrito_local,
+         nombre_distritol_21 = cabecera_distrital_local,
+         nombre_municipio_21 = municipio_local,
+         nominal = lista_nominal_casilla,
+         nulos = num_votos_nulos,
+         noreg = no_registrados,
+         total = total_votos) |>
+  left_join(nombres_mun) |>
+  relocate(municipio_21, .after = nombre_municipio_21) |>
+  select(nombre_estado, estado, clave_casilla, distritol_21:id_tipo_candidatura, pan:cand_ind_2, nominal:total, -numero_votos_validos)
+
+elec <- "dl_21"
+
+glimpse(aux)
+
+colnames(aux) <- sub("cand_ind_", "ind", colnames(aux))
+
+aux <- aux |>
+  mutate(across(pan:total, ~as.numeric(.x)),
+         seccion = formatC(seccion, width = 4,flag = "0"),
+         distritol_21 = formatC(distritol_21, width = 2, flag = "0")) |>
+  rename_with(~paste0('ele_', .x, "_", elec),
+              .cols = pan:total)
+
+colnames(aux) <- sub("_na_", "_panal_", colnames(aux))
+##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
+final <- aux
+final |>
+  count(nchar(clave_casilla))
+
+dl_21 <- final
+glimpse(dl_21)
+
+write_rds(dl_21, glue::glue("inst/electoral/pue/{elec}.rda"))
+

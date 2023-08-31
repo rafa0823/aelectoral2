@@ -152,7 +152,7 @@ aux |>
 
 pm_21 <- aux
 glimpse(pm_21)
-write_rds(pm_21, "inst/electoral/cdmx/pm_21.rds")
+write_rds(pm_21, "inst/electoral/cdmx/pm_21.rda")
 
 # DL21 --------------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/cdmx_normal_casilla.csv"
@@ -184,4 +184,4 @@ aux |>
 
 dl_21 <- aux
 glimpse(dl_21)
-write_rds(dl_21, "inst/electoral/cdmx/dl_21.rds")
+write_rds(dl_21, "inst/electoral/cdmx/dl_21.rda")

@@ -81,7 +81,6 @@ aux <-temp |>
   rename_with(~gsub("config_", "", .x), .cols = contains("config_")) |>
   rename_with(~gsub("cand_", "", .x), .cols = contains("cand_")) |>
   rename(panal = na,
-         pes = es,
          ph = humanista,
          noreg = no_registrados,
          nulos = num_nulos,
@@ -128,7 +127,6 @@ aux <- temp |>
   rename_with(~gsub("config_", "", .x), .cols = contains("config_")) |>
   rename_with(~gsub("cand_", "", .x), .cols = contains("cand_")) |>
   rename(panal = na,
-         pes = es,
          ph = humanista,
          noreg = no_registrados,
          nulos = num_nulos,
@@ -160,3 +158,90 @@ aux |>
 glimpse(aux)
 dl_18 <- aux
 write_rds(dl_18, file = "inst/electoral/mor/dl_18.rda")
+
+# Relación 21 -------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/nombres_municipios_morelos.csv"
+nom_mun <- read_csv(path, skip = 4) |>
+  janitor::clean_names() |>
+  filter(clave_casilla != "-") |>
+  distinct(municipio_21 = id_municipio,
+           nombre_municipio_21 = municipio,
+           seccion) |>
+  na.omit()
+
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/nombre_dl_morelos.csv"
+nom_dl <- read_csv(path, skip = 4) |>
+  janitor::clean_names() |>
+  filter(clave_casilla != "-", distrito_local != "MORELOS") |>
+  distinct(distritol_21 = id_distrito_local,
+           nombre_distritol_21 = distrito_local,
+           seccion) |>
+  na.omit()
+
+rel_21 <- left_join(nom_mun, nom_dl, join_by(seccion))
+
+rel_21 |>
+  filter(n() > 1, .by = seccion)
+# pm_21 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/2021_SEE_AYUN_MOR_CAS.csv"
+aux <- read_csv(path) |>
+  janitor::clean_names() |>
+  rename(estado = id_estado,
+         distritol_21 = id_distrito_local,
+         nombre_distritol_21 = cabecera_distrital_local,
+         municipio_21 = id_municipio,
+         validos = num_votos_validos,
+         noreg = num_votos_can_nreg,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal
+  ) |>
+  rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
+  select(-c(circunscripcion, tipo_casilla:ext_contigua, estatus_acta:ruta_acta)) |>
+  rename_with(~gsub("panalm", "panal", .x), contains("panalm")) |>
+  mutate(estado = as.character(estado),
+         distritol_21 = sprintf("%03s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
+         seccion = sprintf("%04s", seccion)) |>
+  homologar_bd(estado = "17", nombre_estado = "MORELOS") |>
+  rename_with(~paste0("ele_", .x, "_pm_21"), .cols = c(pan:nominal)) |>
+  mutate_all(~tidyr::replace_na(., 0))
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+pm_21 <- aux
+write_rds(pm_21, file = "inst/electoral/mor/pm_21.rda")
+
+# dl_21 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/2021_SEE_DIP_LOC_MR_MOR_CAS.csv"
+aux <- read_csv(path) |>
+  janitor::clean_names() |>
+  rename(estado = id_estado,
+         distritol_21 = id_distrito_local,
+         nombre_distritol_21 = cabecera_distrital_local,
+         municipio_21 = id_municipio,
+         validos = num_votos_validos,
+         noreg = num_votos_can_nreg,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal
+  ) |>
+  select(-c(circunscripcion, tipo_casilla:ext_contigua, estatus_acta:ruta_acta)) |>
+  rename_with(~gsub("panalm", "panal", .x), contains("panalm")) |>
+  mutate(estado = as.character(estado),
+         distritol_21 = sprintf("%03s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
+         seccion = sprintf("%04s", seccion)) |>
+  homologar_bd(estado = "17", nombre_estado = "MORELOS") |>
+  rename_with(~paste0("ele_", .x, "_dl_21"), .cols = c(pan:nominal)) |>
+  mutate_all(~tidyr::replace_na(., 0))
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+dl_21 <- aux
+write_rds(dl_21, file = "inst/electoral/mor/dl_21.rda")
+

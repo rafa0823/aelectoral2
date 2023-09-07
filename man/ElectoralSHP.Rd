@@ -6,19 +6,22 @@
 \description{
 Se inicia leyendo un shp
 }
+\details{
+Al shp leído se le pude agregar otrabase de datos
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{ElectoralSHP$new()}}
-\item \href{#method-print}{\code{ElectoralSHP$print()}}
-\item \href{#method-agregar_shp}{\code{ElectoralSHP$agregar_shp()}}
-\item \href{#method-juntar_bd}{\code{ElectoralSHP$juntar_bd()}}
-\item \href{#method-clone}{\code{ElectoralSHP$clone()}}
+\item \href{#method-ElectoralSHP-new}{\code{ElectoralSHP$new()}}
+\item \href{#method-ElectoralSHP-print}{\code{ElectoralSHP$print()}}
+\item \href{#method-ElectoralSHP-agregar_shp}{\code{ElectoralSHP$agregar_shp()}}
+\item \href{#method-ElectoralSHP-juntar_bd}{\code{ElectoralSHP$juntar_bd()}}
+\item \href{#method-ElectoralSHP-clone}{\code{ElectoralSHP$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-ElectoralSHP-new"></a>}}
+\if{latex}{\out{\hypertarget{method-ElectoralSHP-new}{}}}
 \subsection{Method \code{new()}}{
 Lee un shapefile
 \subsection{Usage}{
@@ -39,8 +42,8 @@ Una lista con shapefiles
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-ElectoralSHP-print"></a>}}
+\if{latex}{\out{\hypertarget{method-ElectoralSHP-print}{}}}
 \subsection{Method \code{print()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ElectoralSHP$print()}\if{html}{\out{</div>}}
@@ -48,8 +51,8 @@ Una lista con shapefiles
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-agregar_shp"></a>}}
-\if{latex}{\out{\hypertarget{method-agregar_shp}{}}}
+\if{html}{\out{<a id="method-ElectoralSHP-agregar_shp"></a>}}
+\if{latex}{\out{\hypertarget{method-ElectoralSHP-agregar_shp}{}}}
 \subsection{Method \code{agregar_shp()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ElectoralSHP$agregar_shp(unidad, entidad = NULL)}\if{html}{\out{</div>}}
@@ -57,8 +60,8 @@ Una lista con shapefiles
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-juntar_bd"></a>}}
-\if{latex}{\out{\hypertarget{method-juntar_bd}{}}}
+\if{html}{\out{<a id="method-ElectoralSHP-juntar_bd"></a>}}
+\if{latex}{\out{\hypertarget{method-ElectoralSHP-juntar_bd}{}}}
 \subsection{Method \code{juntar_bd()}}{
 Junta shapefiles
 \subsection{Usage}{
@@ -76,8 +79,8 @@ Junta shapefiles
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-ElectoralSHP-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-ElectoralSHP-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

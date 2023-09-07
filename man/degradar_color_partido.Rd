@@ -23,9 +23,6 @@ degradar_color_partido(
 
 \item{valor_maximo}{valor máximo que toma la generación de degradados}
 }
-\value{
-
-}
 \description{
 Title
 }

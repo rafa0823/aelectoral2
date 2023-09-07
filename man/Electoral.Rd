@@ -35,22 +35,22 @@ bd \%>\%  agregar_manual(df_21, "seccion")
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Electoral$new()}}
-\item \href{#method-print}{\code{Electoral$print()}}
-\item \href{#method-obtener_bd}{\code{Electoral$obtener_bd()}}
-\item \href{#method-coalicion}{\code{Electoral$coalicion()}}
-\item \href{#method-partido}{\code{Electoral$partido()}}
-\item \href{#method-candidato}{\code{Electoral$candidato()}}
-\item \href{#method-agregar_bd}{\code{Electoral$agregar_bd()}}
-\item \href{#method-agregar_manual}{\code{Electoral$agregar_manual()}}
-\item \href{#method-accion_especiales}{\code{Electoral$accion_especiales()}}
-\item \href{#method-eliminar_votoExtranjero}{\code{Electoral$eliminar_votoExtranjero()}}
-\item \href{#method-clone}{\code{Electoral$clone()}}
+\item \href{#method-Electoral-new}{\code{Electoral$new()}}
+\item \href{#method-Electoral-print}{\code{Electoral$print()}}
+\item \href{#method-Electoral-obtener_bd}{\code{Electoral$obtener_bd()}}
+\item \href{#method-Electoral-coalicion}{\code{Electoral$coalicion()}}
+\item \href{#method-Electoral-partido}{\code{Electoral$partido()}}
+\item \href{#method-Electoral-candidato}{\code{Electoral$candidato()}}
+\item \href{#method-Electoral-agregar_bd}{\code{Electoral$agregar_bd()}}
+\item \href{#method-Electoral-agregar_manual}{\code{Electoral$agregar_manual()}}
+\item \href{#method-Electoral-accion_especiales}{\code{Electoral$accion_especiales()}}
+\item \href{#method-Electoral-eliminar_votoExtranjero}{\code{Electoral$eliminar_votoExtranjero()}}
+\item \href{#method-Electoral-clone}{\code{Electoral$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Electoral-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-new}{}}}
 \subsection{Method \code{new()}}{
 Lo que hace es leer una base de datos electoral, darle formato el formato documentado para unirla o compararla con otras elecciones y la resume por sección.
 \subsection{Usage}{
@@ -96,8 +96,8 @@ extranjero = T, especial = "repartir")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-Electoral-print"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-print}{}}}
 \subsection{Method \code{print()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Electoral$print()}\if{html}{\out{</div>}}
@@ -105,8 +105,8 @@ extranjero = T, especial = "repartir")
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-obtener_bd"></a>}}
-\if{latex}{\out{\hypertarget{method-obtener_bd}{}}}
+\if{html}{\out{<a id="method-Electoral-obtener_bd"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-obtener_bd}{}}}
 \subsection{Method \code{obtener_bd()}}{
 Función basada en leer_base()
 \subsection{Usage}{
@@ -118,8 +118,8 @@ tibble de la bd
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-coalicion"></a>}}
-\if{latex}{\out{\hypertarget{method-coalicion}{}}}
+\if{html}{\out{<a id="method-Electoral-coalicion"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-coalicion}{}}}
 \subsection{Method \code{coalicion()}}{
 Esta función te indica cuales fueron las alianzas de la eleccion indicada
 \subsection{Usage}{
@@ -140,8 +140,8 @@ La lista de coaliciones que hubieron en la elección señalada.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-partido"></a>}}
-\if{latex}{\out{\hypertarget{method-partido}{}}}
+\if{html}{\out{<a id="method-Electoral-partido"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-partido}{}}}
 \subsection{Method \code{partido()}}{
 Reparte los voto de acuerdo con las coaliciones
 \subsection{Usage}{
@@ -162,8 +162,8 @@ Elección con los votos repartidos por alianza
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-candidato"></a>}}
-\if{latex}{\out{\hypertarget{method-candidato}{}}}
+\if{html}{\out{<a id="method-Electoral-candidato"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-candidato}{}}}
 \subsection{Method \code{candidato()}}{
 Reparte los votos por candidato de la elección, para ello necesita saber qué candidatos fueron en alianza y cual fue.
 \subsection{Usage}{
@@ -186,8 +186,8 @@ Una base datos con los votos repartidos por candidato.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-agregar_bd"></a>}}
-\if{latex}{\out{\hypertarget{method-agregar_bd}{}}}
+\if{html}{\out{<a id="method-Electoral-agregar_bd"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-agregar_bd}{}}}
 \subsection{Method \code{agregar_bd()}}{
 Agrega una base de datos de la elección señalada y se la pega a la elección que se haya leído con obtener_bd.
 \subsection{Usage}{
@@ -216,8 +216,8 @@ Tibble de la base de datos con la nueva elección resumidas por sección
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-agregar_manual"></a>}}
-\if{latex}{\out{\hypertarget{method-agregar_manual}{}}}
+\if{html}{\out{<a id="method-Electoral-agregar_manual"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-agregar_manual}{}}}
 \subsection{Method \code{agregar_manual()}}{
 Basada en la función full_join, se juntan bases de datos.
 \subsection{Usage}{
@@ -233,9 +233,6 @@ Basada en la función full_join, se juntan bases de datos.
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-
-}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{bd \%>\%  agregar_manual(df_21, "seccion")
@@ -246,8 +243,8 @@ Basada en la función full_join, se juntan bases de datos.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-accion_especiales"></a>}}
-\if{latex}{\out{\hypertarget{method-accion_especiales}{}}}
+\if{html}{\out{<a id="method-Electoral-accion_especiales"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-accion_especiales}{}}}
 \subsection{Method \code{accion_especiales()}}{
 Para dterminar lo que se va a hacer con las casillas especiales
 \subsection{Usage}{
@@ -268,8 +265,8 @@ Tibble de la bd
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-eliminar_votoExtranjero"></a>}}
-\if{latex}{\out{\hypertarget{method-eliminar_votoExtranjero}{}}}
+\if{html}{\out{<a id="method-Electoral-eliminar_votoExtranjero"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-eliminar_votoExtranjero}{}}}
 \subsection{Method \code{eliminar_votoExtranjero()}}{
 Elimina el voto en el extanjero. Esta función filtra las secciones que son 0000.
 \subsection{Usage}{
@@ -281,8 +278,8 @@ Devuelve el tibble de la elección sin los votos en el extanjero
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Electoral-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -23,9 +23,6 @@ colorear_ganador_degradado(
 
 \item{saturacion}{nivel de saturación de la paleta de color}
 }
-\value{
-
-}
 \description{
 Title
 }

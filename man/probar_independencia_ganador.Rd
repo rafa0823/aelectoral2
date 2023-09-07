@@ -15,9 +15,6 @@ probar_independencia_ganador(bd, ganador, eleccion, ...)
 
 \item{...}{variables del censo de las que se busca analizar la independencia}
 }
-\value{
-
-}
 \description{
 Title
 }

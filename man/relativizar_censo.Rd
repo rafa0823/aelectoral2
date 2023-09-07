@@ -9,9 +9,6 @@ relativizar_censo(bd)
 \arguments{
 \item{bd}{base de datos electoral}
 }
-\value{
-
-}
 \description{
 Title
 }

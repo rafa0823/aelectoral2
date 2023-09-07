@@ -18,9 +18,6 @@ detectar_partidos(bd)
 \arguments{
 \item{bd}{base de datos de cualquier elección en crudo (sin ningún procesamiento)}
 }
-\value{
-
-}
 \description{
 
 }

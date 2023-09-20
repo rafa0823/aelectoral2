@@ -48,8 +48,11 @@ path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Result
 gb_18 <- read_csv(path) |>
   janitor::clean_names()
 
+glimpse(gb_18)
+
 #Modificar los partidos que están escritos de manera distinta: pes, panal
 colnames(gb_18) <- sub("es", "pes", colnames(gb_18))
+colnames(gb_18) <- sub("no_reg", "noreg", colnames(gb_18))
 
 colnames(gb_18) #Revisar que todo esté en orden
 
@@ -92,9 +95,12 @@ path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Result
 dl_18 <- read_csv(path) |>
   janitor::clean_names()
 
+glimpse(dl_18)
+
 #Modificar los partidos que están escritos de manera distinta: pes, panal
 colnames(dl_18) <- sub("es", "pes", colnames(dl_18))
-
+colnames(dl_18) <- sub("no_reg", "noreg", colnames(dl_18))
+colnames(dl_18) <- sub("independiente_", "ind", colnames(dl_18))
 colnames(dl_18) #Revisar que todo esté en orden
 
 ## Hay que pegarle el municipio a partir de la lista nominal
@@ -126,10 +132,9 @@ final_dl18_gto |>
 # guardar rda
 
 dl_18 <- final_dl18_gto
-
+glimpse(dl_18)
+naniar::gg_miss_var(dl_18)
 write_rds(dl_18, "inst/electoral/gto/dl_18.rda")
-
-
 
 # pm_18 -------------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Municipio/guanajuato_normal_casilla.csv"
@@ -139,9 +144,11 @@ aux <- read_csv(path) |>
   janitor::clean_names() |>
   mutate(seccion = as.integer(seccion))
 
+glimpse(aux)
 #Modificar los partidos que están escritos de manera distinta: pes, panal
 colnames(aux) <- sub("es", "pes", colnames(aux))
-
+colnames(aux) <- sub("independiente_", "ind", colnames(aux))
+colnames(aux) <- sub("no_reg", "noreg", colnames(aux))
 colnames(aux) #Revisar que todo esté en orden
 
 ## Hay que pegarle el municipio a partir de la lista nominal
@@ -167,42 +174,39 @@ final <- aux  %>%
 
 final |>
   count(nchar(clave_casilla))
-
+naniar::gg_miss_var(final)
 # guardar rda
-
 pm_18 <- final
-
+glimpse(pm_18)
 write_rds(pm_18, glue::glue("inst/electoral/gto/{elec}.rda"))
-
-
-
 # pm_21 -------------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/guanajuato_normal_casilla.csv"
 elec <- "pm_21"
-
 aux <- read_csv(path, skip = 6) |>
   janitor::clean_names() |>
   select(-id_municipio) |>
-  left_join(relacion_21, join_by(seccion))
-
-glimpse(aux) #Revisar que todo esté en orden
-
-aux <- aux |>
+  left_join(relacion_21, join_by(seccion)) |>
   rename(nombre_municipio_21 = municipio,
          nominal = lista_nominal,
          nombre_estado = estado,
          estado = id_estado,
-         total = total_votos_calculado) %>%
+         total = total_votos_calculado,
+         noreg = no_registrados) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
          distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
-         clave_casilla = gsub("'", "", clave_casilla)) |>
+         clave_casilla = gsub("'", "", clave_casilla),
+         estado = as.character(estado)) |>
   rename_with(~paste0('ele_', .x, "_", elec),
               .cols = pan:nominal)
 
-colnames(aux) <- sub("_na", "_panal", names(aux))
+glimpse(aux)
 
+colnames(aux) <- sub("_na_", "_panal_", names(aux))
+colnames(aux) <- sub("_gto", "", names(aux))
+colnames(aux) <- sub("cand_ind_", "ind", names(aux))
+colnames(aux)
 ## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
 final <- aux  %>%
   select(estado, nombre_estado, distritof_21, nombre_distrito_21, distritol_21, municipio_21, seccion, id_casilla:clave_casilla, everything())
@@ -211,15 +215,13 @@ final <- aux  %>%
 
 final |>
   count(nchar(clave_casilla))
-
+naniar::gg_miss_var(final)
 # guardar rda
 
 pm_21 <- final
 glimpse(pm_21)
 
 write_rds(pm_21, glue::glue("inst/electoral/gto/{elec}.rda"))
-
-
 # dl_21 -------------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/guanajuato_normal_casilla.csv"
 elec <- "dl_21"
@@ -227,26 +229,26 @@ elec <- "dl_21"
 aux <- read_csv(path, skip = 6) |>
   janitor::clean_names() |>
   select(-c(id_distrito_local, distrito_local)) |>
-  left_join(relacion_21, join_by(seccion))
-
-glimpse(aux) #Revisar que todo esté en orden
-
-aux <- aux |>
+  left_join(relacion_21, join_by(seccion)) |>
   rename(nominal = lista_nominal,
          nombre_estado = estado,
          estado = id_estado,
-         total = total_votos_calculado) %>%
+         total = total_votos_calculado,
+         noreg = no_registrados) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
          distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
-         clave_casilla = gsub("'", "", clave_casilla)) |>
+         clave_casilla = gsub("'", "", clave_casilla),
+         estado = as.character(estado)) |>
   rename_with(~paste0('ele_', .x, "_", elec),
               .cols = pan:nominal)
 
+glimpse(aux)
 colnames(aux) <- sub("_na", "_panal", names(aux))
 colnames(aux) <- sub("_gto", "", names(aux))
-
+colnames(aux) <- sub("cand_ind_", "ind", names(aux))
+colnames(aux)
 ## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
 final <- aux  %>%
   select(estado, nombre_estado, distritof_21, nombre_distrito_21, distritol_21, municipio_21, seccion, id_casilla:clave_casilla, everything())

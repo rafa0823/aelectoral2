@@ -186,6 +186,7 @@ rel_21 |>
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/2021_SEE_AYUN_MOR_CAS.csv"
 aux <- read_csv(path) |>
   janitor::clean_names() |>
+  filter(is.na(tribunal)) |>
   rename(estado = id_estado,
          distritol_21 = id_distrito_local,
          nombre_distritol_21 = cabecera_distrital_local,
@@ -218,6 +219,7 @@ write_rds(pm_21, file = "inst/electoral/mor/pm_21.rda")
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/2021_SEE_DIP_LOC_MR_MOR_CAS.csv"
 aux <- read_csv(path) |>
   janitor::clean_names() |>
+  filter(is.na(tribunal)) |>
   rename(estado = id_estado,
          distritol_21 = id_distrito_local,
          nombre_distritol_21 = cabecera_distrital_local,

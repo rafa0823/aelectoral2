@@ -1,6 +1,3 @@
-library(tidyverse)
-devtools::load_all()
-
 # Test de construcción de las bases de datos de aguascalientes
 # Se comparan las bases construidas con los cómputos del INEE
 

@@ -579,6 +579,38 @@ dl_18 |>
 write_rds(dl_18, "inst/electoral/chis/dl_18.rda")
 
 
+# Correcciones ------------------------------------------------------------
+library(tidyverse)
+## dl_21
+
+dl_21 <- read_rds("inst/electoral/chis/dl_21.rda")
+glimpse(dl_21)
+
+dl_21 <- dl_21 |>
+  rename(distritol_21 = distritol,
+         nombre_distritol_21 = nombre_distritol,
+         municipio_21 = municipio,
+         nombre_municipio_21 = nombre_municipio) |>
+  mutate(distritol_21 = sprintf("%03s", distritol_21))
+
+write_rds(dl_21, "inst/electoral/chis/dl_21.rda")
+
+## pm_21
+
+pm_21 <- read_rds("inst/electoral/chis/pm_21.rda")
+glimpse(pm_21)
+pm_21 <- pm_21 |>
+  select(-ele_nulos_pm_21) |>
+  rename_with(~gsub("ep_", "", .x), .cols = contains("indep_")) |>
+  rename(ele_nulos_pm_21 = ele_votos_nulos_pm_21,
+         nombre_municipio_21 = nombre_municipio,
+         municipio_21 = municipio,
+         distritol_21 = distritol,
+         nombre_distritol_21 = nombre_distritol) |>
+  mutate(distritol_21 = sprintf("%03s", distritol_21))
+
+write_rds(pm_21, "inst/electoral/chis/pm_21.rda")
+
 
 
 

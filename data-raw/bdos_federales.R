@@ -49,6 +49,51 @@ bd_df_12 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadís
 
 # FEDERALES -----------------------------------------------------------------------
 
+## Senado 2018
+
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Federal/2018/senadores/2018_SEE_SEN_MR_NAL_CAS.csv"
+sen_18 <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(tipo_casilla != "MEC") |>
+  rename(estado = id_estado,
+         distritof_18 = id_distrito,
+         nombre_distritof = cabecera_distrital,
+         municipio_18 = id_municipio,
+         nombre_municipio = municipio,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal,
+         noreg = num_votos_can_nreg
+         ) |>
+  mutate(estado = sprintf("%02d", estado),
+         distritof_18 = sprintf("%03d", distritof_18),
+         municipio_18 = sprintf("%03d", municipio_18),
+         seccion = sprintf("%04d", seccion)) |>
+  rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
+  select(-c(tipo_casilla:ext_contigua)) |>
+  mutate(
+    casilla = if_else(casilla == "B", "B01",casilla),
+    id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
+                           T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
+    tipo_casilla = substr(casilla, 1, 1),
+    ext_contigua = if_else(nchar(casilla) >= 4, stringr::str_extract_all(casilla,"(?<=C)(\\d+)"), list("0")),
+    clave_casilla = glue::glue("{estado}{stringr::str_pad(seccion,pad = '0', width = 4)}{tipo_casilla}{stringr::str_pad(id_casilla,pad = '0', width = 2)}{stringr::str_pad(ext_contigua,pad = '0', width = 2)}")
+  ) |>
+  tidyr::unnest(cols = c(casilla:ext_contigua)) |>
+  relocate(c(clave_casilla, id_casilla:ext_contigua), .after = seccion) |>
+  mutate_if(is.logical, as.integer) |>
+  mutate_if(is.integer, ~replace_na(., 0)) |>
+  rename_with(~paste("ele", .x, "sen_18", sep = "_"), pan:nominal) |>
+  rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_"))
+
+sen_18 |>
+  count(nchar(clave_casilla))
+
+glimpse(sen_18)
+
+write_rds(sen_18, "inst/electoral/nacional/sen_18.rda")
+
 ## dipfed 21 ------------------------------------------------------------------
 
 # Identificar nombres de variables y nombres de partidos

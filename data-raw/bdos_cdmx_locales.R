@@ -26,8 +26,8 @@ rel_18 <- read_csv(path) |>
          distritol_18 = distrito,
          noreg = no_reg,
          ind = independiente) |>
-  mutate(municipio_18 = sprintf("%02s", municipio_18),
-         distritol_18 = sprintf("%02s", distritol_18),
+  mutate(municipio_18 = sprintf("%03s", municipio_18),
+         distritol_18 = sprintf("%03s", distritol_18),
          seccion = sprintf("%04s", seccion)) |>
   homologar_bd(estado = "09", nombre_estado = "CIUDAD DE MÉXICO") |>
   distinct(municipio_18, nombre_municipio_18, distritol_18, seccion, clave_casilla, nominal)
@@ -42,8 +42,8 @@ aux <- read_csv(path) |>
          distritol_18 = distrito,
          noreg = no_reg,
          ind = independiente) |>
-  mutate(municipio_18 = sprintf("%02s", municipio_18),
-         distritol_18 = sprintf("%02s", distritol_18),
+  mutate(municipio_18 = sprintf("%03s", municipio_18),
+         distritol_18 = sprintf("%03s", distritol_18),
          seccion = sprintf("%04s", seccion)) |>
   homologar_bd(estado = "09", nombre_estado = "CIUDAD DE MÉXICO") %>%
   rename_with(~paste0("ele_", .x, "_gb_18"),
@@ -57,74 +57,88 @@ glimpse(gb_18)
 write_rds(gb_18, "inst/electoral/cdmx/gb_18.rda")
 
 # PM18-------------------------------------------------------------------
-mun <- rel_18 |>
-  distinct(clave_casilla, municipio_18, nombre_municipio_18, nominal)
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Municipio/cdmx_normal_casilla.csv"
-aux <- read_csv(path) |>
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/CDMX/2018/ALCALDIAS_csv/2018_SEE_AYUN_CDMX_CAS.csv"
+pm_18 <- read_csv(path) |>
   janitor::clean_names() |>
-  rename(distritol_18 = distrito,
-         noreg = no_reg) |>
-  homologar_bd(estado = "09", nombre_estado = "CIUDAD DE MÉXICO")  |>
-  mutate(distritol_18 = sprintf("%02s", distritol_18),
-         seccion = sprintf("%04s", seccion),
-         estado = "09") |>
-  rowwise() |>
-  mutate(total = sum(c_across(pan:noreg))) |>
-  left_join(mun, join_by(clave_casilla)) |>
-  relocate(total, .after = noreg) |>
-  relocate(nominal, .after = total) |>
-  rename_with(~paste0("ele_", .x, "_pm_18"),
-              .cols = c(pan:nominal)) |>
-  select(estado, nombre_estado:seccion, municipio_18:nombre_municipio_18, clave_casilla, casilla, id_casilla:ext_contigua, everything())
-
-glimpse(aux)
-
-aux |>
-  count(nchar(clave_casilla))
-
-colnames(aux) <- sub("independiente_", "ind", colnames(aux))
-colnames(aux) <- sub("_es_", "_pes_", colnames(aux))
+  filter(is.na(tribunal)) |>
+  rename(estado = id_estado,
+         distritol_18 = id_distrito_local,
+         nombre_distritol_18 = cabecera_distrital_local,
+         municipio_18 = id_municipio,
+         nombre_municipio_18 = municipio,
+         pes = es,
+         noreg = num_votos_can_nreg,
+         validos = num_votos_validos,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal,
+         panal = na
+  ) |>
+  rename_with(~gsub("cand_", "", .x), .cols = contains("cand")) |>
+  rename_with(~gsub("c_comun_", "", .x), .cols = contains("c_comun_")) |>
+  mutate(distritol_18 = sprintf("%03d", distritol_18),
+         municipio_18 = sprintf("%03d", municipio_18),
+         seccion = sprintf("%04d", seccion)) |>
+  select(-c(estatus_acta:last_col(), circunscripcion)) |>
+  mutate_all(~replace_na(., 0)) |>
+  mutate_if(is.logical, as.integer) |>
+  homologar_bd(estado = "09",
+               nombre_estado = "CDMX"
+  ) |>
+  relocate(clave_casilla, .after = seccion) |>
+  rename_with(~paste("ele", .x, "pm_18", sep = "_"), .cols = pan:last_col()) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_"))
 
 pm_18 <- aux
 glimpse(pm_18)
 write_rds(pm_18, "inst/electoral/cdmx/pm_18.rda")
 # DL18 -------------------------------------------------------------------
-mun <- rel_18 |>
-  distinct(clave_casilla, municipio_18, nombre_municipio_18, nominal)
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Distrito local/cdmx_normal_casilla.csv"
-
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/CDMX/2018/DIPUTACIONES_LOC_MR_csv/2018_SEE_DIP_LOC_MR_CDMX_CAS.csv"
 aux <- read_csv(path) |>
   janitor::clean_names() |>
-  rename(distritol_18 = distrito,
-         noreg = no_reg) |>
-  homologar_bd(estado = "09", nombre_estado = "CIUDAD DE MÉXICO")  |>
-  mutate(distritol_18 = sprintf("%02s", distritol_18),
-         seccion = sprintf("%04s", seccion),
-         estado = "09",
-         prd_mc = if_else(prd_mc_33 > 0, prd_mc_33, prd_mc_29)) |>
-  relocate(prd_mc, .before = nulos) |>
-  select(-c(prd_mc_33, prd_mc_29)) |>
-  rowwise() |>
-  mutate(total = sum(c_across(pan:noreg))) |>
-  left_join(mun, join_by(clave_casilla)) |>
-  relocate(total, .after = noreg) |>
-  relocate(nominal, .after = total) |>
-  rename_with(~paste0("ele_", .x, "_dl_18"),
-              .cols = c(pan:nominal)) |>
-  select(estado, nombre_estado:seccion, municipio_18:nombre_municipio_18, clave_casilla, casilla, id_casilla:ext_contigua, everything())
+  filter(is.na(tribunal)) |>
+  rename(estado = id_estado,
+         distritol_18 = id_distrito_local,
+         nombre_distritol_18 = cabecera_distrital_local,
+         municipio_18 = id_municipio,
+         nombre_municipio_18 = municipio,
+         pes = es,
+         noreg = num_votos_can_nreg,
+         validos = num_votos_validos,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal,
+         panal = na
+  ) |>
+  rename_with(~gsub("cand_", "", .x), .cols = contains("cand")) |>
+  mutate(prd_mc = prd_mc + c_comun_prd_mc) |>
+  select(-c_comun_prd_mc) |>
+  rename_with(~gsub("c_comun_", "", .x), .cols = contains("c_comun_")) |>
+  mutate(distritol_18 = sprintf("%03d", distritol_18),
+         municipio_18 = sprintf("%03d", municipio_18),
+         seccion = sprintf("%04d", seccion)) |>
+  select(-c(estatus_acta:last_col(), circunscripcion)) |>
+  mutate_all(~replace_na(., 0)) |>
+  mutate_if(is.logical, as.integer) |>
+  homologar_bd(estado = "09",
+               nombre_estado = "CDMX"
+  ) |>
+  relocate(clave_casilla, .after = seccion) |>
+  rename_with(~paste("ele", .x, "dl_18", sep = "_"), .cols = pan:last_col()) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_"))
 
 glimpse(aux)
 
 aux |>
   count(nchar(clave_casilla))
 
-colnames(aux) <- sub("independiente_", "ind", colnames(aux))
-colnames(aux) <- sub("_es_", "_pes_", colnames(aux))
-
 dl_18 <- aux
 glimpse(dl_18)
 write_rds(dl_18, "inst/electoral/cdmx/dl_18.rda")
 # PM21 --------------------------------------------------------------------
+nombres_dl <- read_rds("inst/electoral/cdmx/dl_18.rda") |>
+  distinct(distritol_18, nombre_distritol_18)
+
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/cdmx_normal_casilla.csv"
 aux <- read_csv(path) |>
   janitor::clean_names() |>
@@ -136,13 +150,15 @@ aux <- read_csv(path) |>
     nominal = lista_nominal
   ) |>
   homologar_bd(estado = "09", nombre_estado = "CIUDAD DE MÉXICO")  |>
-  mutate(distritol_21 = sprintf("%02s", distritol_21),
-         municipio_21 = sprintf("%02s", municipio_21),
+  mutate(distritol_21 = sprintf("%03s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
          seccion = sprintf("%04s", seccion),
          estado = "09"
   ) %>%
+  left_join(nombres_dl, by = c("distritol_21" = "distritol_18")) |>
   rename_with(~paste0("ele_", .x, "_pm_21"), .cols = pan:nominal) |>
-  select(estado:nombre_estado, distritol_21:seccion, clave_casilla, tipo_casilla:casilla, everything()) %>%
+  select(estado:nombre_estado, nombre_distritol_21 = nombre_distritol_18,
+         distritol_21:seccion, clave_casilla, tipo_casilla:casilla, everything()) %>%
   mutate_all(~tidyr::replace_na(., 0))
 
 glimpse(aux)
@@ -166,13 +182,15 @@ aux <- read_csv(path) |>
     noreg = no_reg
   ) |>
   homologar_bd(estado = "09", nombre_estado = "CIUDAD DE MÉXICO")  |>
-  mutate(distritol_21 = sprintf("%02s", distritol_21),
-         municipio_21 = sprintf("%02s", municipio_21),
+  mutate(distritol_21 = sprintf("%03s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
          seccion = sprintf("%04s", seccion),
          estado = "09"
   ) %>%
+  left_join(nombres_dl, by = c("distritol_21" = "distritol_18")) |>
   rename_with(~paste0("ele_", .x, "_dl_21"), .cols = pan:nominal) |>
-  select(estado:nombre_estado, distritol_21:seccion, clave_casilla, tipo_casilla:casilla, everything()) %>%
+  select(estado:nombre_estado, nombre_distritol_21 = nombre_distritol_18,
+         distritol_21:seccion, clave_casilla, tipo_casilla:casilla, everything()) %>%
   mutate_all(~tidyr::replace_na(., 0))
 
 glimpse(aux)

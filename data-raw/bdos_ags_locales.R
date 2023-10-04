@@ -558,8 +558,121 @@ ags_dl_16 %>% write_rds("inst/electoral/ags/dl_16.rda")
 rm(dl16)
 
 
+# Correcciones ------------------------------------------------------------
+
+pm_16 <- read_rds("inst/electoral/ags/pm_16.rda") |>
+  rename(distritol_16 = distritol,
+         nombre_distritol_16 = nombre_distritol,
+         municipio_16 = municipio,
+         nombre_municipio_16 = nombre_municipio
+  )
+write_rds(pm_16, "inst/electoral/ags/pm_16.rda")
+clave <- pm_16 |>
+  distinct(seccion, distritol_16, nombre_distritol_16, municipio_16, nombre_municipio_16)
+
+dl_16 <- read_rds("inst/electoral/ags/dl_16.rda") |>
+  select(-c(distritol:nombre_municipio)) |>
+  left_join(clave, by = "seccion") |>
+  select(estado, nombre_estado, all_of(names(clave)), everything())
+
+write_rds(dl_16, "inst/electoral/ags/dl_16.rda")
+
+gb_16 <- read_rds("inst/electoral/ags/gb_16.rda") |>
+  rename(distritol_16 = distritol,
+         nombre_distritol_16 = nombre_distritol,
+         municipio_16 = municipio,
+         nombre_municipio_16 = nombre_municipio
+  )
+
+write_rds(gb_16, "inst/electoral/ags/gb_16.rda")
+
+dl_18 <- read_rds("inst/electoral/ags/dl_18.rda") |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
+  rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
+  select(-id_estado) |>
+  rename(distritol_18 = distritol,
+         nombre_distritol_18 = nombre_distritol,
+         municipio_18 = municipio,
+         nombre_municipio_18 = nombre_municipio)
+
+write_rds(dl_18, "inst/electoral/ags/dl_18.rda")
 
 
+# 2021 --------------------------------------------------------------------
+homologar_bd <- function(bd, estado, nombre_estado){
+  bd |>
+    mutate(estado = !!estado,
+           nombre_estado = nombre_estado,
+           casilla = if_else(casilla == "B", "B01",casilla),
+           id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
+                                  T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
+           tipo_casilla = substr(casilla, 1, 1),
+           ext_contigua = if_else(nchar(casilla) >= 4, stringr::str_extract_all(casilla,"(?<=C)(\\d+)"), list("0")),
+           clave_casilla = glue::glue("{estado}{stringr::str_pad(seccion,pad = '0', width = 4)}{tipo_casilla}{stringr::str_pad(id_casilla,pad = '0', width = 2)}{stringr::str_pad(ext_contigua,pad = '0', width = 2)}")
+    ) |>
+    tidyr::unnest(cols = c(casilla:ext_contigua))
+}
 
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/ags_normal_casilla.csv"
+dl_21 <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(is.na(tribunal)) |>
+  rename(estado = id_estado,
+         distritol_21 = id_distrito_local,
+         nombre_distritol_21 = cabecera_distrital_local,
+         municipio_21 = id_municipio,
+         nombre_municipio_21 = municipio,
+         panal = panala,
+         noreg = num_votos_can_nreg,
+         validos = num_votos_validos,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal) |>
+  mutate(distritol_21 = sprintf("%03d", distritol_21),
+         municipio_21 = sprintf("%03d", municipio_21),
+         seccion = sprintf("%04d", seccion)) |>
+  select(-c(estatus_acta:last_col(), circunscripcion)) |>
+  homologar_bd(estado = "01",
+               nombre_estado = "AGUASCALIENTES"
+  ) |>
+  mutate_if(is.double, ~replace_na(., 0)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  rename_with(~paste("ele", .x, "dl_21", sep = "_"), .cols = pan:last_col()) |>
+  rename_with(~gsub("cand_", "", .x), .cols = contains("cand_")) |>
+  rename_with(~gsub("_panala_", "_panal_", .x), contains("_panala_"))
 
+write_rds(dl_21, "inst/electoral/ags/dl_21.rda")
 
+## PM_21
+
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/ags_normal_casilla.csv"
+pm_21 <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(is.na(tribunal)) |>
+  rename(estado = id_estado,
+         distritol_21 = id_distrito_local,
+         nombre_distritol_21 = cabecera_distrital_local,
+         municipio_21 = id_municipio,
+         nombre_municipio_21 = municipio,
+         panal = panala,
+         noreg = num_votos_can_nreg,
+         validos = num_votos_validos,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal) |>
+  mutate(distritol_21 = sprintf("%03d", distritol_21),
+         municipio_21 = sprintf("%03d", municipio_21),
+         seccion = sprintf("%04d", seccion)) |>
+  select(-c(estatus_acta:last_col(), circunscripcion)) |>
+  homologar_bd(estado = "01",
+               nombre_estado = "AGUASCALIENTES"
+  ) |>
+  mutate_if(is.double, ~replace_na(., 0)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  rename_with(~paste("ele", .x, "pm_21", sep = "_"), .cols = pan:last_col()) |>
+  rename_with(~gsub("cand_", "", .x), .cols = contains("cand_")) |>
+  rename_with(~gsub("_panala_", "_panal_", .x), contains("_panala_"))
+
+glimpse(pm_21)
+
+write_rds(pm_21, "inst/electoral/ags/pm_21.rda")

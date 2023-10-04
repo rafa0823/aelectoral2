@@ -513,9 +513,170 @@ mex_dl_15 %>% write_rds("inst/electoral/mex/dl_15.rda")
 rm(dl15)
 
 
+# GB_13 -------------------------------------------------------------------
+library(tidyverse)
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2023/Gobernador/mexico_normal_casilla.csv"
 
+# Funciones ---------------------------------------------------------------
 
+homologar_bd <- function(bd, estado, nombre_estado){
+  bd |>
+    mutate(estado = !!estado,
+           nombre_estado = nombre_estado,
+           casilla = case_when(casilla == "B"~ "B01",
+                               grepl("MEC", casilla) ~ gsub("MEC", "M", casilla),
+                               grepl("VA", casilla) ~ gsub("VA", "V", casilla),
+                               grepl("VPPP", casilla) ~ gsub("VPPP", "P", casilla),
+                               T ~casilla),
+           id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
+                                  T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
+           tipo_casilla = substr(casilla, 1, 1),
+           ext_contigua = if_else(nchar(casilla) >= 4, stringr::str_extract_all(casilla,"(?<=C)(\\d+)"), list("0")),
+           clave_casilla = glue::glue("{estado}{stringr::str_pad(seccion,pad = '0', width = 4)}{tipo_casilla}{stringr::str_pad(id_casilla,pad = '0', width = 2)}{stringr::str_pad(ext_contigua,pad = '0', width = 2)}")
+    ) |>
+    tidyr::unnest(cols = c(casilla:ext_contigua))
+}
 
+# Procesamiento -----------------------------------------------------------
+gb_23 <- read_csv(path) |>
+  janitor::clean_names() |>
+  rename(
+    estado = id_estado,
+    distritol_23 = id_distrito_local,
+    nombre_distritol_23 = cabecera_distrital_local,
+    nombre_municipio_23 = municipio,
+    municipio_23 = id_municipio,
+    validos = num_votos_validos,
+    noreg = num_votos_can_nreg,
+    nulos = num_votos_nulos,
+    total = total_votos,
+    nominal = lista_nominal
+  ) |>
+  rename_with(~gsub("naem", "panal", .x), contains("naem")) |>
+  mutate(
+    estado = as.character(estado),
+    distritol_23 = sprintf("%03s", distritol_23),
+    municipio_23 = sprintf("%03s", municipio_23),
+    seccion = sprintf("%04s", seccion),
+    seccion = if_else(grepl("V", casilla), "9999", seccion)
+  ) |>
+  homologar_bd(estado = "15", nombre_estado = "MEXICO") |>
+  select(-c(circunscripcion, estatus_acta:ruta_acta)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  rename_with(~paste("ele", .x, "gb_23", sep = "_"), pan:nominal)
 
+gb_23 |>
+  count(nchar(clave_casilla))
 
+naniar::vis_miss(gb_23)
 
+write_rds(gb_23, "inst/electoral/mex/gb_23.rda")
+
+# Correcciones a bds ------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/MEX/2015/DIPUTACIONES_LOC_MR_csv/2015_SEE_DIP_LOC_MR_MEX_SEC.csv"
+nombres <- read_csv("~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/MEX/2015/DIPUTACIONES_LOC_MR_csv/2015_SEE_DIP_LOC_MR_MEX_MUN.csv") |>
+  janitor::clean_names() |>
+  distinct(municipio_15 = sprintf("%03s", id_municipio),
+           nombre_municipio_15 = municipio)
+
+nombres_dl <- read_csv("~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/MEX/") |>
+  janitor::clean_names() |>
+  distinct(municipio_15 = sprintf("%03s", id_municipio),
+           nombre_municipio_15 = municipio)
+
+clave_15 <- read_csv(path) |>
+  janitor::clean_names() |>
+  distinct(seccion = sprintf("%04s", seccion),
+           municipio_15 = sprintf("%03s", id_municipio)) |>
+  left_join(nombres)
+
+clave_15 |>
+  filter(seccion == "4266")
+
+#DL 15
+read_rds("inst/electoral/mex/dl_15.rda") |>
+  filter(tepjf != "Anulada" | is.na(tepjf)) |>
+  select(-municipio) |>
+  rename(distritol_15 = distritol,
+         nombre_distritol_15 = nombre_distritol,
+         nombre_municipio_15 = nombre_municipio,
+  ) |>
+  rename_with(~gsub("independiente", "ind", .x), contains("independiente")) |>
+  left_join(clave_15) |>
+  write_rds("inst/electoral/mex/dl_15.rda")
+
+#PM_15
+read_rds("inst/electoral/mex/pm_15.rda") |>
+  as_tibble() |>
+  filter(tepjf != "Anulada" | is.na(tepjf)) |>
+  select(-municipio, -nombre_municipio) |>
+  rename(distritol_15 = distritol,
+         nombre_distritol_15 = nombre_distritol,
+  ) |>
+  rename_with(~gsub("independiente", "ind", .x), contains("independiente")) |>
+  left_join(clave_15) |>
+  write_rds("inst/electoral/mex/pm_15.rda")
+
+# GB 17
+
+read_rds("inst/electoral/mex/gb_17.rda") |>
+  as_tibble() |>
+  rename(nombre_distritol_17 = nombre_distrito) |>
+  mutate(distritol_17 = sprintf("%03s", distritol_17)) |>
+  rename_with(~gsub("independiente_", "ind", .x), contains("independiente")) |>
+  write_rds("inst/electoral/mex/gb_17.rda")
+
+#DL 18
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/MEX/2018/DIPUTACIONES_LOC_MR_csv/2018_SEE_DIP_LOC_MR_MEX_DISCAND.csv"
+clave_18 <- read_csv(path) |>
+  janitor::clean_names() |>
+  distinct(distritol_18 = sprintf("%03s", id_distrito_local),
+           nombre_distritol_18 = cabecera_distrital_local)
+
+read_rds("inst/electoral/mex/dl_18.rda") |>
+  as_tibble() |>
+  rename(nombre_municipio_18 = nombre_municipio,
+         distritol_18 = distritol,
+         municipio_18 = municipio) |>
+  mutate(distritol_18 = sprintf("%03s", distritol_18)) |>
+  left_join(clave_18) |>
+  rename_with(~gsub("independiente_", "ind", .x), contains("independiente")) |>
+  write_rds("inst/electoral/mex/dl_18.rda")
+
+## PM_18
+
+read_rds("inst/electoral/mex/pm_18.rda") |>
+  as_tibble() |>
+  rename(nombre_municipio_18 = nombre_municipio,
+         distritol_18 = distritol,
+         municipio_18 = municipio) |>
+  mutate(distritol_18 = sprintf("%03s", distritol_18)) |>
+  left_join(clave_18) |>
+  rename_with(~gsub("independiente_", "ind", .x), contains("independiente")) |>
+  write_rds("inst/electoral/mex/pm_18.rda")
+
+## DL_21
+read_rds("inst/electoral/mex/dl_21.rda") |>
+  as_tibble() |>
+  rename(distritol_21 = distritol,
+         nombre_distritol_21 = nombre_distritol,
+         municipio_21 = municipio,
+         nombre_municipio_21 = nombre_municipio,
+         ele_validos_dl_21 = ele_votos_validos_dl_21) |>
+  mutate(distritol_21 = sprintf("%03s", distritol_21)) |>
+  write_rds("inst/electoral/mex/dl_21.rda")
+
+## PM_21
+clave_21 <- read_csv("~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/MEX/2021/AYUNTAMIENTOS_csv/2021_SEE_AYUN_MEX_CAS.csv") |>
+  janitor::clean_names() |>
+  distinct(distritol_21 = sprintf("%03s", id_distrito_local),
+           nombre_distritol_21 = cabecera_distrital_local,
+           seccion = sprintf("%04s", seccion))
+
+read_rds("inst/electoral/mex/pm_21.rda") |>
+  as_tibble() |>
+  rename(municipio_21 = municipio,
+         nombre_municipio_21 = nombre_municipio) |>
+  left_join(clave_21) |>
+  rename_with(~gsub("independiente_", "ind", .x), contains("independiente")) |>
+  write_rds("inst/electoral/mex/pm_21.rda")

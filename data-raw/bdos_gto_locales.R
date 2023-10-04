@@ -22,6 +22,12 @@ path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Lista 
 ln_18 <- readxl::read_excel(path, skip = 6) |>
   janitor::clean_names()
 
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/GTO/2018/AYUNTAMIENTOS_csv/2018_SEE_AYUN_GTO_CAS.csv"
+nombre_distrito <- read_csv(path) |>
+  janitor::clean_names() |>
+  distinct(distritol_18 = sprintf("%03s", id_distrito_local),
+           nombre_distritol_18 = cabecera_distrital_local)
+
 # Relacion 21 -------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/guanajuato_normal_casilla.csv"
 dl_21 <- read_csv(path, skip = 6) |>
@@ -68,7 +74,8 @@ gb_18 <- gb_18 |>
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
-         distritol_18 = formatC(distritol_18, width = 2, flag = "0")) |>
+         distritol_18 = formatC(distritol_18, width = 3, flag = "0")) |>
+  left_join(nombre_distrito) |>
   rename_with(~paste0('ele_', .x, "_gb_18"),
               .cols = pan:nominal)
 
@@ -85,6 +92,8 @@ final_gb18_gto |>
 # guardar rda
 
 gb_18 <- final_gb18_gto
+
+glimpse(gb_18)
 
 write_rds(gb_18, "inst/electoral/gto/gb_18.rda")
 
@@ -115,14 +124,16 @@ dl_18 <- dl_18 |>
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
-         distritol_18 = formatC(distritol_18, width = 2, flag = "0")) |>
+         distritol_18 = formatC(distritol_18, width = 3, flag = "0")) |>
+  left_join(nombre_distrito) |>
   rename_with(~paste0('ele_', .x, "_dl_18"),
               .cols = pan:nominal)
 
 ## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
 final_dl18_gto <- dl_18  %>%
   homologar_bd(estado = "11", nombre_estado = "GUANAJUATO") |>
-  select(estado, nombre_estado, distritol_18, municipio_18, seccion, id_casilla:clave_casilla, everything())
+  select(estado, nombre_estado, distritol_18, municipio_18, seccion, id_casilla:clave_casilla, everything()) |>
+  mutate_all(~replace_na(.x, 0))
 
 ##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
 
@@ -161,14 +172,16 @@ aux <- aux |>
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_18 = formatC(municipio_18, width = 3, flag = "0"),
-         distritol_18 = formatC(distritol_18, width = 2, flag = "0")) |>
+         distritol_18 = formatC(distritol_18, width = 3, flag = "0")) |>
+  left_join(nombre_distrito) |>
   rename_with(~paste0('ele_', .x, "_", elec),
               .cols = pan:nominal)
 
 ## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
 final <- aux  %>%
   homologar_bd(estado = "11", nombre_estado = "GUANAJUATO") |>
-  select(estado, nombre_estado, distritol_18, municipio_18, seccion, id_casilla:clave_casilla, everything())
+  select(estado, nombre_estado, distritol_18, municipio_18, seccion, id_casilla:clave_casilla, everything()) |>
+  mutate_all(~replace_na(.x, 0))
 
 ##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
 
@@ -191,15 +204,17 @@ aux <- read_csv(path, skip = 6) |>
          nombre_estado = estado,
          estado = id_estado,
          total = total_votos_calculado,
-         noreg = no_registrados) %>%
+         noreg = no_registrados,
+         nombre_distritol_21 = nombre_distrito_21) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
-         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
+         distritol_21 = formatC(distritol_21, width = 3, flag = "0"),
          clave_casilla = gsub("'", "", clave_casilla),
          estado = as.character(estado)) |>
   rename_with(~paste0('ele_', .x, "_", elec),
-              .cols = pan:nominal)
+              .cols = pan:nominal) |>
+  select(-distritof_21)
 
 glimpse(aux)
 
@@ -209,7 +224,7 @@ colnames(aux) <- sub("cand_ind_", "ind", names(aux))
 colnames(aux)
 ## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
 final <- aux  %>%
-  select(estado, nombre_estado, distritof_21, nombre_distrito_21, distritol_21, municipio_21, seccion, id_casilla:clave_casilla, everything())
+  select(estado, nombre_estado,nombre_distritol_21, distritol_21, municipio_21, seccion, id_casilla:clave_casilla, everything())
 
 ##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
 
@@ -226,6 +241,9 @@ write_rds(pm_21, glue::glue("inst/electoral/gto/{elec}.rda"))
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/guanajuato_normal_casilla.csv"
 elec <- "dl_21"
 
+nom_mun <- pm_21 |>
+  distinct(municipio_21, nombre_municipio_21)
+
 aux <- read_csv(path, skip = 6) |>
   janitor::clean_names() |>
   select(-c(id_distrito_local, distrito_local)) |>
@@ -234,15 +252,18 @@ aux <- read_csv(path, skip = 6) |>
          nombre_estado = estado,
          estado = id_estado,
          total = total_votos_calculado,
-         noreg = no_registrados) %>%
+         noreg = no_registrados,
+         nombre_distritol_21 = nombre_distrito_21) %>%
   mutate(across(pan:nominal, ~as.numeric(.x)),
          seccion = formatC(seccion, width = 4,flag = "0"),
          municipio_21 = formatC(municipio_21, width = 3, flag = "0"),
-         distritol_21 = formatC(distritol_21, width = 2, flag = "0"),
+         distritol_21 = formatC(distritol_21, width = 3, flag = "0"),
          clave_casilla = gsub("'", "", clave_casilla),
          estado = as.character(estado)) |>
+  left_join(nom_mun) |>
   rename_with(~paste0('ele_', .x, "_", elec),
-              .cols = pan:nominal)
+              .cols = pan:nominal) |>
+  select(-distritof_21)
 
 glimpse(aux)
 colnames(aux) <- sub("_na", "_panal", names(aux))
@@ -251,7 +272,7 @@ colnames(aux) <- sub("cand_ind_", "ind", names(aux))
 colnames(aux)
 ## E1C10 hay unas casillas que tienen más de 4 número de caracteres. ¿Esto cómo se procesa?
 final <- aux  %>%
-  select(estado, nombre_estado, distritof_21, nombre_distrito_21, distritol_21, municipio_21, seccion, id_casilla:clave_casilla, everything())
+  select(estado, nombre_estado, nombre_distritol_21, distritol_21, nombre_municipio_21, municipio_21, seccion, id_casilla:clave_casilla, everything())
 
 ##TEST: El test satisfactorio cuando todas las claves casilla tienen 11 caracteres
 

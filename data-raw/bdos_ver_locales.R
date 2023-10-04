@@ -21,11 +21,12 @@ homologar_bd <- function(bd, estado, nombre_estado){
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2017/Municipal/veracruz_normal_casilla.csv"
 pm_17 <- read_csv(path) |>
   janitor::clean_names() |>
+  filter(tepjf != "Anulada" | is.na(tepjf)) |>
   rename(estado = id_estado,
          distritol_17 = id_distrito,
-         nombre_distrio = cabecera_distrital,
+         nombre_distritol_17 = cabecera_distrital,
          municipio_17 = id_municipio,
-         nombre_municipio = municipio,
+         nombre_municipio_17 = municipio,
          pes = es,
          noreg = num_votos_can_nreg,
          validos = num_votos_validos,
@@ -35,7 +36,7 @@ pm_17 <- read_csv(path) |>
          panal = nva_alianza
          ) |>
   rename_with(~gsub("cand_", "", .x), .cols = contains("cand")) |>
-  mutate(distritol_17 = sprintf("%02d", distritol_17),
+  mutate(distritol_17 = sprintf("%03d", distritol_17),
          municipio_17 = sprintf("%03d", municipio_17),
          seccion = sprintf("%04d", seccion)) |>
   select(-c(estatus_acta:last_col(), circunscripcion)) |>
@@ -50,12 +51,12 @@ pm_17 <- read_csv(path) |>
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2017/Municipal/veracruz_ext_casilla.csv"
 pm_17_ext <- read_csv(path) |>
   janitor::clean_names() |>
-  filter(!is.na(id_estado)) |>
+  filter(!is.na(id_estado), tepjf != "Anulada" | is.na(tepjf)) |>
   rename(estado = id_estado,
          distritol_17 = id_distrito,
-         nombre_distrio = cabecera_distrital,
+         nombre_distritol_17 = cabecera_distrital,
          municipio_17 = id_municipio,
-         nombre_municipio = municipio,
+         nombre_municipio_17 = municipio,
          pes = es,
          noreg = num_votos_can_nreg,
          validos = num_votos_validos,
@@ -65,7 +66,7 @@ pm_17_ext <- read_csv(path) |>
          panal = nva_alianza
   ) |>
   rename_with(~gsub("cand_", "", .x), .cols = contains("cand")) |>
-  mutate(distritol_17 = sprintf("%02d", distritol_17),
+  mutate(distritol_17 = sprintf("%03d", distritol_17),
          municipio_17 = sprintf("%03d", municipio_17),
          seccion = sprintf("%04d", seccion)) |>
   select(-c(estatus_acta:last_col())) |>
@@ -89,11 +90,12 @@ write_rds(pm_17, "inst/electoral/ver/pm_17.rda")
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Gobernador/veracruz_normal_casilla.csv"
 gb_18 <- read_csv(path) |>
   janitor::clean_names() |>
+  filter(is.na(tribunal)) |>
   rename(estado = id_estado,
          distritol_18 = id_distrito_local,
-         nombre_distrio = cabecera_distrital_local,
+         nombre_distritol_18 = cabecera_distrital_local,
          municipio_18 = id_municipio,
-         nombre_municipio = municipio,
+         nombre_municipio_18 = municipio,
          pes = es,
          panal = na,
          noreg = num_votos_can_nreg,
@@ -101,7 +103,7 @@ gb_18 <- read_csv(path) |>
          nulos = num_votos_nulos,
          total = total_votos,
          nominal = lista_nominal) |>
-  mutate(distritol_18 = sprintf("%02d", distritol_18),
+  mutate(distritol_18 = sprintf("%03d", distritol_18),
          municipio_18 = sprintf("%03d", municipio_18),
          seccion = sprintf("%04d", seccion)) |>
   select(-c(estatus_acta:last_col(), circunscripcion)) |>
@@ -116,16 +118,16 @@ gb_18 <- read_csv(path) |>
 glimpse(gb_18)
 
 write_rds(gb_18, "inst/electoral/ver/gb_18.rda")
-
 # dl_18 -------------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Distrito local/veracruz_normal_casilla.csv"
 dl_18 <- read_csv(path) |>
   janitor::clean_names() |>
+  filter(tribunal != "ANULADA" | is.na(tribunal)) |>
   rename(estado = id_estado,
          distritol_18 = id_distrito_local,
-         nombre_distrio = cabecera_distrital_local,
+         nombre_distritol_18 = cabecera_distrital_local,
          municipio_18 = id_municipio,
-         nombre_municipio = municipio,
+         nombre_municipio_18 = municipio,
          pes = es,
          panal = na,
          noreg = num_votos_can_nreg,
@@ -134,7 +136,7 @@ dl_18 <- read_csv(path) |>
          total = total_votos,
          nominal = lista_nominal) |>
   rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
-  mutate(distritol_18 = sprintf("%02d", distritol_18),
+  mutate(distritol_18 = sprintf("%03d", distritol_18),
          municipio_18 = sprintf("%03d", municipio_18),
          seccion = sprintf("%04d", seccion)) |>
   select(-c(estatus_acta:last_col(), circunscripcion)) |>
@@ -157,18 +159,19 @@ write_rds(dl_18, "inst/electoral/ver/dl_18.rda")
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/veracruz_normal_casilla.csv"
 pm_21 <- read_csv(path) |>
   janitor::clean_names() |>
+  filter(is.na(tribunal)) |>
   rename(estado = id_estado,
          distritol_21 = id_distrito_local,
-         nombre_distrio = cabecera_distrital_local,
+         nombre_distritol_21 = cabecera_distrital_local,
          municipio_21 = id_municipio,
-         nombre_municipio = municipio,
+         nombre_municipio_21 = municipio,
          noreg = num_votos_can_nreg,
          validos = num_votos_validos,
          nulos = num_votos_nulos,
          total = total_votos,
          nominal = lista_nominal) |>
   rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
-  mutate(distritol_21 = sprintf("%02d", distritol_21),
+  mutate(distritol_21 = sprintf("%03d", distritol_21),
          municipio_21 = sprintf("%03d", municipio_21),
          seccion = sprintf("%04d", seccion)) |>
   select(-c(estatus_acta:last_col(), circunscripcion)) |>
@@ -189,17 +192,18 @@ write_rds(pm_21, "inst/electoral/ver/pm_21.rda")
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/veracruz_normal_casilla.csv"
 dl_21 <- read_csv(path) |>
   janitor::clean_names() |>
+  filter(is.na(tribunal)) |>
   rename(estado = id_estado,
          distritol_21 = id_distrito_local,
-         nombre_distrio = cabecera_distrital_local,
+         nombre_distritol_21 = cabecera_distrital_local,
          municipio_21 = id_municipio,
-         nombre_municipio = municipio,
+         nombre_municipio_21 = municipio,
          noreg = num_votos_can_nreg,
          validos = num_votos_validos,
          nulos = num_votos_nulos,
          total = total_votos,
          nominal = lista_nominal) |>
-  mutate(distritol_21 = sprintf("%02d", distritol_21),
+  mutate(distritol_21 = sprintf("%03d", distritol_21),
          municipio_21 = sprintf("%03d", municipio_21),
          seccion = sprintf("%04d", seccion)) |>
   select(-c(estatus_acta:last_col(), circunscripcion)) |>

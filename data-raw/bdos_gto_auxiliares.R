@@ -6,134 +6,77 @@ path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Lista 
 ln_18 <- readxl::read_excel(path, skip = 6) |>
   janitor::clean_names()
 
-
-
-
-
-
-
-
-
-
-
-
-
 # Formato alianzas --------------------------------------------------------
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/locales/"
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/Sucias/guana_gob_18.csv"
 
-## GB 18
-gb_18_guanajuato <- ln_18 |>
+gb_18 <- read_csv(path, skip = 8) |>
+  janitor::clean_names() |>
+  filter(grepl("_", alianza)) |>
   transmute(eleccion = "gb_18",
             estado = "11",
-            nombre_estado = toupper(entidad),
-            coaliciones = T,
+            nombre_estado = "GUANAJUATO",
+            coaliciones = tolower(alianza),
             candidatura_comun = F
   ) |>
   distinct() |>
   na.omit()
 
-write_excel_csv(gb_18_guanajuato, file = paste0(path, "gb_18_guanajuato.csv"))
-
+write_rds(gb_18, file = "inst/alianzas/gto/gb_18.rda")
 ## DL 18
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/Sucias/guana_mun_dl_18.csv"
+read_csv(path, skip = 9) |>
+  janitor::clean_names() |>
+  filter(!is.na(distrito)) |>
+  count(partido_politico) #No hay coaliciones
 
-dl_18_guanajuato <- ln_18 |>
-  arrange(distritacion_local_2016) |>
-  transmute(eleccion = "dl_18",
-            estado = "11",
-            nombre_estado = toupper(entidad),
-            distritol_18 = sprintf("%02d", distritacion_local_2016),
-            coaliciones = T,
-            candidatura_comun = T
-  ) |>
-  distinct() |>
-  na.omit()
-
-write_excel_csv(dl_18_guanajuato, file = paste0(path, "dl_18_guanajuato.csv"))
-
-## DF 18
-df_18_guanajuato <- ln_18 |>
-  arrange(distrito_federal) |>
-  transmute(eleccion = "df_18",
-            estado = "11",
-            nombre_estado = toupper(entidad),
-            distritof_18 = sprintf("%02d", distrito_federal),
-            coaliciones = T,
-            candidatura_comun = F
-  ) |>
-  distinct() |>
-  na.omit()
-
-write_excel_csv(df_18_guanajuato, file = paste0(path, "df_18_guanajuato.csv"))
 
 ## PM 18
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/Sucias/guana_pm_18.csv"
 
-pm_18_guanajuato <- ln_18 |>
-  arrange(municipio) |>
+pm_18 <- read_csv(path) |>
+  janitor::clean_names() |>
+  mutate(candidatura_propietaria = iconv(candidatura_propietaria, from = "ISO-8859-1", to = "UTF-8"),
+         partido_ci = case_when(partido_ci == "NA_Gto" ~ "panal",
+                                grepl("CAND_IND", partido_ci) ~ gsub("CAND_IND_", "ind", partido_ci),
+                                T ~ partido_ci)) |>
+  filter(grepl("_", partido_ci)) |>
   transmute(eleccion = "pm_18",
-            estado = "11",
-            nombre_estado = toupper(entidad),
-            municipio_18 = sprintf("%02d", municipio),
-            coaliciones = T,
-            candidatura_comun = F
-  ) |>
-  distinct() |>
-  na.omit()
+            estado = id_estado,
+            nombre_estado = "GUANAJUATO",
+            municipio_18 = sprintf("%03d", id_municipio_local),
+            coaliciones = partido_ci,
+            candidatura_comun = F)
 
-write_excel_csv(pm_18_guanajuato, file = paste0(path, "pm_18_guanajuato.csv"))
+write_rds(pm_18, file = "inst/alianzas/gto/pm_18.rda")
 
 ## pm_21
-
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Municipio/guanajuato_normal_casilla.csv"
-pm_21_guanajuato <- read_csv(path, skip = 6) |>
-  arrange(ID_MUNICIPIO) |>
-  transmute(eleccion = "pm_21",
-            estado = "11",
-            nombre_estado = ESTADO,
-            municipio_21 = sprintf("%02d", ID_MUNICIPIO),
-            coaliciones = T,
-            candidatura_comun = T
-  ) |>
-  distinct() |>
-  na.omit()
-
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/locales/"
-write_excel_csv(pm_21_guanajuato, file = paste0(path, "pm_21_guanajuato.csv"))
-
-## df_21
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2021/Distrito local/guanajuato_normal_casilla.csv"
-dl_21_guanajuato <- read_csv(path, skip = 6) |>
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/Sucias/guana_mun_21.csv"
+pm_21 <- read_csv(path, skip = 6) |>
   janitor::clean_names() |>
+  filter(!is.na(pri_prd)) |>
+  distinct(id_municipio, .keep_all = T) |>
+  transmute(eleccion = "pm_21",
+            estado = id_estado,
+            nombre_estado = "GUANAJUATO",
+            municipio_18 = sprintf("%03d", id_municipio),
+            coaliciones = "pri_prd",
+            candidatura_comun = F)
+
+write_rds(pm_21, file = "inst/alianzas/gto/pm_21.rda")
+
+
+## dl_21
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/Sucias/guana_dl_21.csv"
+dl_21 <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(!is.na(pri_prd)) |>
+  distinct(id_distrito_local, .keep_all = T) |>
   transmute(eleccion = "dl_21",
             estado = "11",
             nombre_estado = "GUANAJUATO",
-            distritol_21 = sprintf("%02d",
-                                   as.numeric(as.roman(
-                                     gsub("DISTRITO ", "", distrito_local)))
-            ),
-            coaliciones = T,
+            distritol_21 = sprintf("%02d", id_distrito_local),
+            coaliciones = "pri_prd",
             candidatura_comun = F
-  ) |>
-  distinct() |>
-  na.omit()
+  )
 
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/locales/"
-write_excel_csv(dl_21_guanajuato, file = paste0(path, "dl_21_guanajuato.csv"))
-
-## DF 21
-
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Federal/2021/Diputado_normal_casilla.csv"
-df_21_guanajuato <- read_delim(path, "|",skip = 6) |>
-  janitor::clean_names() |>
-  filter(id_estado == 11) |>
-  transmute(eleccion = "df_21",
-            estado = "11",
-            nombre_estado = "GUANAJUATO",
-            distritol_21 = sprintf("%02d", id_distrito),
-            coaliciones = T,
-            candidatura_comun = F
-  ) |>
-  distinct() |>
-  na.omit()
-
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/alianzas/locales/"
-write_excel_csv(df_21_guanajuato, file = paste0(path, "df_21_guanajuato.csv"))
+write_rds(dl_21, "inst/alianzas/gto/dl_21.rda")

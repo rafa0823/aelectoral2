@@ -524,6 +524,93 @@ chis_dl_21 %>% write_rds("inst/electoral/chis/dl_21.rda")
 
 rm(dl21)
 
+library(tidyverse)
+
+# Funciones ---------------------------------------------------------------
+homologar_bd <- function(bd, estado, nombre_estado){
+  bd |>
+    mutate(estado = !!estado,
+           nombre_estado = nombre_estado,
+           casilla = if_else(casilla == "B", "B01",casilla),
+           id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
+                                  T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
+           tipo_casilla = substr(casilla, 1, 1),
+           ext_contigua = if_else(nchar(casilla) >= 4, stringr::str_extract_all(casilla,"(?<=C)(\\d+)"), list("0")),
+           clave_casilla = glue::glue("{estado}{stringr::str_pad(seccion,pad = '0', width = 4)}{tipo_casilla}{stringr::str_pad(id_casilla,pad = '0', width = 2)}{stringr::str_pad(ext_contigua,pad = '0', width = 2)}")
+    ) |>
+    tidyr::unnest(cols = c(casilla:ext_contigua))
+}
+# DL_18 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Distrito local/chiapas_normal_casilla.csv"
+dl_18 <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(tribunal != "Anulada" | is.na(tribunal)) |>
+  rename(estado = id_estado,
+         distritol_18 = id_distrito_local,
+         nombre_distritol_18 = cabecera_distrital_local,
+         municipio_18 = id_municipio,
+         nombre_municipio_18 = municipio,
+         pes = es,
+         panal = na,
+         noreg = num_votos_can_nreg,
+         validos = num_votos_validos,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal,
+         casilla = casillas
+  ) |>
+  rename_with(~gsub("cand_", "", .x), .cols = contains("cand")) |>
+  mutate(distritol_18 = sprintf("%03d", distritol_18),
+         municipio_18 = sprintf("%03d", municipio_18),
+         seccion = sprintf("%04d", seccion)) |>
+  select(-c(estatus_acta:last_col(), circunscripcion)) |>
+  mutate_all(~replace_na(., 0)) |>
+  mutate_if(is.logical, as.integer) |>
+  homologar_bd(estado = "07",
+               nombre_estado = "CHIAPAS"
+  ) |>
+  relocate(clave_casilla, .after = seccion) |>
+  rename_with(~paste("ele", .x, "dl_18", sep = "_"), .cols = pan:last_col()) |>
+  rename_with(~gsub("_es_", "_pes_", .x), .cols = contains("_es_"))
+
+dl_18 |>
+  count(nchar(clave_casilla))
+
+write_rds(dl_18, "inst/electoral/chis/dl_18.rda")
+
+
+# Correcciones ------------------------------------------------------------
+library(tidyverse)
+## dl_21
+
+dl_21 <- read_rds("inst/electoral/chis/dl_21.rda")
+glimpse(dl_21)
+
+dl_21 <- dl_21 |>
+  rename(distritol_21 = distritol,
+         nombre_distritol_21 = nombre_distritol,
+         municipio_21 = municipio,
+         nombre_municipio_21 = nombre_municipio) |>
+  mutate(distritol_21 = sprintf("%03s", distritol_21))
+
+write_rds(dl_21, "inst/electoral/chis/dl_21.rda")
+
+## pm_21
+
+pm_21 <- read_rds("inst/electoral/chis/pm_21.rda")
+glimpse(pm_21)
+pm_21 <- pm_21 |>
+  select(-ele_nulos_pm_21) |>
+  rename_with(~gsub("ep_", "", .x), .cols = contains("indep_")) |>
+  rename(ele_nulos_pm_21 = ele_votos_nulos_pm_21,
+         nombre_municipio_21 = nombre_municipio,
+         municipio_21 = municipio,
+         distritol_21 = distritol,
+         nombre_distritol_21 = nombre_distritol) |>
+  mutate(distritol_21 = sprintf("%03s", distritol_21))
+
+write_rds(pm_21, "inst/electoral/chis/pm_21.rda")
+
 
 
 

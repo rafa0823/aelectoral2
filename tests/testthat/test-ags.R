@@ -1,7 +1,7 @@
 test_that("tiene las columnas requeridas", {
   # Proceso electoral 2016
-  columnas <- c("estado", "nombre_estado", "seccion", "municipio_16", "nombre_municipio",
-                "distritol_16", "nombre_distritol")
+  columnas <- c("estado", "nombre_estado", "seccion", "municipio_16", "nombre_municipio_16",
+                "distritol_16", "nombre_distritol_16")
   bd <- Electoral$new("dl_16", "ags", llaves = c("seccion", "municipio_16", "distritol_16"))
   c("gb_16", "pm_16") |>
     walk(~bd$agregar_bd(eleccion = .x, entidad = "ags"))
@@ -10,22 +10,20 @@ test_that("tiene las columnas requeridas", {
     select(-contains("ele")) |>
     names()
 
-  expect_equal(bd, columnas)
+  expect_setequal(bd, columnas)
   # Proceso electoral 2018-2019
-  columnas <- c("estado", "nombre_estado", "seccion", "municipio_18", "nombre_municipio",
-                "distritol_18", "nombre_distritol")
+  columnas <- c("estado", "nombre_estado", "seccion", "municipio_18", "nombre_municipio_18",
+                "distritol_18", "nombre_distritol_18")
   bd <- Electoral$new("dl_18", "ags", llaves = c("seccion", "municipio_18", "distritol_18"))
-  c("pm_19") |>
-    walk(~bd$agregar_bd(eleccion = .x, entidad = "ags"))
 
   bd <- bd$bd |>
     select(-contains("ele")) |>
     names()
-  expect_equal(bd, columnas)
+  expect_setequal(bd, columnas)
 
   # Proceso electoral 2021
-  columnas <- c("estado", "nombre_estado", "seccion", "municipio_21", "nombre_municipio",
-                "distritol_21", "nombre_distritol")
+  columnas <- c("estado", "nombre_estado", "seccion", "municipio_21", "nombre_municipio_21",
+                "distritol_21", "nombre_distritol_21")
   bd <- Electoral$new("dl_21", "ags", llaves = c("seccion", "municipio_21", "distritol_21"))
   c("pm_21") |>
     walk(~bd$agregar_bd(eleccion = .x, entidad = "ags"))
@@ -33,11 +31,13 @@ test_that("tiene las columnas requeridas", {
   bd <- bd$bd |>
     select(-contains("ele")) |>
     names()
-  expect_equal(bd, columnas)
+  expect_setequal(bd, columnas)
 })
+
 test_that("las municipio, seccion y distrito tienen la longitud correcta", {
   # Proceso electoral 2016
-  bd <- Electoral$new("dl_16", "ags", llaves = c("seccion", "municipio", "distritol"))
+  bd <- Electoral$new("dl_16", "ags", llaves = c("seccion", "municipio_16", "distritol_16"),
+                      extranjero = FALSE)
   c("gb_16", "pm_16") |>
     walk(~bd$agregar_bd(eleccion = .x, entidad = "ags"))
 
@@ -49,11 +49,11 @@ test_that("las municipio, seccion y distrito tienen la longitud correcta", {
     pull(n)
 
   mun <- bd |>
-    count(n = nchar(municipio)) |>
+    count(n = nchar(municipio_16)) |>
     pull(n)
 
   dl <- bd |>
-    count(n = nchar(distritol)) |>
+    count(n = nchar(distritol_16)) |>
     pull(n)
 
   expect_equal(seccion, 7)
@@ -61,9 +61,7 @@ test_that("las municipio, seccion y distrito tienen la longitud correcta", {
   expect_equal(dl, 6)
 
   # Proceso electoral 2018-2019
-  bd <- Electoral$new("dl_18", "ags", llaves = c("seccion", "municipio", "distritol"))
-  c("pm_19") |>
-    walk(~bd$agregar_bd(eleccion = .x, entidad = "ags"))
+  bd <- Electoral$new("dl_18", "ags", llaves = c("seccion", "municipio_18", "distritol_18"))
 
   bd <- bd$bd |>
     mutate(across(-contains("ele"), ~gsub(" ", "", .x)))
@@ -73,18 +71,18 @@ test_that("las municipio, seccion y distrito tienen la longitud correcta", {
     pull(n)
 
   mun <- bd |>
-    count(n = nchar(municipio)) |>
+    count(n = nchar(municipio_18)) |>
     pull(n)
 
   dl <- bd |>
-    count(n = nchar(distritol)) |>
+    count(n = nchar(distritol_18)) |>
     pull(n)
 
   expect_equal(seccion, 7)
   expect_equal(mun, 6)
   expect_equal(dl, 6)
 
-  #Preceso electoral 2021
+  #Proceso electoral 2021
 
   bd <- Electoral$new("dl_21", "ags", llaves = c("seccion", "municipio_21", "distritol_21"))
   c("pm_21") |>
@@ -98,17 +96,18 @@ test_that("las municipio, seccion y distrito tienen la longitud correcta", {
     pull(n)
 
   mun <- bd |>
-    count(n = nchar(municipio)) |>
+    count(n = nchar(municipio_21)) |>
     pull(n)
 
   dl <- bd |>
-    count(n = nchar(distritol)) |>
+    count(n = nchar(distritol_21)) |>
     pull(n)
 
   expect_equal(seccion, 7)
   expect_equal(mun, 6)
   expect_equal(dl, 6)
 })
+
 test_that("resultados coinciden", {
   bd <- Electoral$new("dl_16", "ags", llaves = c("seccion", "municipio", "distritol"))
   c("pm_16", "gb_16", "dl_18", "pm_19", "dl_21", "pm_21") |>

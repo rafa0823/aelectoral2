@@ -46,9 +46,12 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
                                        mustWork = TRUE)) %>% tibble::as_tibble()
 
     if(entidad != "nacional"){
-      nombre <- aelectoral2::diccionario %>% filter(abreviatura == !!entidad) %>% pull(id_estado) %>%
+      nombre <- aelectoral2::diccionario %>%
+        filter(abreviatura == !!entidad) %>%
+        pull(id_estado) %>%
         stringr::str_pad(width = 2, pad = "0")
-      res <- res %>% filter(estado == !!nombre)
+      res <- res %>%
+        filter(estado == !!nombre)
     }} else{
       res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{eleccion}.rda"),
                                          package = "aelectoral2",
@@ -61,16 +64,18 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
 
   w <- switch(nivel_sep, municipio = 3, distritof = 2, distritol = 2, estado = 2)
 
-  alianzas <- res %>% transmute(
-    !!rlang::sym(names(res)[2]) := paste(stringr::str_pad(estado, width = 2, pad = "0"),
-                                 stringr::str_pad(!!rlang::sym(names(res)[2]), width = w, pad = "0"),
-                                 sep = "_"),
-    coalicion = coaliciones
-  )
+  alianzas <- res %>%
+    transmute(
+      !!rlang::sym(names(res)[2]) := paste(stringr::str_pad(estado, width = 2, pad = "0"),
+                                           stringr::str_pad(!!rlang::sym(names(res)[2]), width = w, pad = "0"),
+                                           sep = "_"),
+      coalicion = coaliciones
+    )
 
   if(!nivel %in% names(alianzas)) {
 
-    alianzas <- alianzas %>% left_join(bd_e %>% distinct(!!rlang::sym(names(alianzas)[1]), !!rlang::sym(nivel)))
+    alianzas <- alianzas %>%
+      left_join(bd_e %>% distinct(!!rlang::sym(names(alianzas)[1]), !!rlang::sym(nivel)))
   }
 
 

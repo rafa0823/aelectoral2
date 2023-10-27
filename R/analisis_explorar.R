@@ -28,7 +28,7 @@ calcular_diferencias <- function(bd, partido, eleccion_referencia, eleccion_cont
                              mutate("dif_{stringr::str_remove(eleccion_referencia, 'ele_')}_{stringr::str_sub(string = .x, start = -5, end = -1)}":=!!sym(eleccion_referencia)-!!sym(.x))
                          }
                ) %>%
-                reduce(full_join)
+                 reduce(full_join)
                return(bd)
 
              })%>%
@@ -56,12 +56,15 @@ calcular_votos_relativos <- function(bd, partido, eleccion, grupo){
               ~{
                 sufijo <- paste("ele",partido, .x, sep = "_")
                 nominal <-  paste("ele_nominal", .x, sep = "_")
-                bd %>% group_by({{grupo}}) %>%
-                  summarise(across(sufijo,
+                bd %>%
+                  group_by({{grupo}}) %>%
+                  summarise(across(any_of(sufijo),
                                    ~sum(.x, na.rm = T)/sum(!!sym(nominal),
                                                            na.rm=T))) %>%
                   filter(!is.na({{grupo}}))
-              }) %>% reduce(full_join)
+              }) %>%
+    reduce(full_join) |>
+    rename_with(~gsub("ele_","pct_", .x), starts_with("ele_"))
   return(res)
 }
 
@@ -97,16 +100,23 @@ calcular_votos_totales <- function(bd, partido, eleccion, grupo=NULL){
 #' @export
 #' @import dplyr purrr
 #' @examples
-ganador_eleccion <- function(bd, eleccion){
+ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL){
+  if(is.null(partido)){
+    partido <- extraer_partidos(bd, eleccion, tipo)
+  }
+
+  prefijo <- if_else(tipo == "relativo", "pct", "ele")
+
   res <- bd %>%
+    select(nivel, matches(glue::glue("{prefijo}_{partido}_{eleccion}"))) |>
     mutate(ganador = pmap(across(ends_with(glue::glue("_{eleccion}")) &
                                    -contains("_nominal_") &
                                    -contains("_total_")),
                           ~ names(c(...)[which.max(c(...))])),
-           ganador =stringr::str_remove(string = ganador, "ele_|cand_") %>%
+           ganador =stringr::str_remove(string = ganador, "ele_|cand_|pct_") %>%
              stringr::str_remove(string = ., pattern = glue::glue("_{eleccion}"))
     ) %>%
-    rename("ganador_{eleccion}":=ganador) %>%
+    rename("ganador_{eleccion}":= ganador) %>%
     as_tibble()
   return(res)
 }
@@ -332,6 +342,21 @@ probar_independencia_ganador <-function(bd, ganador, eleccion, ...){
                                                            "Rechazo independencia"))
                 })
   return(res)
+}
+
+extraer_partidos <- function(bd, eleccion, tipo){
+  prefijo <- if_else(tipo == "relativo", "pct_", "ele_")
+  bd %>%
+    select(matches(glue::glue("{prefijo}|cand_"))) %>%
+    names() %>%
+    stringr::str_remove(glue::glue("{prefijo}|cand_")) %>%
+    stringr::str_remove(eleccion) %>%
+    stringr::str_remove("nominal_") %>%
+    stringr::str_remove("total_") %>%
+    stringr::str_remove("noreg_") %>%
+    stringr::str_remove("nulos_") %>%
+    (function(x) gsub("_", "", x)) () |>
+    unique()
 }
 
 

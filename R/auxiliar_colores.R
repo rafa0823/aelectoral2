@@ -11,7 +11,8 @@
 #' @export
 #'
 #' @examples
-colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, saturacion=.9){
+colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, tipo, saturacion=.9){
+  prefijo <- if_else(tipo == "relativo", "pct", "ele")
   # Partidos
   partidos <- names(colores_nombrados)
 
@@ -21,23 +22,25 @@ colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, sa
 
   # Calcular ganador y máximo de votación
   bd <- bd %>%
-    select({{grupo}},matches(glue::glue("ele_{partidos}_{eleccion}"))) %>% na.omit() %>%
-    rowwise()
-  bd <- bd %>%
-    mutate(ganador=list(which.max(c_across(cols = starts_with("ele_")))) %>%
-             map_chr(~names(bd)[[.x+1]]) ,
-           max_votacion=max(c_across(cols = starts_with("ele_")))
-    ) %>%
-    ungroup() %>%
-    mutate(ganador= stringr::str_remove(ganador, "ele_") %>%
-             stringr::str_remove(., pattern = glue::glue("_{eleccion}")))
+    select({{grupo}}, matches(glue::glue("{prefijo}_{partidos}_{eleccion}")), contains("ganador")) %>%
+    na.omit() %>%
+    rowwise() |>
+    #Calcular el máximo entre las columnas que contienen el prefijo seleccionado {prefijo}
+    mutate(max_votacion = max(c_across(matches(glue::glue("{prefijo}_{partidos}_{eleccion}")))))
+
   # Funciones de color
-  funciones_color <- map(unique(bd$ganador),
+  funciones_color <- map(unique(bd[[glue::glue("ganador_{eleccion}")]]),
                          ~colorRamp(colors = c("white",colores_saturados[[.x]]), space = "Lab") %>%
                            leaflet::colorNumeric(domain = c(0, max(bd$max_votacion))))
-  names(funciones_color) <- unique(bd$ganador)
+  names(funciones_color) <- unique(bd[[glue::glue("ganador_{eleccion}")]])
 
-  res <- bd %>% mutate(color_ganador=map2_chr(ganador, max_votacion,~funciones_color[[.x]](.y)))
+  res <- bd %>%
+    mutate(!!rlang::sym(glue::glue("col_{eleccion}")) :=
+             map2_chr(
+               !!rlang::sym(glue::glue("ganador_{eleccion}")), max_votacion, ~funciones_color[[.x]](.y)
+             )
+    ) |>
+    select(-max_votacion)
   return(res)
 }
 

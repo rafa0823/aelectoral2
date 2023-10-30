@@ -10,11 +10,13 @@
 repartir_coalicion <- function(bd, nivel, eleccion){
   if(sum(is.na(bd[[nivel]]))>0) bd <- bd %>% mutate(!!rlang::sym(nivel) := tidyr::replace_na(!!rlang::sym(nivel),"E"))
 
-  pre <- bd %>% group_by(across(all_of(nivel))) %>%
+  pre <- bd %>%
+    group_by(across(all_of(nivel))) %>%
     summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>%
     filter(!is.na(!!rlang::sym(nivel))) %>%
     select(all_of(nivel), contains(eleccion)) %>%
-    tidyr::pivot_longer(-nivel) %>% mutate(
+    tidyr::pivot_longer(-nivel) %>%
+    mutate(
       alianza = gsub(pattern = glue::glue("ele_|_{eleccion}|_cc"),"",name),
       partidos = stringr::str_split(alianza, "_"),
       num_partidos = purrr::map_int(partidos,~length(.x)),
@@ -22,10 +24,14 @@ repartir_coalicion <- function(bd, nivel, eleccion){
       residuo = value %% num_partidos
     )
 
-  r <- pre %>% filter(num_partidos == 1) %>% group_by(across(all_of(nivel))) %>%
-    mutate(rango = dense_rank(-partido)) %>% ungroup
+  r <- pre %>%
+    filter(num_partidos == 1) %>%
+    group_by(across(all_of(nivel))) %>%
+    mutate(rango = dense_rank(-partido)) %>%
+    ungroup()
 
-  total <- pre %>% tidyr::unnest(partidos) %>%
+  total <- pre %>%
+    tidyr::unnest(partidos) %>%
     left_join(r %>% select(all_of(nivel), alianza, rango),
               by = c(nivel, "partidos" = "alianza")) %>%
     group_by(across(all_of(nivel)), alianza) %>%
@@ -34,7 +40,9 @@ repartir_coalicion <- function(bd, nivel, eleccion){
     summarise(partido = sum(partido, na.rm = T)) %>%
     tidyr::pivot_wider(names_from = partidos, values_from = partido)
 
-  total <- total %>% rename_with(.cols = -all_of(nivel),~glue::glue("ele_{.x}_{eleccion}")) %>% ungroup
+  total <- total %>%
+    rename_with(.cols = -all_of(nivel),~glue::glue("ele_{.x}_{eleccion}")) %>%
+    ungroup()
 
   return(total)
 }

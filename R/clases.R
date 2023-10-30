@@ -13,6 +13,7 @@ Electoral <- R6::R6Class("Electoral",
                                        todas = NULL,
                                        bd_partido = list(),
                                        bd_candidato = list(),
+                                       shp = NULL,
                                        eleccion = NA_character_,
                                        entidad = NA_character_,
                                        tipo_eleccion = NA_character_,
@@ -137,16 +138,15 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #'@description
                                        #'Agrega una base de datos de la elección señalada y se la pega a la elección que se haya leído con obtener_bd.
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
-                                       #' @param entidad Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".
                                        #'
                                        #' @return Tibble de la base de datos con la nueva elección resumidas por sección
                                        #' @examples
-                                       #'  bd$agregar_bd(eleccion = "pm_21",entidad = "mex", extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
+                                       #'  bd$agregar_bd(eleccion = "pm_21", extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
 
-                                       agregar_bd = function(eleccion, entidad){
+                                       agregar_bd = function(eleccion){
 
                                          add <- leer_base(eleccion = eleccion,
-                                                          entidad = entidad, tipo_eleccion = self$tipo_eleccion)
+                                                          entidad = self$entidad, tipo_eleccion = self$tipo_eleccion)
 
                                          self$todas <- self$todas %>% append(list(add) %>% purrr::set_names(eleccion))
 
@@ -206,6 +206,12 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @examples
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)
+                                       },
+                                       fusionar_shp = function(shp, bd, nivel){
+                                         self$shp <- shp |>
+                                           inner_join(self[[bd]] |>
+                                                        reduce(full_join, join_by({{nivel}})),
+                                                      join_by({{nivel}}))
                                        }
                          ))
 

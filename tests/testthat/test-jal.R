@@ -9,9 +9,7 @@ test_that("tiene las columnas requeridas", {
     select(-contains("ele")) |>
     names()
 
-  len <- setdiff(columnas, bd)
-
-  expect_length(len, 0)
+  expect_setequal(bd, columnas)
   # Proceso electoral 2021
   columnas <- c("estado", "nombre_estado", "seccion", "municipio_21", "distritol_21")
   bd <- Electoral$new("dl_21", "jal", llaves = c("seccion", "municipio_21", "distritol_21"))
@@ -22,9 +20,7 @@ test_that("tiene las columnas requeridas", {
     select(-contains("ele")) |>
     names()
 
-  len <- setdiff(columnas, bd)
-
-  expect_length(len, 0)
+  expect_setequal(bd, columnas)
 })
 test_that("las municipio, seccion y distrito tienen la longitud correcta", {
   # Proceso electoral 2018

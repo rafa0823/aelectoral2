@@ -3,7 +3,9 @@ library(leaflet)
 
 cdmx_secc <- Electoral$new(eleccion = "df_21", entidad = "cdmx")
 cdmx_secc$partido("df_21")
-cdmx_secc$obtener_degradado_ganador(base = "bd_partido", colores_nombrados = set_names(paleta$colores,paleta$partidos), eleccion = "df_21")
+cdmx_secc$obtener_degradado_ganador(base = "bd_partido",
+                                    colores_nombrados = set_names(paleta$colores,paleta$partidos),
+                                    eleccion = "df_21")
 
 c("dl_21", "pm_21") |>
   walk(~{

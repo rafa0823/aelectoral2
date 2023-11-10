@@ -27,3 +27,11 @@ cdmx_secc$fusionar_shp(shp = shp$shp$secc_22_cdmx |>
                        bd = "bd_partido")
 
 cdmx_secc$shp
+
+censo <- Censo$new(entidad = "cdmx")
+
+tablero <- Tablero$new(electoral = cdmx_secc, censo = censo)
+
+tablero$calcular_irs()
+
+tablero$clases$electoral$shp

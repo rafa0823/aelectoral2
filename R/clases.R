@@ -278,12 +278,12 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                              colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                          grupo = self$nivel, tipo = tipo)
+                                                                        grupo = self$nivel, tipo = tipo)
                                          } else if(tipo == "absoluto"){
                                            if(sum(grepl("ganador_", nombres)) == 0) {
                                              self$calcular_ganador(base = base, eleccion = eleccion,tipo = tipo, nivel = self$nivel, partido = partidos)
 
-                                             }
+                                           }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                              colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
                                                                         grupo = self$nivel, tipo = tipo)
@@ -335,3 +335,74 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                 self$shp[[nivel]] <- join_shp_bd(self$shp[[nivel]], bd)
                               }
                             ))
+
+#' Clase R6 para leer y unir shapefiles
+#'
+#' @description
+#' Se inicia leyendo un shp
+#'
+#' @details
+#' Al shp leído se le pude agregar otrabase de datos
+#'
+Censo <- R6::R6Class("Censo",
+                     public = list(
+                       bd = NULL,
+                       ano = NULL,
+                       entidad = NULL,
+                       nivel = NULL,
+                       initialize = function(ano = 2020,
+                                             entidad,
+                                             nivel = "seccion"){
+                         self$ano <- ano
+                         self$entidad <- entidad
+                         self$nivel <- nivel
+                         self$bd <- leer_censo(ano = self$ano,
+                                               entidad = self$entidad,
+                                               nivel = self$nivel)
+                       }
+                     )
+)
+
+Tablero <- R6::R6Class("Censo",
+                       public = list(
+                         clases = NULL,
+                         nivel = NULL,
+                         initialize = function(electoral, censo){
+                           self$clases <- lst(electoral, censo)
+
+                           self$revisar_entidad()
+                           self$revisar_niveles()
+
+                         },
+                         revisar_entidad = function(){
+                           entidades <- self$clases |>
+                             purrr::map_chr(~.x$entidad) |>
+                             unique() |>
+                             length()
+
+                           if(entidades > 1) stop("Las entidades no coinciden")
+                         },
+                         revisar_niveles = function(){
+                           # if(length(self$clases$electoral) != length(self$clases$censo)){
+                           #   stop("No hay correspondencia entre los niveles de agregación del censo y la base electoral")
+                           # }
+
+                           nivel <- purrr::map2_chr(self$clases, self$clases,~{
+                             if(.x$nivel != .y$nivel){
+                               stop("No hay correspondencia entre los niveles de agregación del censo y la base electoral")
+                             }
+
+                             return(.x$nivel)
+                           })
+
+                           self$nivel <- unique(nivel)
+                         },
+                         calcular_irs = function(){
+
+                           self$clases$electoral$shp <-
+                             self$clases$electoral$shp |>
+                             left_join(calcular_irs(bd = self$clases$censo$bd,
+                                                    electoral = self$clases$electoral$shp,
+                                                    nivel = self$nivel), self$nivel)
+                         }
+                       ))

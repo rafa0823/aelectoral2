@@ -57,7 +57,7 @@ glimpse(gb_18)
 write_rds(gb_18, "inst/electoral/cdmx/gb_18.rda")
 
 # PM18-------------------------------------------------------------------
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/PEL/CDMX/2018/ALCALDIAS_csv/2018_SEE_AYUN_CDMX_CAS.csv"
+path <- "~/Google Drive/Unidades compartidas/Recursos/Externas/Limpieza/PEL/CDMX/2018/ALCALDIAS_csv/2018_SEE_AYUN_CDMX_CAS.csv"
 pm_18 <- read_csv(path) |>
   janitor::clean_names() |>
   filter(is.na(tribunal)) |>
@@ -80,7 +80,7 @@ pm_18 <- read_csv(path) |>
          municipio_18 = sprintf("%03d", municipio_18),
          seccion = sprintf("%04d", seccion)) |>
   select(-c(estatus_acta:last_col(), circunscripcion)) |>
-  mutate_all(~replace_na(., 0)) |>
+  mutate_all(~tidyr::replace_na(., 0)) |>
   mutate_if(is.logical, as.integer) |>
   homologar_bd(estado = "09",
                nombre_estado = "CDMX"
@@ -89,7 +89,6 @@ pm_18 <- read_csv(path) |>
   rename_with(~paste("ele", .x, "pm_18", sep = "_"), .cols = pan:last_col()) |>
   rename_with(~gsub("_es_", "_pes_", .x), contains("_es_"))
 
-pm_18 <- aux
 glimpse(pm_18)
 write_rds(pm_18, "inst/electoral/cdmx/pm_18.rda")
 # DL18 -------------------------------------------------------------------

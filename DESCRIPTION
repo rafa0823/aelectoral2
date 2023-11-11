@@ -37,6 +37,8 @@ Imports:
 Suggests: 
     devtools,
     janitor,
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0),
     tidyverse
 VignetteBuilder: 

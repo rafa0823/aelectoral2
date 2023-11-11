@@ -65,3 +65,12 @@ degradar_color_partido <- function(bd_larga, nombre, variable,    colores_nombra
   res <- bd_larga %>%
     mutate(color=map2_chr(!!enquo(nombre), !!enquo(variable),~funciones_color[[.x]](.y)))
   return(res)   }
+
+asociar_colores <- function(partidos) {
+  paleta <- paleta |>
+    filter(partidos %in% !!partidos)
+
+  names(paleta$colores) <- paleta$partidos
+
+  return(paleta$colores)
+}

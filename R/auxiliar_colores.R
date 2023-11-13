@@ -59,7 +59,7 @@ colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, ti
 #' @return
 #' @export
 #' @examples
-degradar_color_partido <- function(bd_larga, nombre, variable,    colores_nombrados,    valor_maximo=1){
+degradar_color_partido <- function(bd_larga, nombre, variable, colores_nombrados, valor_maximo=1){
   partidos <- names(colores_nombrados)
   funciones_color <- map(partidos,
                          ~colorRamp(colors = c("white",colores_nombrados[[.x]]), space = "Lab") %>%
@@ -67,7 +67,8 @@ degradar_color_partido <- function(bd_larga, nombre, variable,    colores_nombra
   names(funciones_color) <- unique(partidos)
   res <- bd_larga %>%
     mutate(color=map2_chr(!!enquo(nombre), !!enquo(variable),~funciones_color[[.x]](.y)))
-  return(res)   }
+  return(res)
+  }
 
 asociar_colores <- function(partidos) {
   paleta <- paleta |>
@@ -76,4 +77,17 @@ asociar_colores <- function(partidos) {
   names(paleta$colores) <- paleta$partidos
 
   return(paleta$colores)
+}
+
+obtener_color <- function(bd, c_principal, var){
+  no_principal <-last(colortools::complementary(c_principal))
+
+  bd <- bd %>% mutate(col := !!rlang::sym(var))
+
+  colorear <- leaflet::colorQuantile(grDevices::colorRamp(c(no_principal,"white", c_principal),
+                                      space = "Lab",bias=1.5,
+                                      interpolate="spline"),
+                            domain = bd[["col"]], n = 10)
+
+  bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
 }

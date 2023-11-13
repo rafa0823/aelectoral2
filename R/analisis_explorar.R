@@ -302,12 +302,6 @@ graficar_totales_eleccion <- function (bd, colores_nombrados, eleccion, grupo = 
   return(grafica)
 }
 
-
-
-
-
-
-
 #' Title
 #'
 #' @param bd base con resultados electorales y una columna adicional con el ganador de cada sección
@@ -428,16 +422,8 @@ crear_quantiles <- function(bd, partido, grupos = 4){
     rename_with(~glue::glue("quant_{partido}"), quant)
 }
 
-crear_label <- function(bd){
-  ganador <- self[[bd]] |>
-    as_tibble() |>
-    ungroup() |>
-    select(all_of(nivel), contains("ganador")) |>
-    tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
-    tidyr::separate(col = name, into = c("basura", "eleccion", "ano")) |>
-    summarise(label_g = glue::glue("Ganador: {toupper(value)}<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
-
-  votos <- self[[bd]] |>
+crear_label <- function(bd, nivel){
+  votos <- bd |>
     as_tibble() |>
     ungroup() |>
     select(all_of(nivel), contains("pct")) |>
@@ -449,18 +435,34 @@ crear_label <- function(bd){
       label = glue::glue("Votos {partido}: {value}")) |>
     summarise(label_v = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
 
-  indice <- self[[bd]] |>
+  if(sum(grepl("ganador", names(bd))) > 0) {
+  ganador <- bd |>
+    as_tibble() |>
+    ungroup() |>
+    select(all_of(nivel), contains("ganador")) |>
+    tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+    tidyr::separate(col = name, into = c("basura", "eleccion", "ano")) |>
+    summarise(label_g = glue::glue("Ganador: {toupper(value)}<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
+  }
+
+  if(sum(grepl("quant", names(bd))) > 0){
+
+  indice <- bd |>
     select(all_of(nivel), contains("quant")) |>
     tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
     tidyr::separate(col = name, into = c("basura", "partido")) |>
     mutate(label = glue::glue("Indice {toupper(partido)}: {value}")) |>
     summarise(label_ind = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel)))
 
-  label <- votos |>
-    left_join(ganador, join_by(!!rlang::sym(nivel), eleccion, ano)) |>
-    left_join(indice, join_by(!!rlang::sym(nivel))) |>
-    transmute(seccion,
+  }
+
+  label <- votos %>%
+    { if (exists("ganador")) left_join(., ganador, by = join_by(!!sym(nivel), eleccion, ano)) else . } %>%
+    { if (exists("indice")) left_join(., indice, by = join_by(!!sym(nivel))) else . } %>%
+    transmute(!!rlang::sym(nivel),
               eleccion = paste(eleccion, ano, sep = "_"),
-              label = paste(glue::glue("Sección {stringr::str_sub(!!rlang::sym(nivel), -4, -1)}"), label_g, label_v, label_ind, sep = "<br>"))
+              label = paste(glue::glue("Sección: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>")) |>
+    tidyr::pivot_wider(id_cols = !!rlang::sym(nivel), names_from = eleccion, values_from = label) |>
+    rename_with(~paste0("label_", .x), -!!rlang::sym(nivel))
 }
 

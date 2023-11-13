@@ -221,9 +221,9 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)
                                        },
-                                       fusionar_shp = function(shp, base){
+                                       fusionar_shp = function(shp, bd){
 
-                                         if("list" %in% class(self[[base]])){
+                                         if("list" %in% class(self[[bd]])){
                                            stop("No se ha ejecutado la función self$colapsar_base")
                                          }
                                          self$shp <- shp |>

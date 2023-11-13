@@ -18,29 +18,32 @@ colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, ti
 
   # Homologar colores
   colores_saturados <- colores_nombrados %>%  shades::saturation(saturacion)
+
   names(colores_saturados) <- names(colores_nombrados)
 
   # Calcular ganador y máximo de votación
-  bd <- bd %>%
-    select({{grupo}}, matches(glue::glue("{prefijo}_{partidos}_{eleccion}")), contains("ganador")) %>%
+  aux <- bd %>%
+    select(all_of(grupo), matches(glue::glue("{prefijo}_{partidos}_{eleccion}")), contains("ganador")) %>%
     na.omit() %>%
     rowwise() |>
     #Calcular el máximo entre las columnas que contienen el prefijo seleccionado {prefijo}
-    mutate(max_votacion = max(c_across(matches(glue::glue("{prefijo}_{partidos}_{eleccion}")))))
+    mutate(max_votacion = max(c_across(matches(glue::glue("{prefijo}_{partidos}_{eleccion}"))))) |>
+    ungroup()
 
   # Funciones de color
-  funciones_color <- map(unique(bd[[glue::glue("ganador_{eleccion}")]]),
+  funciones_color <- map(names(colores_nombrados),
                          ~colorRamp(colors = c("white",colores_saturados[[.x]]), space = "Lab") %>%
-                           leaflet::colorNumeric(domain = c(0, max(bd$max_votacion))))
-  names(funciones_color) <- unique(bd[[glue::glue("ganador_{eleccion}")]])
+                           leaflet::colorNumeric(domain = c(0, max(aux$max_votacion))))
+  names(funciones_color) <- unique(aux[[glue::glue("ganador_{eleccion}")]])
 
-  res <- bd %>%
+  res <- aux %>%
     mutate(!!rlang::sym(glue::glue("col_{eleccion}")) :=
              map2_chr(
                !!rlang::sym(glue::glue("ganador_{eleccion}")), max_votacion, ~funciones_color[[.x]](.y)
              )
     ) |>
-    select(-max_votacion)
+    select(all_of(grupo), contains("col_"))
+
   return(res)
 }
 

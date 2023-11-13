@@ -18,20 +18,18 @@ c("dl_21", "pm_21") |>
                                         eleccion = .x)
   })
 
-cdmx_secc$colapsar_base("bd_partido")
-
 shp <- ElectoralSHP$new(unidad = "secc_22", entidad = "cdmx")
 
-cdmx_secc$fusionar_shp(shp = shp$shp$secc_22_cdmx |>
-                         filter(distritol_22 == "09_18"),
+cdmx_secc$colapsar_base("bd_partido", filtro = shp$shp$secc_22_cdmx |>
+                          filter(distritol_22 == "09_18") |>
+                          as_tibble() |>
+                          select(seccion))
+# cdmx_secc$calcular_irs |> debug()
+cdmx_secc$calcular_irs(ano = "2020", base = "bd_partido")
+
+cdmx_secc$fusionar_shp(shp = shp$shp$secc_22_cdmx,
                        bd = "bd_partido")
 
-cdmx_secc$shp
+tablero <- Tablero$new(info_seccion = cdmx_secc)
 
-censo <- Censo$new(entidad = "cdmx")
-
-tablero <- Tablero$new(electoral = cdmx_secc, censo = censo)
-
-tablero$calcular_irs()
-
-tablero$clases$electoral$shp
+tablero$info_seccion$shp

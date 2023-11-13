@@ -2,7 +2,7 @@
 % Please edit documentation in R/lectura.R
 \name{leer_base}
 \alias{leer_base}
-\title{Función para leer una base de datos
+\title{Función para leer una base de datos electoral
 Basada en la funcion read_rds del paquete readr}
 \usage{
 leer_base(eleccion, entidad, tipo_eleccion)
@@ -18,7 +18,7 @@ leer_base(eleccion, entidad, tipo_eleccion)
 tibble de la base electoral
 }
 \description{
-Función para leer una base de datos
+Función para leer una base de datos electoral
 Basada en la funcion read_rds del paquete readr
 }
 \examples{

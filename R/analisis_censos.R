@@ -35,7 +35,7 @@ relativizar_censo <- function(bd){
 
 }
 
-calcular_irs <- function(bd, electoral, nivel){
+calcular_irs <- function(bd, electoral, nivel, c_principal){
   base <- bd %>%
     semi_join(electoral, nivel) |>
     transmute(!!rlang::sym(nivel),
@@ -72,16 +72,15 @@ calcular_irs <- function(bd, electoral, nivel){
                                  y > 70 & y <= 80 ~ 8,
                                  y > 80 & y <= 90 ~ 9,
                                  y > 90 ~ 10 ),
-           gdo_rez = case_when(intervalo <= 1 ~ "Muy bajo",
+           quant_irs = case_when(intervalo <= 1 ~ "Muy bajo",
                                intervalo > 1 & intervalo <= 3 ~ "Bajo",
                                intervalo > 3 & intervalo <= 4 ~ "Medio",
                                intervalo > 4 & intervalo <= 6 ~ "Alto",
                                intervalo > 6 ~ "Muy alto")) |>
-    select(-y,-intervalo)
+    select(-y,-intervalo) |>
+    obtener_color(c_principal = c_principal, "irs")
 
   return(base)
 
 }
-irs <- calcular_irs(bd, nivel = "seccion")
-irs
 

@@ -9,6 +9,7 @@ colorear_ganador_degradado(
   eleccion,
   colores_nombrados,
   grupo,
+  tipo,
   saturacion = 0.9
 )
 }

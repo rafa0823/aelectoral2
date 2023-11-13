@@ -1,5 +1,5 @@
 
-#' Función para leer una base de datos
+#' Función para leer una base de datos electoral
 #' Basada en la funcion read_rds del paquete readr
 #'
 #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
@@ -24,7 +24,31 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
   return(res)
 }
 
+#' Función para leer censo
+#' Basada en la funcion read_rds del paquete readr
+#'
+#' @param ano Es el año del censo
+#' @param entidad Cuando se requiere la información de todo el país se escribe "nacional", cuando es local se pone la abreviatura oficial de la entidad, por ejemplo "chis", "dgo", "mex".
+#' @param nivel Unidad geográfica en la que se requiere la información del censo
+#' @return tibble de la base del censo
+#' @examples leer_censo(ano = 2020, entidad = "nacional", nivel = "seccion")
 
+leer_censo <- function(ano, entidad, nivel){
+  res <- readr::read_rds(system.file(glue::glue("censo/{nivel}_{ano}.rda"),
+                                     package = "aelectoral2",
+                                     mustWork = TRUE)) %>% tibble::as_tibble()
+
+  if(entidad != "nacional"){
+    nombre <- aelectoral2::diccionario %>%
+      filter(abreviatura == !!entidad) %>%
+      pull(id_estado) %>%
+      stringr::str_pad(width = 2, pad = "0")
+
+    res <- res %>% filter(entidad == !!nombre)
+  }
+
+  return(res)
+}
 
 #' Función para leer la base de datos de alianzas por partido y por nivel
 #' También transforma la bd de alianzas al nivel de la base electoral.

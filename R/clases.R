@@ -11,6 +11,7 @@
 Electoral <- R6::R6Class("Electoral",
                          public = list(bd = NA,
                                        todas = NULL,
+                                       censo = NULL,
                                        bd_partido = list(),
                                        bd_candidato = list(),
                                        shp = NULL,
@@ -220,7 +221,11 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)
                                        },
-                                       fusionar_shp = function(shp, bd){
+                                       fusionar_shp = function(shp, base){
+
+                                         if("list" %in% class(self[[base]])){
+                                           stop("No se ha ejecutado la función self$colapsar_base")
+                                         }
                                          self$shp <- shp |>
                                            inner_join(self[[bd]], by = self$nivel)
                                        },
@@ -254,9 +259,16 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @description Une todas las bases de datos que conformen la lista de la 'base'
                                        #' @param nivel es el nivel de agregación por el cual se van a unir las bases. El valor tiene que ser un símbolo (sin comillas).
                                        #' @return Regresa una única tibble con todas las bases de datos unidas como columnas
-                                       colapsar_base = function(base){
-                                         self[[base]] <- self[[base]] |>
+                                       colapsar_base = function(base, filtro = NULL){
+                                         aux <- self[[base]] |>
                                            reduce(left_join, self$nivel)
+
+                                         if(!is.null(filtro)){
+                                           aux <- aux |>
+                                             inner_join(filtro, by = self$nivel)
+                                         }
+
+                                         self[[base]] <- aux
                                        },
                                        #' @description Especifica un color degradado según el número de votos obtenidos por el partido ganador.
                                        #' Se recomienda ampliamente usar la función con el parámetro tipo = "relativo" y con partidos específicos.
@@ -289,7 +301,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                              left_join(colorear_ganador_degradado(self[[base]][[eleccion]], eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                        grupo = self$nivel, tipo = tipo), by = self$nivel)
+                                                                                  grupo = self$nivel, tipo = tipo), by = self$nivel)
                                          }
                                        },
                                        obtener_indice_completo = function(base){
@@ -311,6 +323,24 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                          ele <- unique(stringr::str_sub(subset(names(self[[base]]), grepl("ele_", names(self[[base]]))), -5, -1))
                                          self$nombres_elecciones <- nombres_elecciones |>
                                            filter(eleccion %in% ele)
+                                       },
+                                       calcular_irs = function(ano, base = NULL, c_principal = "#140a8c"){
+
+                                         if("list" %in% class(self[[base]])){
+                                           stop("No se ha ejecutado la función self$colapsar_base")
+                                         }
+
+                                         self$censo <- leer_censo(ano = ano,
+                                                                  entidad = self$entidad,
+                                                                  nivel = self$nivel)
+
+                                         self[[base]] <-
+                                           self[[base]] |>
+                                           left_join(calcular_irs(bd = self$censo,
+                                                                  electoral = self[[base]],
+                                                                  nivel = self$nivel,
+                                                                  c_principal = c_principal),
+                                                     self$nivel)
                                        }
                          ))
 
@@ -360,3 +390,19 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                             ))
 
 
+#' Clase R6 para leer y unir shapefiles
+#'
+#' @description
+#' Se inicia leyendo un shp
+#'
+#' @details
+#' Al shp leído se le pude agregar otrabase de datos
+#'
+Tablero <- R6::R6Class("Censo",
+                       public = list(
+                         info_seccion = NULL,
+                         initialize = function(info_seccion){
+                           self$info_seccion <- info_seccion
+
+                         }
+                       ))

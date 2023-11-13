@@ -5,7 +5,7 @@
 \title{Title
 Obtiene el partido ganador para cada una de las observaciones de la base. Puede ser sección, municipio o distrito}
 \usage{
-ganador_eleccion(bd, eleccion)
+ganador_eleccion(bd, eleccion, tipo = NULL, nivel, partido = NULL)
 }
 \arguments{
 \item{bd}{base de datos con resultados electorales}

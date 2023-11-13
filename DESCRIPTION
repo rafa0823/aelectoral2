@@ -15,11 +15,13 @@ Imports:
     broom,
     cluster,
     ClustGeo,
+    colortools,
     dplyr,
     forcats,
     ggplot2,
     ggrepel,
     glue,
+    grDevices,
     infer,
     leaflet,
     purrr,
@@ -35,12 +37,12 @@ Imports:
     tibble,
     tidyr
 Suggests: 
-    devtools,
     janitor,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
     tidyverse
+    testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

@@ -21,6 +21,7 @@ Electoral <- R6::R6Class("Electoral",
                                        extranjero = NA,
                                        especiales = NA,
                                        partidos = NA_character_,
+                                       nombres_elecciones = NA,
                                        colores = NA,
                                        llaves = NULL,
 
@@ -58,6 +59,7 @@ Electoral <- R6::R6Class("Electoral",
                                          self$partidos <- partidos
                                          self$obtener_bd()
                                          self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
+                                         self$colores <- asociar_colores(partidos = self$partidos)
 
                                          if(!self$extranjero){
                                            self$eliminar_votoExtranjero()
@@ -220,11 +222,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        },
                                        fusionar_shp = function(shp, bd){
                                          self$shp <- shp |>
-                                           inner_join(self[[bd]],
-                                                      by = self$nivel)
-                                       },
-                                       colores_nombrados = function(){
-                                         self$colores <- asociar_colores(partidos = self$partidos)
+                                           inner_join(self[[bd]], by = self$nivel)
                                        },
                                        #' @description Calcula los votos relativos para los partidos seleccionados
                                        #' @param base Es la base de datos que será modificada
@@ -270,7 +268,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param colores_nombrados Es un vector nombrado con los colores que se quieren asignar a los partidos.
                                        #' Los colores nombrados tienen que estar ligados a todos los partidos ganadores de la elección.
                                        obtener_degradado_ganador = function(base, eleccion, tipo = "relativo",
-                                                                            colores_nombrados = self$colores_nombrados,
+                                                                            colores_nombrados = self$colores,
                                                                             partidos = self$partidos){
                                          #Acá se debe incluir un objeto ya creado de colores
                                          nombres <- names(self[[base]][[eleccion]])
@@ -282,16 +280,16 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                              self$calcular_ganador(base = base, eleccion = eleccion,tipo = tipo, partido = partidos)
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
-                                             colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                        grupo = self$nivel, tipo = tipo)
+                                             left_join(colorear_ganador_degradado(self[[base]][[eleccion]], eleccion = eleccion, colores_nombrados = colores_nombrados,
+                                                                                  grupo = self$nivel, tipo = tipo), by = self$nivel)
                                          } else if(tipo == "absoluto"){
                                            if(sum(grepl("ganador_", nombres)) == 0) {
                                              self$calcular_ganador(base = base, eleccion = eleccion,tipo = tipo, nivel = self$nivel, partido = partidos)
 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
-                                             colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                        grupo = self$nivel, tipo = tipo)
+                                             left_join(colorear_ganador_degradado(self[[base]][[eleccion]], eleccion = eleccion, colores_nombrados = colores_nombrados,
+                                                                        grupo = self$nivel, tipo = tipo), by = self$nivel)
                                          }
                                        },
                                        obtener_indice_completo = function(base){
@@ -304,6 +302,15 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                                          self[[base]] <- self[[base]] |>
                                            left_join(reduce(ind, left_join, by = self$nivel), by = self$nivel)
+                                       },
+                                       añadir_leyenda = function(base){
+                                         self[[base]] <- self[[base]] |>
+                                           left_join(crear_label(self[[base]], nivel = self$nivel), by = self$nivel)
+                                       },
+                                       obtener_nombres_elecciones = function(base){
+                                         ele <- unique(stringr::str_sub(subset(names(self[[base]]), grepl("ele_", names(self[[base]]))), -5, -1))
+                                         self$nombres_elecciones <- nombres_elecciones |>
+                                           filter(eleccion %in% ele)
                                        }
                          ))
 

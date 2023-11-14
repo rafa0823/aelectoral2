@@ -14,11 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(dplyr)
-library(purrr)
-```
-
 En esta viñeta se desarolla el *happy path* para generar todos los insumos requeridos para generar un tablero electoral desde aelectoral. 
 
 ### Vectores base
@@ -35,37 +30,47 @@ partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
 Dada la nueva configuración de aelectoral2 crear una clase requiere que se tenga claridad de cuáles son los partidos 
 para los que se desea el análisis. Sin embargo, en primera instancia no es necesario incluirlo. 
 ```{r}
-bd <- Electoral$new("pm_15", entidad = "mex")
-bd <- Electoral$new("pm_15", entidad = "mex", partidos = partidos)
-bd$partido("pm_15")
-bd$voto_relativo("bd_partido", "pm_15")
-bd$calcular_ganador("bd_partido", "pm_15")
-
-elecciones |> 
-  walk(~{
-    bd$agregar_bd(.x)
-    bd$partido(.x)
-    bd$voto_relativo("bd_partido", .x)
-    bd$calcular_ganador("bd_partido", .x)
-  })
-
-bd$colapsar_base("bd_partido")
+# Obtención de columnas relevantes para una elección
+bd <- Electoral$new("gb_18", entidad = "cdmx", partidos = partidos)
+bd$partido("gb_18")
+bd$voto_relativo("bd_partido", "gb_18")
+bd$calcular_ganador("bd_partido", "gb_18")
+bd$obtener_degradado_ganador(base = "bd_partido", eleccion = "gb_18")
 ```
 
 * Columnas de índice, degradado y quantiles
 
 ```{r}
-#Creación del objeto de colores
-bd$colores_nombrados()
-
-# Cálculo del índice
-bd$obtener_indice_completo("bd_partido")
-
-bd$bd_partido |> 
-  glimpse()
+#Obtención de columnas relevantes para todas las elecciones requeridas
+walk(elecciones, ~{
+  bd$agregar_bd(.x)
+  bd$partido(.x)
+  bd$voto_relativo("bd_partido", .x)
+  bd$calcular_ganador("bd_partido", .x)
+  bd$obtener_degradado_ganador(base = "bd_partido", eleccion = .x)
+})
 ```
 
 * Label para leaflet
+```{r}
+# Se genera un solo tibble asociado al mapa
+bd$colapsar_base("bd_partido", filtro = shp$shp$secc_22_cdmx |>
+                                               filter(distritol_22 == "09_18") |>
+                                               as_tibble() |>
+                                               select(seccion))
+
+#Se genera el índice para todos los partidos definidos al principio del código
+bd$obtener_indice_completo("bd_partido")
+#Se calcula el índice de rezago
+bd$calcular_irs(ano = "2020", base = "bd_partido")
+#Se aña de la leyenda para el leaflet
+bd$añadir_leyenda("bd_partido")
+#Se pega la base completa al mapa
+bd$fusionar_shp(shp = shp$shp$secc_22_cdmx,
+                bd = "bd_partido")
+#Se obtienen los nombres completos de las elecciones
+bd$obtener_nombres_elecciones("bd_partido")
+```
 
 
 

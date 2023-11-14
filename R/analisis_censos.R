@@ -59,9 +59,9 @@ calcular_irs <- function(bd, electoral, nivel, c_principal){
   pred <- as.data.frame(pred)
   irs <- (pred$PC1 - mean(pred$PC1)) / sd(pred$PC1)
 
-  base <- bind_cols(base |> select(all_of(nivel)), irs = irs) |>
-    mutate(y = 100/(max(irs)-min(irs))*
-             (irs - min(irs)),
+  base <- bind_cols(base |> select(all_of(nivel)), rezago = irs) |>
+    mutate(y = 100/(max(rezago)-min(rezago))*
+             (rezago - min(rezago)),
            intervalo = case_when(y <= 10 ~ 1,
                                  y > 10 & y <= 20 ~ 2,
                                  y > 20 & y <= 30 ~ 3,
@@ -72,13 +72,14 @@ calcular_irs <- function(bd, electoral, nivel, c_principal){
                                  y > 70 & y <= 80 ~ 8,
                                  y > 80 & y <= 90 ~ 9,
                                  y > 90 ~ 10 ),
-           quant_irs = case_when(intervalo <= 1 ~ "Muy bajo",
+           quant_rezago = case_when(intervalo <= 1 ~ "Muy bajo",
                                intervalo > 1 & intervalo <= 3 ~ "Bajo",
                                intervalo > 3 & intervalo <= 4 ~ "Medio",
                                intervalo > 4 & intervalo <= 6 ~ "Alto",
-                               intervalo > 6 ~ "Muy alto")) |>
+                               intervalo > 6 ~ "Muy alto"),
+           quant_rezago = factor(quant_rezago, levels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto"))) |>
     select(-y,-intervalo) |>
-    obtener_color(c_principal = c_principal, "irs")
+    obtener_color(c_principal = c_principal, "rezago")
 
   return(base)
 

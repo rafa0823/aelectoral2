@@ -268,7 +268,12 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                              inner_join(filtro, by = self$nivel)
                                          }
 
-                                         self[[base]] <- aux
+                                         self[[base]] <- aux |>
+                                           rename_with(~gsub("total", "participacion", .x), contains("total"))
+
+                                         self$partidos <- gsub("total", "participacion", self$partidos)
+
+                                         names(self$colores)[names(self$colores) == "total"] <- "participacion"
                                        },
                                        #' @description Especifica un color degradado según el número de votos obtenidos por el partido ganador.
                                        #' Se recomienda ampliamente usar la función con el parámetro tipo = "relativo" y con partidos específicos.
@@ -341,6 +346,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                   nivel = self$nivel,
                                                                   c_principal = c_principal),
                                                      self$nivel)
+
+                                         self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
                                        }
                          ))
 

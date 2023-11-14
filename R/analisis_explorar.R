@@ -407,9 +407,9 @@ colorear_indice <- function(bd, c_principal, var){
   bd <- bd %>% mutate(col := !!rlang::sym(var))
 
   colorear <- leaflet::colorQuantile(colorRamp(c(no_principal,"white", c_principal),
-                                      space = "Lab",bias=1.5,
-                                      interpolate="spline"),
-                            domain = bd[["col"]], n = 10)
+                                               space = "Lab",bias=1.5,
+                                               interpolate="spline"),
+                                     domain = bd[["col"]], n = 10)
 
   bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
 
@@ -436,23 +436,24 @@ crear_label <- function(bd, nivel){
     summarise(label_v = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
 
   if(sum(grepl("ganador", names(bd))) > 0) {
-  ganador <- bd |>
-    as_tibble() |>
-    ungroup() |>
-    select(all_of(nivel), contains("ganador")) |>
-    tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
-    tidyr::separate(col = name, into = c("basura", "eleccion", "ano")) |>
-    summarise(label_g = glue::glue("Ganador: {toupper(value)}<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
+    ganador <- bd |>
+      as_tibble() |>
+      ungroup() |>
+      select(all_of(nivel), contains("ganador")) |>
+      tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+      tidyr::separate(col = name, into = c("basura", "eleccion", "ano")) |>
+      summarise(label_g = glue::glue("Ganador: {toupper(value)}<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
   }
 
   if(sum(grepl("quant", names(bd))) > 0){
 
-  indice <- bd |>
-    select(all_of(nivel), contains("quant")) |>
-    tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
-    tidyr::separate(col = name, into = c("basura", "partido")) |>
-    mutate(label = glue::glue("Indice {toupper(partido)}: {value}")) |>
-    summarise(label_ind = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel)))
+    indice <- bd |>
+      select(all_of(nivel), contains("quant")) |>
+      tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+      tidyr::separate(col = name, into = c("basura", "partido")) |>
+      mutate(label = glue::glue("Indice {toupper(partido)}: {value}")) |>
+      summarise(label_ind = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel))) |>
+      mutate(label_ind_2 = paste("Sección:", stringr::str_sub(seccion, -4, -1), "<br>", label_ind))
 
   }
 
@@ -461,8 +462,10 @@ crear_label <- function(bd, nivel){
     { if (exists("indice")) left_join(., indice, by = join_by(!!sym(nivel))) else . } %>%
     transmute(!!rlang::sym(nivel),
               eleccion = paste(eleccion, ano, sep = "_"),
-              label = paste(glue::glue("Sección: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>")) |>
+              label = paste(glue::glue("Sección: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>"),
+              label_ind_2) |>
     tidyr::pivot_wider(id_cols = !!rlang::sym(nivel), names_from = eleccion, values_from = label) |>
-    rename_with(~paste0("label_", .x), -!!rlang::sym(nivel))
+    rename_with(~paste0("label_", .x), -!!rlang::sym(nivel)) %>%
+    { if (exists("indice")) left_join(., select(indice, all_of(nivel), label_ind_2), by = join_by(!!sym(nivel))) else . }
 }
 

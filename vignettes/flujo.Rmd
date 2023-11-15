@@ -53,6 +53,7 @@ walk(elecciones, ~{
 
 * Label para leaflet
 ```{r}
+shp <- ElectoralSHP$new(unidad = "secc_22", entidad = "cdmx")
 # Se genera un solo tibble asociado al mapa
 bd$colapsar_base("bd_partido", filtro = shp$shp$secc_22_cdmx |>
                                                filter(distritol_22 == "09_18") |>
@@ -66,8 +67,7 @@ bd$calcular_irs(ano = "2020", base = "bd_partido")
 #Se aña de la leyenda para el leaflet
 bd$añadir_leyenda("bd_partido")
 #Se pega la base completa al mapa
-bd$fusionar_shp(shp = shp$shp$secc_22_cdmx,
-                bd = "bd_partido")
+bd$fusionar_shp(base = "bd_partido", shp = shp$shp$secc_22_cdmx)
 #Se obtienen los nombres completos de las elecciones
 bd$obtener_nombres_elecciones("bd_partido")
 ```

@@ -20,7 +20,7 @@ En esta viñeta se desarolla el *happy path* para generar todos los insumos requ
 
 ```{r}
 library(aelectoral2)
-elecciones <- c("gb_17", "pm_18", "dl_18", "df_18", "pm_21", "df_21", "dl_21")
+elecciones <- c("pm_18", "dl_18", "df_18", "pm_21", "df_21", "dl_21")
 partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
 ```
 

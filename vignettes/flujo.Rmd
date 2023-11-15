@@ -19,6 +19,7 @@ En esta viñeta se desarolla el *happy path* para generar todos los insumos requ
 ### Vectores base
 
 ```{r}
+library(aelectoral2)
 elecciones <- c("gb_17", "pm_18", "dl_18", "df_18", "pm_21", "df_21", "dl_21")
 partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
 ```
@@ -69,7 +70,7 @@ bd$añadir_leyenda("bd_partido")
 bd$fusionar_shp(shp = shp$shp$secc_22_cdmx,
                 bd = "bd_partido")
 #Se obtienen los nombres completos de las elecciones
-bd$obtener_nombres_elecciones("bd_partido")
+bd$obtener_nombres_elecciones("bd_partido") #Esto se va al Tablero
 ```
 
 

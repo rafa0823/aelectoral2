@@ -1,12 +1,11 @@
 library(tidyverse)
 library(leaflet)
-
-cdmx_secc <- Electoral$new(eleccion = "df_21", entidad = "cdmx")
+partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
+cdmx_secc <- Electoral$new(eleccion = "df_21", entidad = "cdmx", partidos = partidos)
 cdmx_secc$partido("df_21")
-
-cdmx_secc$obtener_degradado_ganador(base = "bd_partido",
-                                    colores_nombrados = set_names(paleta$colores,paleta$partidos),
-                                    eleccion = "df_21")
+# cdmx_secc$voto_relativo("bd_partido", "df_21")
+# cdmx_secc$calcular_ganador("bd_partido", "df_21")
+cdmx_secc$obtener_degradado_ganador(base = "bd_partido", eleccion = "df_21")
 
 c("dl_21", "pm_21") |>
   walk(~{
@@ -36,8 +35,8 @@ cdmx_secc$fusionar_shp(shp = shp$shp$secc_22_cdmx,
                        base = "bd_partido")
 
 tablero <- Tablero$new(info_seccion = cdmx_secc)
-
-tablero$agregar_eleccion(elecciones = c("df_21", "dl_21", "pm_21"),
+tablero$agregar_eleccion |> debug()
+tablero$agregar_eleccion(elecciones = c("df_21"),
                          nivel = "municipio_22",
                          bd_relacion = shp$shp$secc_22_cdmx |>
                            as_tibble() |>
@@ -49,7 +48,7 @@ tablero$info$shp |>
   pluck("municipio_22")
 
 
-tablero$agregar_eleccion(elecciones = c("df_21", "dl_21", "pm_21"),
+tablero$agregar_eleccion(elecciones = c("df_21"),
                          nivel = "distritof_22",
                          bd_relacion = shp$shp$secc_22_cdmx |>
                            as_tibble() |>

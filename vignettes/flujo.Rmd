@@ -1,0 +1,76 @@
+---
+title: "flujo"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{flujo}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+En esta viñeta se desarolla el *happy path* para generar todos los insumos requeridos para generar un tablero electoral desde aelectoral. 
+
+### Vectores base
+
+```{r}
+elecciones <- c("gb_17", "pm_18", "dl_18", "df_18", "pm_21", "df_21", "dl_21")
+partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
+```
+
+
+### Insumos
+* Base de datos por partido con todos los datos en términos absolutos y ganador por elección
+
+Dada la nueva configuración de aelectoral2 crear una clase requiere que se tenga claridad de cuáles son los partidos 
+para los que se desea el análisis. Sin embargo, en primera instancia no es necesario incluirlo. 
+```{r}
+# Obtención de columnas relevantes para una elección
+bd <- Electoral$new("gb_18", entidad = "cdmx", partidos = partidos)
+bd$partido("gb_18")
+bd$voto_relativo("bd_partido", "gb_18")
+bd$calcular_ganador("bd_partido", "gb_18")
+bd$obtener_degradado_ganador(base = "bd_partido", eleccion = "gb_18")
+```
+
+* Columnas de índice, degradado y quantiles
+
+```{r}
+#Obtención de columnas relevantes para todas las elecciones requeridas
+walk(elecciones, ~{
+  bd$agregar_bd(.x)
+  bd$partido(.x)
+  bd$voto_relativo("bd_partido", .x)
+  bd$calcular_ganador("bd_partido", .x)
+  bd$obtener_degradado_ganador(base = "bd_partido", eleccion = .x)
+})
+```
+
+* Label para leaflet
+```{r}
+# Se genera un solo tibble asociado al mapa
+bd$colapsar_base("bd_partido", filtro = shp$shp$secc_22_cdmx |>
+                                               filter(distritol_22 == "09_18") |>
+                                               as_tibble() |>
+                                               select(seccion))
+
+#Se genera el índice para todos los partidos definidos al principio del código
+bd$obtener_indice_completo("bd_partido")
+#Se calcula el índice de rezago
+bd$calcular_irs(ano = "2020", base = "bd_partido")
+#Se aña de la leyenda para el leaflet
+bd$añadir_leyenda("bd_partido")
+#Se pega la base completa al mapa
+bd$fusionar_shp(shp = shp$shp$secc_22_cdmx,
+                bd = "bd_partido")
+#Se obtienen los nombres completos de las elecciones
+bd$obtener_nombres_elecciones("bd_partido")
+```
+
+
+

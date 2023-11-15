@@ -21,6 +21,9 @@ Electoral <- R6::R6Class("Electoral",
                                        tipo_eleccion = NA_character_,
                                        extranjero = NA,
                                        especiales = NA,
+                                       partidos = NA_character_,
+                                       nombres_elecciones = NA,
+                                       colores = NA,
                                        llaves = NULL,
                                        elecciones_agregadas = NULL,
                                        analisis = tibble::tribble(~eleccion, ~nivel, ~analisis, ~parametros),
@@ -33,7 +36,7 @@ Electoral <- R6::R6Class("Electoral",
                                        #' @param tipo_eleccion Por default es "MR" refiriéndose a mayoría relativa.
                                        #' @param extranjero Se refiere a si se desea incluir los votos en el extrajero, entendidos como sección 0000. El default es TRUE
                                        #' @param especiales Las casillas especiales se pueden "eliminar", "repartir" o dejar como están es el parámetro default.
-                                       #'
+                                       #' @param partidos Aquellos partidos para los cuales se van a realizar todas las operaciones de aelectoral en las que acote el número de partidos.
                                        #' @return Un data frame con la elección seleccionada
                                        #' @export
                                        #' @examples
@@ -41,10 +44,12 @@ Electoral <- R6::R6Class("Electoral",
                                        #' llaves = c("seccion", "distritof", "distritol", "municipio"),
                                        #' extranjero = T, especial = "repartir")
 
-                                       initialize = function(eleccion, entidad,
+                                       initialize = function(eleccion,
+                                                             entidad,
                                                              nivel = "seccion",
                                                              llaves = "seccion",
                                                              tipo_eleccion = "MR",
+                                                             partidos = NULL,
                                                              extranjero = T, especiales = NULL){
                                          self$eleccion <- eleccion
                                          self$elecciones_agregadas <- eleccion
@@ -54,10 +59,10 @@ Electoral <- R6::R6Class("Electoral",
                                          self$especiales <- especiales
                                          self$llaves <- c("estado", llaves)
                                          self$tipo_eleccion <- tipo_eleccion
-
+                                         self$partidos <- partidos
                                          self$obtener_bd()
-
                                          self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
+                                         self$colores <- asociar_colores(partidos = self$partidos)
 
                                          if(!self$extranjero){
                                            self$eliminar_votoExtranjero()
@@ -231,7 +236,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                          if("list" %in% class(self[[base]])){
                                            stop("No se ha ejecutado la función self$colapsar_base")
                                          }
-
                                          self$shp <- self$shp |>
                                            append(
                                              list(shp |>
@@ -248,7 +252,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param eleccion Es el tipo de elección y su año separado por "_".
                                        #' @param partidos Es un vector con los partidos que se quieren calcular los votos relativos
                                        #' @return Regresa columnas con el prefijo 'pct' en la misma base entregada
-                                       voto_relativo = function(base, eleccion, partidos){
+                                       voto_relativo = function(base, eleccion, partidos = self$partidos){
                                          self[[base]][[eleccion]] <-
                                            self[[base]][[eleccion]] |>
                                            left_join(
@@ -274,7 +278,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param tipo Es el tipo de datos que trae la base de datos, puede ser 'absoluto' o 'relativo'.
                                        #' Los absolutos tienen como prefijo 'ele', mientras que los relativos tienen como prefijo 'pct'.
                                        #' @return Regresa columnas con el prefijo 'ganador' en la misma base entregada
-                                       calcular_ganador = function(base, eleccion, tipo = "absoluto", partidos = NULL){
+                                       calcular_ganador = function(base, eleccion, tipo = "absoluto", partidos = self$partidos){
                                          self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                            ganador_eleccion(eleccion = eleccion, tipo = tipo, nivel = self$nivel[length(self$nivel)], partido = partidos)
 
@@ -299,7 +303,12 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                              inner_join(filtro, by = self$nivel[length(self$nivel)])
                                          }
 
-                                         self[[base]] <- aux
+                                         self[[base]] <- aux |>
+                                           rename_with(~gsub("total", "participacion", .x), contains("total"))
+
+                                         self$partidos <- gsub("total", "participacion", self$partidos)
+
+                                         names(self$colores)[names(self$colores) == "total"] <- "participacion"
                                        },
                                        #' @description Especifica un color degradado según el número de votos obtenidos por el partido ganador.
                                        #' Se recomienda ampliamente usar la función con el parámetro tipo = "relativo" y con partidos específicos.
@@ -311,11 +320,10 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param colores_nombrados Es un vector nombrado con los colores que se quieren asignar a los partidos.
                                        #' Los colores nombrados tienen que estar ligados a todos los partidos ganadores de la elección.
                                        obtener_degradado_ganador = function(base, eleccion, tipo = "relativo",
-                                                                            colores_nombrados, partidos = NULL){
+                                                                            colores_nombrados = self$colores,
+                                                                            partidos = self$partidos){
+                                         #Acá se debe incluir un objeto ya creado de colores
                                          nombres <- names(self[[base]][[eleccion]])
-                                         if(is.null(partidos)) {
-                                           partidos <- names(colores_nombrados)
-                                         }
                                          if(tipo == "relativo"){
                                            if(sum(grepl("pct_", nombres)) == 0){
                                              self$voto_relativo(base = base, eleccion = eleccion, partido = partidos)
@@ -324,16 +332,18 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                              self$calcular_ganador(base = base, eleccion = eleccion,tipo = tipo, partido = partidos)
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
-                                             colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                        grupo = self$nivel[length(self$nivel)], tipo = tipo)
+                                             left_join(colorear_ganador_degradado(self[[base]][[eleccion]], eleccion = eleccion, colores_nombrados = colores_nombrados,
+                                                                                  grupo = self$nivel[length(self$nivel)], tipo = tipo), 
+                                                       by = self$nivel[length(self$nivel)])
                                          } else if(tipo == "absoluto"){
                                            if(sum(grepl("ganador_", nombres)) == 0) {
                                              self$calcular_ganador(base = base, eleccion = eleccion,tipo = tipo, nivel = self$nivel[length(self$nivel)], partido = partidos)
 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
-                                             colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                        grupo = self$nivel[length(self$nivel)], tipo = tipo)
+                                             left_join(colorear_ganador_degradado(self[[base]][[eleccion]], eleccion = eleccion, colores_nombrados = colores_nombrados,
+                                                                                  grupo = self$nivel[length(self$nivel)], tipo = tipo), 
+                                                       by = self$nivel[length(self$nivel)])
                                          }
 
                                          self$analisis <- self$analisis |>
@@ -344,6 +354,26 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                              tipo = tipo,
                                                                              colores_nombrados = colores_nombrados,
                                                                              partidos = partidos)))
+                                       },
+                                       obtener_indice_completo = function(base){
+                                         ind <- names(self$colores) |>
+                                           purrr::map2(self$colores, ~{
+                                             aux <- crear_indice(self[[base]], .x, nivel = self$nivel)
+                                             aux <- colorear_indice(aux, c_principal = .y, var = .x)
+                                             aux <- crear_quantiles(aux, .x)
+                                           })
+
+                                         self[[base]] <- self[[base]] |>
+                                           left_join(reduce(ind, left_join, by = self$nivel), by = self$nivel)
+                                       },
+                                       añadir_leyenda = function(base){
+                                         self[[base]] <- self[[base]] |>
+                                           left_join(crear_label(self[[base]], nivel = self$nivel), by = self$nivel)
+                                       },
+                                       obtener_nombres_elecciones = function(base){
+                                         ele <- unique(stringr::str_sub(subset(names(self[[base]]), grepl("ele_", names(self[[base]]))), -5, -1))
+                                         self$nombres_elecciones <- nombres_elecciones |>
+                                           filter(eleccion %in% ele)
                                        },
                                        calcular_irs = function(ano, base = NULL, c_principal = "#140a8c"){
 
@@ -362,6 +392,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                   nivel = self$nivel[length(self$nivel)],
                                                                   c_principal = c_principal),
                                                      self$nivel[length(self$nivel)])
+
+                                         self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
 
                                          self$analisis <- self$analisis |>
                                            tibble::add_row(eleccion = NULL,
@@ -416,6 +448,7 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               }
                             ))
 
+
 #' Clase R6 para leer y unir shapefiles
 #'
 #' @description
@@ -424,7 +457,6 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
 #' @details
 #' Al shp leído se le pude agregar otrabase de datos
 #'
-
 
 Tablero <- R6::R6Class("Tablero",
                        public = list(

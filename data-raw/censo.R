@@ -12,4 +12,4 @@ censo <- censo |>
          seccion = paste(entidad, seccion, sep = "_")) |>
   select(-id, - distrito)
 
-write_rds(censo, "inst/censo/seccion_2020.rda")
+readr::write_rds(censo, "inst/censo/seccion_2020.rda")

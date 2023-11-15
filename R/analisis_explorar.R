@@ -105,10 +105,8 @@ ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL){
     partido <- extraer_partidos(bd, eleccion, tipo)
   }
 
-  prefijo <- if_else(tipo == "relativo", "pct", "ele")
-
   res <- bd %>%
-    select(nivel, matches(glue::glue("{prefijo}_{partido}_{eleccion}"))) |>
+    select(nivel, matches(glue::glue("ele_{partido}_{eleccion}"))) |>
     mutate(ganador = pmap(across(ends_with(glue::glue("_{eleccion}")) &
                                    -contains("_nominal_") &
                                    -contains("_total_")),
@@ -117,7 +115,8 @@ ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL){
              stringr::str_remove(string = ., pattern = glue::glue("_{eleccion}"))
     ) %>%
     rename("ganador_{eleccion}":= ganador) %>%
-    as_tibble()
+    as_tibble() |>
+    left_join(select(bd, nivel, !contains("ele")), by = nivel)
   return(res)
 }
 
@@ -303,12 +302,6 @@ graficar_totales_eleccion <- function (bd, colores_nombrados, eleccion, grupo = 
   return(grafica)
 }
 
-
-
-
-
-
-
 #' Title
 #'
 #' @param bd base con resultados electorales y una columna adicional con el ganador de cada sección
@@ -359,5 +352,120 @@ extraer_partidos <- function(bd, eleccion, tipo){
     unique()
 }
 
+#' @title Cálculo de índice para variables electorales
+#' @description
+#' Función que calcula el índice para la variable o variables que se le soliciten.
+#' Requiere que la base de datos esté en términos relativos.
+#' La función estandariza los resultados para que no importe el signo de los datos.
+#' @param bd Base de datos en términos relativos
+#' @param partido variable para la cual se quiere calcular el índice.
+#' @param nivel El nivel de agregación en el que se encuentran los datos.
+#' Si la base de datos tiene más de uno, se pueden incluir dentro de la función.
+#'
+crear_indice <- function(bd, partido, nivel){
+  bd_partido <- bd |>
+    as_tibble() |>
+    select(all_of(nivel), contains(c(glue::glue("{partido}_")))) |>
+    na.omit()
 
+  pca_modelo <- bd_partido |>
+    select(-all_of(nivel)) |>
+    stats::prcomp(scale. = T)
+
+  aux <- pca_modelo %>%
+    broom::tidy(matrix = "rotation") %>%
+    tidyr::pivot_wider(names_from = "PC", names_prefix = "PC",
+                       values_from = "value")
+
+  pred <- predict(pca_modelo, newdata = bd_partido)
+  pred <- as.data.frame(pred)
+  if(sum(aux$PC1) > 0) {
+    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1))
+  } else{
+    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1
+  }
+  bd_partido <- cbind(bd_partido, ind = ind)
+
+  bd_partido <- bd_partido |>
+    select(all_of(nivel), ind) |>
+    rename_with(~glue::glue("{partido}"), ind)
+
+  return(as_tibble(bd_partido))
+}
+
+#' @title Creación de paletas para índice
+#' @description
+#' Añade una nueva columna a la base de datos. Recibe una variable de tipo índice, calcula el color complementario
+#' a un color entregado y relaciona los valores del índice con un color de la paleta.
+#' @param bd Base de datos con columna de índice.
+#' @param c_principal el color que tomará el valor más alto del índice
+#' @param var la variable de tipo índice a la que se le asociará el color.
+
+colorear_indice <- function(bd, c_principal, var){
+  no_principal <- last(colortools::complementary(c_principal, plot = F))
+
+  bd <- bd %>% mutate(col := !!rlang::sym(var))
+
+  colorear <- leaflet::colorQuantile(colorRamp(c(no_principal,"white", c_principal),
+                                               space = "Lab",bias=1.5,
+                                               interpolate="spline"),
+                                     domain = bd[["col"]], n = 10)
+
+  bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
+
+}
+
+crear_quantiles <- function(bd, partido, grupos = 4){
+  bd |>
+    mutate(quant = dvmisc::create_qgroups(!!rlang::sym(partido), groups = grupos),
+           quant = factor(quant, labels = c("Nada", "Poco", "Algo", "Mucho"))) |>
+    rename_with(~glue::glue("quant_{partido}"), quant)
+}
+
+crear_label <- function(bd, nivel){
+  votos <- bd |>
+    as_tibble() |>
+    ungroup() |>
+    select(all_of(nivel), contains("pct")) |>
+    mutate(across(contains("pct"), ~scales::percent(.x,1))) |>
+    tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+    tidyr::separate(col = name, into = c("basura", "partido", "eleccion", "ano")) |>
+    mutate(
+      partido = if_else(partido == "total", "Participación", toupper(partido)),
+      label = glue::glue("Votos {partido}: {value}")) |>
+    summarise(label_v = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
+
+  if(sum(grepl("ganador", names(bd))) > 0) {
+    ganador <- bd |>
+      as_tibble() |>
+      ungroup() |>
+      select(all_of(nivel), contains("ganador")) |>
+      tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+      tidyr::separate(col = name, into = c("basura", "eleccion", "ano")) |>
+      summarise(label_g = glue::glue("Ganador: {toupper(value)}<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
+  }
+
+  if(sum(grepl("quant", names(bd))) > 0){
+
+    indice <- bd |>
+      select(all_of(nivel), contains("quant")) |>
+      tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+      tidyr::separate(col = name, into = c("basura", "partido")) |>
+      mutate(label = glue::glue("Indice {toupper(partido)}: {value}")) |>
+      summarise(label_ind = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel))) |>
+      mutate(label_ind_2 = paste("Sección:", stringr::str_sub(seccion, -4, -1), "<br>", label_ind))
+
+  }
+
+  label <- votos %>%
+    { if (exists("ganador")) left_join(., ganador, by = join_by(!!sym(nivel), eleccion, ano)) else . } %>%
+    { if (exists("indice")) left_join(., indice, by = join_by(!!sym(nivel))) else . } %>%
+    transmute(!!rlang::sym(nivel),
+              eleccion = paste(eleccion, ano, sep = "_"),
+              label = paste(glue::glue("Sección: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>"),
+              label_ind_2) |>
+    tidyr::pivot_wider(id_cols = !!rlang::sym(nivel), names_from = eleccion, values_from = label) |>
+    rename_with(~paste0("label_", .x), -!!rlang::sym(nivel)) %>%
+    { if (exists("indice")) left_join(., select(indice, all_of(nivel), label_ind_2), by = join_by(!!sym(nivel))) else . }
+}
 

@@ -40,7 +40,7 @@ colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, ti
                !!rlang::sym(glue::glue("ganador_{eleccion}")), max_votacion, ~funciones_color[[.x]](.y)
              )
     ) |>
-    select(-max_votacion)
+    select(all_of(grupo), contains("col_"))
   return(res)
 }
 
@@ -64,8 +64,17 @@ degradar_color_partido <- function(bd_larga, nombre, variable, colores_nombrados
   names(funciones_color) <- unique(partidos)
   res <- bd_larga %>%
     mutate(color=map2_chr(!!enquo(nombre), !!enquo(variable),~funciones_color[[.x]](.y)))
-  return(res)   }
+  return(res)
+  }
 
+asociar_colores <- function(partidos) {
+  paleta <- paleta |>
+    filter(partidos %in% !!partidos)
+
+  names(paleta$colores) <- paleta$partidos
+
+  return(paleta$colores)
+}
 
 obtener_color <- function(bd, c_principal, var){
   no_principal <-last(colortools::complementary(c_principal))
@@ -78,5 +87,4 @@ obtener_color <- function(bd, c_principal, var){
                             domain = bd[["col"]], n = 10)
 
   bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
-
 }

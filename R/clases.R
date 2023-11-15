@@ -14,7 +14,7 @@ Electoral <- R6::R6Class("Electoral",
                                        censo = NULL,
                                        bd_partido = list(),
                                        bd_candidato = list(),
-                                       shp = NULL,
+                                       shp = list(),
                                        eleccion = NA_character_,
                                        nivel = NA_character_,
                                        entidad = NA_character_,
@@ -22,7 +22,8 @@ Electoral <- R6::R6Class("Electoral",
                                        extranjero = NA,
                                        especiales = NA,
                                        llaves = NULL,
-
+                                       elecciones_agregadas = NULL,
+                                       analisis = tibble::tribble(~eleccion, ~nivel, ~analisis, ~parametros),
                                        #' #' Initialize: Obtener base de datos electoral
                                        #' @description
                                        #' Lo que hace es leer una base de datos electoral, darle formato el formato documentado para unirla o compararla con otras elecciones y la resume por sección.
@@ -46,6 +47,7 @@ Electoral <- R6::R6Class("Electoral",
                                                              tipo_eleccion = "MR",
                                                              extranjero = T, especiales = NULL){
                                          self$eleccion <- eleccion
+                                         self$elecciones_agregadas <- eleccion
                                          self$entidad <- entidad
                                          self$nivel <- nivel
                                          self$extranjero <- extranjero
@@ -104,11 +106,11 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        coalicion = function(eleccion){
                                          if(!eleccion %in% names(self$todas)) stop("Favor de agregar la elección primero con el método agregar_bd")
 
-                                         self$partido(self$nivel, eleccion)
+                                         self$partido(self$nivel[length(self$nivel)], eleccion)
 
-                                         al <- leer_alianza(self$nivel, eleccion, self$entidad, self$bd)
+                                         al <- leer_alianza(self$nivel[length(self$nivel)], eleccion, self$entidad, self$bd)
 
-                                         self$candidato(al, self$nivel, eleccion)
+                                         self$candidato(al, self$nivel[length(self$nivel)], eleccion)
                                        },
 
                                        #' @description
@@ -119,7 +121,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @return Elección con los votos repartidos por alianza
                                        #' @examples
                                        partido = function(eleccion){
-                                         aux_c <- self$bd %>% repartir_coalicion(nivel = self$nivel, eleccion = eleccion)
+                                         aux_c <- self$bd %>% repartir_coalicion(nivel = self$nivel[length(self$nivel)], eleccion = eleccion)
 
                                          self$bd_partido <- self$bd_partido %>%
                                            append(
@@ -127,6 +129,9 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                purrr::set_names(eleccion)
                                            )
 
+                                         self$analisis <- self$analisis |>
+                                           tibble::add_row(eleccion = eleccion, nivel = self$nivel[length(self$nivel)], analisis = "partido",
+                                                           parametros = list(eleccion = eleccion))
                                        },
                                        #' @description
                                        #' Reparte los votos por candidato de la elección, para ello necesita saber qué candidatos fueron en alianza y cual fue.
@@ -138,10 +143,11 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @examples
                                        candidato = function(alianzas, eleccion){
                                          aux_c <- repartir_candidato(bd = self$bd_partido[[eleccion]],
-                                                                     alianzas, self$nivel, eleccion)
+                                                                     alianzas, self$nivel[length(self$nivel)], eleccion)
 
                                          self$bd_candidato <- self$bd_candidato %>%
                                            append(list(aux_c) %>% purrr::set_names(eleccion))
+
                                        },
 
                                        #'@description
@@ -170,6 +176,10 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                          self$bd <- self$bd %>% full_join(
                                            add, by = c("estado", "seccion")
                                          )
+
+                                         self$elecciones_agregadas <- self$elecciones_agregadas |>
+                                           append(eleccion) |>
+                                           unique()
 
                                        },
 
@@ -222,9 +232,16 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            stop("No se ha ejecutado la función self$colapsar_base")
                                          }
 
-                                         self$shp <- shp |>
-                                           inner_join(self[[base]],
-                                                      by = self$nivel)
+                                         self$shp <- self$shp |>
+                                           append(
+                                             list(shp |>
+                                                    inner_join(self[[base]],
+                                                               by = self$nivel[length(self$nivel)])) |>
+                                               purrr::set_names(self$nivel[length(self$nivel)])
+                                             )
+
+                                         self[[base]] = list()
+
                                        },
                                        #' @description Calcula los votos relativos para los partidos seleccionados
                                        #' @param base Es la base de datos que será modificada
@@ -237,10 +254,18 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            left_join(
                                              aelectoral2::calcular_votos_relativos(self[[base]][[eleccion]],
                                                                                    eleccion = eleccion,
-                                                                                   grupo = !!rlang::sym(self$nivel),
+                                                                                   grupo = !!rlang::sym(self$nivel[length(self$nivel)]),
                                                                                    partido = partidos),
-                                             by = self$nivel
+                                             by = self$nivel[length(self$nivel)]
                                            )
+
+                                         self$analisis <- self$analisis |>
+                                           tibble::add_row(eleccion = eleccion,
+                                                           nivel = self$nivel[length(self$nivel)],
+                                                           analisis = "voto_relativo",
+                                                           parametros = list(list(base = base,
+                                                                             eleccion = eleccion,
+                                                                             partidos = partidos)))
 
                                        },
                                        #' @description Calcula el partido ganador por nivel entre los partidos disponibles
@@ -251,18 +276,27 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @return Regresa columnas con el prefijo 'ganador' en la misma base entregada
                                        calcular_ganador = function(base, eleccion, tipo = "absoluto", partidos = NULL){
                                          self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
-                                           ganador_eleccion(eleccion = eleccion, tipo = tipo, nivel = self$nivel, partido = partidos)
+                                           ganador_eleccion(eleccion = eleccion, tipo = tipo, nivel = self$nivel[length(self$nivel)], partido = partidos)
+
+                                         self$analisis <- self$analisis |>
+                                           tibble::add_row(eleccion = eleccion,
+                                                           nivel = self$nivel[length(self$nivel)], analisis = "calcular_ganador",
+                                                           parametros = list(list(base = base, eleccion = eleccion,
+                                                                             tipo = tipo, partidos = partidos)))
                                        },
                                        #' @description Une todas las bases de datos que conformen la lista de la 'base'
                                        #' @param nivel es el nivel de agregación por el cual se van a unir las bases. El valor tiene que ser un símbolo (sin comillas).
                                        #' @return Regresa una única tibble con todas las bases de datos unidas como columnas
                                        colapsar_base = function(base, filtro = NULL){
                                          aux <- self[[base]] |>
-                                           reduce(left_join, self$nivel)
+                                           reduce(left_join, self$nivel[length(self$nivel)])
 
                                          if(!is.null(filtro)){
                                            aux <- aux |>
-                                             inner_join(filtro, by = self$nivel)
+                                             inner_join(filtro, by = self$nivel[length(self$nivel)])
+
+                                           self$bd <- self$bd |>
+                                             inner_join(filtro, by = self$nivel[length(self$nivel)])
                                          }
 
                                          self[[base]] <- aux
@@ -291,16 +325,25 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                              colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                        grupo = self$nivel, tipo = tipo)
+                                                                        grupo = self$nivel[length(self$nivel)], tipo = tipo)
                                          } else if(tipo == "absoluto"){
                                            if(sum(grepl("ganador_", nombres)) == 0) {
-                                             self$calcular_ganador(base = base, eleccion = eleccion,tipo = tipo, nivel = self$nivel, partido = partidos)
+                                             self$calcular_ganador(base = base, eleccion = eleccion,tipo = tipo, nivel = self$nivel[length(self$nivel)], partido = partidos)
 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                              colorear_ganador_degradado(eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                        grupo = self$nivel, tipo = tipo)
+                                                                        grupo = self$nivel[length(self$nivel)], tipo = tipo)
                                          }
+
+                                         self$analisis <- self$analisis |>
+                                           tibble::add_row(eleccion = eleccion,
+                                                           nivel = self$nivel[length(self$nivel)],
+                                                           analisis = "colorear_ganador_degradado",
+                                                           parametros = list(list(base = base, eleccion = eleccion,
+                                                                             tipo = tipo,
+                                                                             colores_nombrados = colores_nombrados,
+                                                                             partidos = partidos)))
                                        },
                                        calcular_irs = function(ano, base = NULL, c_principal = "#140a8c"){
 
@@ -310,15 +353,21 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                                          self$censo <- leer_censo(ano = ano,
                                                                   entidad = self$entidad,
-                                                                  nivel = self$nivel)
+                                                                  nivel = self$nivel[length(self$nivel)])
 
                                          self[[base]] <-
                                            self[[base]] |>
                                            left_join(calcular_irs(bd = self$censo,
                                                                   electoral = self[[base]],
-                                                                  nivel = self$nivel,
+                                                                  nivel = self$nivel[length(self$nivel)],
                                                                   c_principal = c_principal),
-                                                     self$nivel)
+                                                     self$nivel[length(self$nivel)])
+
+                                         self$analisis <- self$analisis |>
+                                           tibble::add_row(eleccion = NULL,
+                                                           nivel = self$nivel[length(self$nivel)],
+                                                           analisis = "calcular_irs",
+                                                           parametros = list(list(ano = ano, base = base, c_principal = c_principal)))
                                        }
                          ))
 
@@ -377,11 +426,34 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
 #'
 
 
-Tablero <- R6::R6Class("Censo",
+Tablero <- R6::R6Class("Tablero",
                        public = list(
-                         info_seccion = NULL,
+                         info = NULL,
                          initialize = function(info_seccion){
-                           self$info_seccion <- info_seccion
+                           self$info <- info_seccion
+                         },
+                         agregar_eleccion = function(elecciones, nivel, bd_relacion, shp){
 
+                           self$info$bd <- self$info$bd |>
+                             dplyr::left_join(bd_relacion,
+                                              by = self$info$nivel[[1]])
+
+                           self$info$nivel <- self$info$nivel |>
+                             append(nivel)
+
+                           elecciones |>
+                             purrr::walk(~{
+                               self$info$partido(eleccion = .x)
+                               self$info$obtener_degradado_ganador(base = "bd_partido",
+                                                                   colores_nombrados = set_names(paleta$colores,paleta$partidos),
+                                                                   eleccion = .x)
+                             })
+
+                           self$info$colapsar_base("bd_partido")
+
+                           # self$info$calcular_irs(ano = "2020", base = "bd_partido")
+
+                           self$info$fusionar_shp(shp = shp,
+                                                  base = "bd_partido")
                          }
                        ))

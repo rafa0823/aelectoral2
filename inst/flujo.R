@@ -3,6 +3,7 @@ library(leaflet)
 
 cdmx_secc <- Electoral$new(eleccion = "df_21", entidad = "cdmx")
 cdmx_secc$partido("df_21")
+
 cdmx_secc$obtener_degradado_ganador(base = "bd_partido",
                                     colores_nombrados = set_names(paleta$colores,paleta$partidos),
                                     eleccion = "df_21")
@@ -14,12 +15,16 @@ c("dl_21", "pm_21") |>
     # cdmx_secc$voto_relativo(base = "bd_partido", partidos = paleta$partidos, eleccion = .x)
     # cdmx_secc$calcular_ganador(base = "bd_partido", partidos = paleta$partidos, eleccion = .x)
     cdmx_secc$obtener_degradado_ganador(base = "bd_partido",
-                                        colores_nombrados = set_names(paleta$colores,paleta$partidos),
+                                        colores_nombrados = set_names(paleta$colores, paleta$partidos),
                                         eleccion = .x)
   })
 
 shp <- ElectoralSHP$new(unidad = "secc_22", entidad = "cdmx")
-
+shp$agregar_shp("mun_22", entidad = "cdmx")
+shp$agregar_shp("df_22", entidad = "cdmx")
+shp$shp$secc_22_cdmx
+shp$shp$mun_22_cdmx
+shp$shp$df_22_cdmx
 cdmx_secc$colapsar_base("bd_partido", filtro = shp$shp$secc_22_cdmx |>
                           filter(distritol_22 == "09_18") |>
                           as_tibble() |>
@@ -28,8 +33,32 @@ cdmx_secc$colapsar_base("bd_partido", filtro = shp$shp$secc_22_cdmx |>
 cdmx_secc$calcular_irs(ano = "2020", base = "bd_partido")
 
 cdmx_secc$fusionar_shp(shp = shp$shp$secc_22_cdmx,
-                       bd = "bd_partido")
+                       base = "bd_partido")
 
 tablero <- Tablero$new(info_seccion = cdmx_secc)
 
-tablero$info_seccion$shp
+tablero$agregar_eleccion(elecciones = c("df_21", "dl_21", "pm_21"),
+                         nivel = "municipio_22",
+                         bd_relacion = shp$shp$secc_22_cdmx |>
+                           as_tibble() |>
+                           select(seccion, municipio_22),
+                         shp = shp$shp$mun_22_cdmx
+)
+
+tablero$info$shp |>
+  pluck("municipio_22")
+
+
+tablero$agregar_eleccion(elecciones = c("df_21", "dl_21", "pm_21"),
+                         nivel = "distritof_22",
+                         bd_relacion = shp$shp$secc_22_cdmx |>
+                           as_tibble() |>
+                           select(seccion, distritof_22),
+                         shp = shp$shp$df_22_cdmx
+)
+
+tablero$info$shp |>
+  pluck("distritof_22")
+# hay que meter clase shp a que funcione dentro de clase electoral
+
+

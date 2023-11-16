@@ -57,28 +57,26 @@ calcular_irs <- function(bd, electoral, nivel, c_principal){
 
   pred <- predict(cp, newdata = base)
   pred <- as.data.frame(pred)
-  irs <- (pred$PC1 - mean(pred$PC1)) / sd(pred$PC1)
+  if(sum(cp$PC1) > 0) {
+    irs <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) + abs(min(pred$PC1))
+  } else{
+    irs <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1 + abs(min(pred$PC1))
+  }
+  #El Método Dalenius Hodges forma estratos en los cuales la varianza es mínima intragrupos y máxima
+  #intergrupos.
+  ja <- stratification::strata.cumrootf(irs, CV = 0.05, Ls = 5)
+  #Necesitamos incluir un valor antes y otro después de los breaks para que 'cut' entienda que debe incluir
+  #los valores menores al límite inferior y mayores al límite superior.
+  intervalo <- c(-Inf, ja$bh, Inf)
+  labels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto")
 
   base <- bind_cols(base |> select(all_of(nivel)), rezago = irs) |>
-    mutate(y = 100/(max(rezago)-min(rezago))*
-             (rezago - min(rezago)),
-           intervalo = case_when(y <= 10 ~ 1,
-                                 y > 10 & y <= 20 ~ 2,
-                                 y > 20 & y <= 30 ~ 3,
-                                 y > 30 & y <= 40 ~ 4,
-                                 y > 40 & y <= 50 ~ 5,
-                                 y > 50 & y <= 60 ~ 6,
-                                 y > 60 & y <= 70 ~ 7,
-                                 y > 70 & y <= 80 ~ 8,
-                                 y > 80 & y <= 90 ~ 9,
-                                 y > 90 ~ 10 ),
-           quant_rezago = case_when(intervalo <= 1 ~ "Muy bajo",
-                               intervalo > 1 & intervalo <= 3 ~ "Bajo",
-                               intervalo > 3 & intervalo <= 4 ~ "Medio",
-                               intervalo > 4 & intervalo <= 6 ~ "Alto",
-                               intervalo > 6 ~ "Muy alto"),
-           quant_rezago = factor(quant_rezago, levels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto"))) |>
-    select(-y,-intervalo) |>
+    mutate(quant_rezago = cut(irs,
+                              breaks = intervalo,
+                              labels = labels,
+                              include.lowest = T),
+           quant_rezago = factor(quant_rezago, levels = labels)
+           ) |>
     obtener_color(c_principal = c_principal, "rezago")
 
   return(base)

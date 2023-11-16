@@ -243,9 +243,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                by = self$nivel[length(self$nivel)])) |>
                                                purrr::set_names(self$nivel[length(self$nivel)])
                                              )
-
-                                         self[[base]] = list()
-
                                        },
                                        #' @description Calcula los votos relativos para los partidos seleccionados
                                        #' @param base Es la base de datos que será modificada
@@ -463,6 +460,7 @@ Tablero <- R6::R6Class("Tablero",
                          info = NULL,
                          initialize = function(info_seccion){
                            self$info <- info_seccion$clone()
+                           self$info$bd_partido <- list()
                          },
                          agregar_eleccion = function(elecciones, nivel, bd_relacion, shp){
 

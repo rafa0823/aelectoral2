@@ -333,7 +333,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                              left_join(colorear_ganador_degradado(self[[base]][[eleccion]], eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                                  grupo = self$nivel[length(self$nivel)], tipo = tipo), 
+                                                                                  grupo = self$nivel[length(self$nivel)], tipo = tipo),
                                                        by = self$nivel[length(self$nivel)])
                                          } else if(tipo == "absoluto"){
                                            if(sum(grepl("ganador_", nombres)) == 0) {
@@ -342,7 +342,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            }
                                            self[[base]][[eleccion]] <- self[[base]][[eleccion]] |>
                                              left_join(colorear_ganador_degradado(self[[base]][[eleccion]], eleccion = eleccion, colores_nombrados = colores_nombrados,
-                                                                                  grupo = self$nivel[length(self$nivel)], tipo = tipo), 
+                                                                                  grupo = self$nivel[length(self$nivel)], tipo = tipo),
                                                        by = self$nivel[length(self$nivel)])
                                          }
 
@@ -462,7 +462,7 @@ Tablero <- R6::R6Class("Tablero",
                        public = list(
                          info = NULL,
                          initialize = function(info_seccion){
-                           self$info <- info_seccion
+                           self$info <- info_seccion$clone()
                          },
                          agregar_eleccion = function(elecciones, nivel, bd_relacion, shp){
 
@@ -477,7 +477,6 @@ Tablero <- R6::R6Class("Tablero",
                              purrr::walk(~{
                                self$info$partido(eleccion = .x)
                                self$info$obtener_degradado_ganador(base = "bd_partido",
-                                                                   colores_nombrados = set_names(paleta$colores,paleta$partidos),
                                                                    eleccion = .x)
                              })
 

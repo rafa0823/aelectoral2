@@ -22,7 +22,6 @@ Electoral <- R6::R6Class("Electoral",
                                        extranjero = NA,
                                        especiales = NA,
                                        partidos = NA_character_,
-                                       nombres_elecciones = NA,
                                        colores = NA,
                                        llaves = NULL,
                                        elecciones_agregadas = NULL,
@@ -242,7 +241,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                     inner_join(self[[base]],
                                                                by = self$nivel[length(self$nivel)])) |>
                                                purrr::set_names(self$nivel[length(self$nivel)])
-                                             )
+                                           )
 
                                          self[[base]] = list()
 
@@ -268,8 +267,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "voto_relativo",
                                                            parametros = list(list(base = base,
-                                                                             eleccion = eleccion,
-                                                                             partidos = partidos)))
+                                                                                  eleccion = eleccion,
+                                                                                  partidos = partidos)))
 
                                        },
                                        #' @description Calcula el partido ganador por nivel entre los partidos disponibles
@@ -286,7 +285,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            tibble::add_row(eleccion = eleccion,
                                                            nivel = self$nivel[length(self$nivel)], analisis = "calcular_ganador",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-                                                                             tipo = tipo, partidos = partidos)))
+                                                                                  tipo = tipo, partidos = partidos)))
                                        },
                                        #' @description Une todas las bases de datos que conformen la lista de la 'base'
                                        #' @param nivel es el nivel de agregación por el cual se van a unir las bases. El valor tiene que ser un símbolo (sin comillas).
@@ -351,9 +350,9 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "colorear_ganador_degradado",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-                                                                             tipo = tipo,
-                                                                             colores_nombrados = colores_nombrados,
-                                                                             partidos = partidos)))
+                                                                                  tipo = tipo,
+                                                                                  colores_nombrados = colores_nombrados,
+                                                                                  partidos = partidos)))
                                        },
                                        obtener_indice_completo = function(base){
                                          ind <- names(self$colores) |>
@@ -369,11 +368,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        añadir_leyenda = function(base){
                                          self[[base]] <- self[[base]] |>
                                            left_join(crear_label(self[[base]], nivel = self$nivel), by = self$nivel)
-                                       },
-                                       obtener_nombres_elecciones = function(base){
-                                         ele <- unique(stringr::str_sub(subset(names(self[[base]]), grepl("ele_", names(self[[base]]))), -5, -1))
-                                         self$nombres_elecciones <- nombres_elecciones |>
-                                           filter(eleccion %in% ele)
                                        },
                                        calcular_irs = function(ano, base = NULL, c_principal = "#140a8c"){
 
@@ -461,6 +455,7 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
 Tablero <- R6::R6Class("Tablero",
                        public = list(
                          info = NULL,
+                         nombres_elecciones = NA,
                          initialize = function(info_seccion){
                            self$info <- info_seccion$clone()
                          },
@@ -486,5 +481,11 @@ Tablero <- R6::R6Class("Tablero",
 
                            self$info$fusionar_shp(shp = shp,
                                                   base = "bd_partido")
+                         },
+                         obtener_nombres_elecciones = function(){
+                           ele <- unique(stringr::str_sub(subset(names(self$info$analisis)), grepl("ele_", names(self$info$bd_partido), -5, -1)))
+                           self$nombres_elecciones <- nombres_elecciones |>
+                             filter(eleccion %in% ele)
                          }
-                       ))
+                       )
+)

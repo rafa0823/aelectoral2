@@ -69,8 +69,6 @@ bd$calcular_irs(ano = "2020", base = "bd_partido")
 # bd$añadir_leyenda("bd_partido")
 #Se pega la base completa al mapa
 bd$fusionar_shp(base = "bd_partido", shp = shp$shp$secc_22_cdmx)
-#Se obtienen los nombres completos de las elecciones
-bd$obtener_nombres_elecciones("bd_partido") #Esto se va al Tablero
 ```
 
 

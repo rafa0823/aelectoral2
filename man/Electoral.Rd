@@ -50,6 +50,9 @@ bd \%>\%  agregar_manual(df_21, "seccion")
 \item \href{#method-Electoral-calcular_ganador}{\code{Electoral$calcular_ganador()}}
 \item \href{#method-Electoral-colapsar_base}{\code{Electoral$colapsar_base()}}
 \item \href{#method-Electoral-obtener_degradado_ganador}{\code{Electoral$obtener_degradado_ganador()}}
+\item \href{#method-Electoral-obtener_indice_completo}{\code{Electoral$obtener_indice_completo()}}
+\item \href{#method-Electoral-añadir_leyenda}{\code{Electoral$añadir_leyenda()}}
+\item \href{#method-Electoral-obtener_nombres_elecciones}{\code{Electoral$obtener_nombres_elecciones()}}
 \item \href{#method-Electoral-calcular_irs}{\code{Electoral$calcular_irs()}}
 \item \href{#method-Electoral-clone}{\code{Electoral$clone()}}
 }
@@ -66,6 +69,7 @@ Lo que hace es leer una base de datos electoral, darle formato el formato docume
   nivel = "seccion",
   llaves = "seccion",
   tipo_eleccion = "MR",
+  partidos = NULL,
   extranjero = T,
   especiales = NULL
 )}\if{html}{\out{</div>}}
@@ -81,6 +85,8 @@ Lo que hace es leer una base de datos electoral, darle formato el formato docume
 \item{\code{llaves}}{Son las claves cartográficas de los niveles. Por default la unidad mínima es sección y está acompañada de estado.}
 
 \item{\code{tipo_eleccion}}{Por default es "MR" refiriéndose a mayoría relativa.}
+
+\item{\code{partidos}}{Aquellos partidos para los cuales se van a realizar todas las operaciones de aelectoral en las que acote el número de partidos.}
 
 \item{\code{extranjero}}{Se refiere a si se desea incluir los votos en el extrajero, entendidos como sección 0000. El default es TRUE}
 
@@ -287,7 +293,7 @@ Devuelve el tibble de la elección sin los votos en el extanjero
 \if{latex}{\out{\hypertarget{method-Electoral-fusionar_shp}{}}}
 \subsection{Method \code{fusionar_shp()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Electoral$fusionar_shp(shp, bd)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$fusionar_shp(shp, base)}\if{html}{\out{</div>}}
 }
 
 }
@@ -297,7 +303,7 @@ Devuelve el tibble de la elección sin los votos en el extanjero
 \subsection{Method \code{voto_relativo()}}{
 Calcula los votos relativos para los partidos seleccionados
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Electoral$voto_relativo(base, eleccion, partidos)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$voto_relativo(base, eleccion)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -321,7 +327,7 @@ Regresa columnas con el prefijo 'pct' en la misma base entregada
 \subsection{Method \code{calcular_ganador()}}{
 Calcula el partido ganador por nivel entre los partidos disponibles
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Electoral$calcular_ganador(base, eleccion, tipo = "absoluto", partidos = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$calcular_ganador(base, eleccion, tipo = "absoluto")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -367,13 +373,7 @@ Regresa una única tibble con todas las bases de datos unidas como columnas
 Especifica un color degradado según el número de votos obtenidos por el partido ganador.
 Se recomienda ampliamente usar la función con el parámetro tipo = "relativo" y con partidos específicos.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Electoral$obtener_degradado_ganador(
-  base,
-  eleccion,
-  tipo = "relativo",
-  colores_nombrados,
-  partidos = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$obtener_degradado_ganador(base, eleccion, tipo = "relativo")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -386,13 +386,40 @@ Se recomienda ampliamente usar la función con el parámetro tipo = "relativo" y
 \item{\code{tipo}}{Es el tipo de datos que trae la base de datos, puede ser 'absoluto' o 'relativo'.
 Los absolutos tienen como prefijo 'ele', mientras que los relativos tienen como prefijo 'pct'.}
 
+\item{\code{nivel}}{Es el nivel de agregación que se quiere calcular los votos relativos, puede ser 'seccion', 'municipio', 'distritol', 'distritof' y el año de elección.}
+
 \item{\code{colores_nombrados}}{Es un vector nombrado con los colores que se quieren asignar a los partidos.
 Los colores nombrados tienen que estar ligados a todos los partidos ganadores de la elección.}
-
-\item{\code{nivel}}{Es el nivel de agregación que se quiere calcular los votos relativos, puede ser 'seccion', 'municipio', 'distritol', 'distritof' y el año de elección.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Electoral-obtener_indice_completo"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-obtener_indice_completo}{}}}
+\subsection{Method \code{obtener_indice_completo()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$obtener_indice_completo(base)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Electoral-añadir_leyenda"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-añadir_leyenda}{}}}
+\subsection{Method \code{añadir_leyenda()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$añadir_leyenda(base)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Electoral-obtener_nombres_elecciones"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-obtener_nombres_elecciones}{}}}
+\subsection{Method \code{obtener_nombres_elecciones()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$obtener_nombres_elecciones(base)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Electoral-calcular_irs"></a>}}

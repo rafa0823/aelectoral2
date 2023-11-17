@@ -12,13 +12,15 @@ Al shp leído se le pude agregar otrabase de datos
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-Censo-new}{\code{Tablero$new()}}
-\item \href{#method-Censo-clone}{\code{Tablero$clone()}}
+\item \href{#method-Tablero-new}{\code{Tablero$new()}}
+\item \href{#method-Tablero-agregar_eleccion}{\code{Tablero$agregar_eleccion()}}
+\item \href{#method-Tablero-reiniciar_info}{\code{Tablero$reiniciar_info()}}
+\item \href{#method-Tablero-clone}{\code{Tablero$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Censo-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Censo-new}{}}}
+\if{html}{\out{<a id="method-Tablero-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Tablero-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$new(info_seccion)}\if{html}{\out{</div>}}
@@ -26,8 +28,26 @@ Al shp leído se le pude agregar otrabase de datos
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Censo-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-Censo-clone}{}}}
+\if{html}{\out{<a id="method-Tablero-agregar_eleccion"></a>}}
+\if{latex}{\out{\hypertarget{method-Tablero-agregar_eleccion}{}}}
+\subsection{Method \code{agregar_eleccion()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Tablero$agregar_eleccion(elecciones, nivel, bd_relacion, shp)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Tablero-reiniciar_info"></a>}}
+\if{latex}{\out{\hypertarget{method-Tablero-reiniciar_info}{}}}
+\subsection{Method \code{reiniciar_info()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Tablero$reiniciar_info()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Tablero-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Tablero-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

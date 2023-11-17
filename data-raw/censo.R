@@ -43,7 +43,7 @@ readr::write_rds(censo_dl22, "inst/censo/distritol_22_2020.rda")
 # censo por municipio -----------------------------------------------------
 
 csv <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INEGI/Censo 2020/Datos geografico/ITER_NALCSV20.csv"
-censo_mun <- read_csv(csv) |>
+censo_mun <- read_csv(csv, na = "*") |>
   janitor::clean_names()
 
 # IMPORTANTE!!!!! hacer relación de municipio inegi y municipio ine

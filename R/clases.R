@@ -483,9 +483,8 @@ Tablero <- R6::R6Class("Tablero",
                                                   base = "bd_partido")
                          },
                          obtener_nombres_elecciones = function(){
-                           ele <- unique(stringr::str_sub(subset(names(self$info$analisis)), grepl("ele_", names(self$info$bd_partido), -5, -1)))
                            self$nombres_elecciones <- nombres_elecciones |>
-                             filter(eleccion %in% ele)
+                             filter(eleccion %in% na.omit(unique(self$info$analisis$eleccion)))
                          }
                        )
 )

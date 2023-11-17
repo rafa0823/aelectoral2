@@ -1,10 +1,31 @@
+---
+title: "flujo_tablero"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{flujo_tablero}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(aelectoral2)
 library(tidyverse)
 library(leaflet)
+```
+
+## Creación de clase Electoral con los objetos requeridos
+```{r}
+
 partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
 cdmx_secc <- Electoral$new(eleccion = "df_21", entidad = "cdmx", partidos = partidos)
 cdmx_secc$partido("df_21")
-# cdmx_secc$voto_relativo("bd_partido", "df_21")
-# cdmx_secc$calcular_ganador("bd_partido", "df_21")
 cdmx_secc$obtener_degradado_ganador(base = "bd_partido", eleccion = "df_21")
 
 c("dl_21", "pm_21") |>
@@ -30,12 +51,13 @@ cdmx_secc$calcular_irs(ano = "2020", base = "bd_partido")
 
 cdmx_secc$fusionar_shp(shp = shp$shp$secc_22_cdmx,
                        base = "bd_partido")
+```
 
+
+```{r}
 tablero <- Tablero$new(info_seccion = cdmx_secc)
-# tablero$agregar_eleccion |> debug()
 
 # IMPORTANTE!!!!! hacer relación de municipio inegi y municipio ine
-# tablero$agregar_eleccion |> debug()
 tablero$agregar_eleccion(elecciones = c("df_21", "dl_21", "pm_21"),
                          nivel = "municipio_22",
                          bd_relacion = shp$shp$secc_22_cdmx |>
@@ -58,6 +80,8 @@ tablero$agregar_eleccion(elecciones = c("df_21", "dl_21", "pm_21"),
 
 tablero$info$shp |>
   pluck("distritof_22")
-# hay que meter clase shp a que funcione dentro de clase electoral
 
+tablero$obtener_nombres_elecciones()
+
+```
 

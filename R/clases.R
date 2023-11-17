@@ -264,12 +264,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "voto_relativo",
                                                            parametros = list(list(base = base,
-<<<<<<< HEAD
                                                                              eleccion = eleccion)))
-=======
-                                                                                  eleccion = eleccion,
-                                                                                  partidos = partidos)))
->>>>>>> 64adb8f63fd1115e4af3b6de675654b3ebebfc44
 
                                        },
                                        #' @description Calcula el partido ganador por nivel entre los partidos disponibles
@@ -288,11 +283,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            tibble::add_row(eleccion = eleccion,
                                                            nivel = self$nivel[length(self$nivel)], analisis = "calcular_ganador",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-<<<<<<< HEAD
                                                                              tipo = tipo)))
-=======
-                                                                                  tipo = tipo, partidos = partidos)))
->>>>>>> 64adb8f63fd1115e4af3b6de675654b3ebebfc44
                                        },
                                        #' @description Une todas las bases de datos que conformen la lista de la 'base'
                                        #' @param nivel es el nivel de agregación por el cual se van a unir las bases. El valor tiene que ser un símbolo (sin comillas).
@@ -355,13 +346,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "obtener_degradado_ganador",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-<<<<<<< HEAD
                                                                              tipo = tipo)))
-=======
-                                                                                  tipo = tipo,
-                                                                                  colores_nombrados = colores_nombrados,
-                                                                                  partidos = partidos)))
->>>>>>> 64adb8f63fd1115e4af3b6de675654b3ebebfc44
                                        },
                                        obtener_indice_completo = function(base){
                                          ind <- names(self$colores) |>

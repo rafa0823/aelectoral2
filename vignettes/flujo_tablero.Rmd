@@ -82,5 +82,7 @@ tablero$agregar_eleccion(elecciones = c("df_21"),
 tablero$info$shp |>
   pluck("distritof_22")
 
+tablero$obtener_nombres_elecciones()
+
 ```
 

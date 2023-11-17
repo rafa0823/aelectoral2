@@ -46,9 +46,11 @@ csv <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INEGI/Cen
 censo_mun <- read_csv(csv) |>
   janitor::clean_names()
 
-censo_mun <- censo_mun |>
-  mutate(municipio = paste(entidad, mun, sep = "_")) |>
-  filter(nom_loc == "Total del Municipio") |>
-  select(pobtot:vph_sintic)
+# IMPORTANTE!!!!! hacer relación de municipio inegi y municipio ine
 
-readr::write_rds(censo_mun, "inst/censo/municipio_2020.rda")
+censo_mun <- censo_mun |>
+  mutate(municipio_22 = paste(entidad, mun, sep = "_")) |>
+  filter(nom_loc == "Total del Municipio") |>
+  select(entidad, municipio_22, pobtot:vph_sintic)
+
+readr::write_rds(censo_mun, "inst/censo/municipio_22_2020.rda")

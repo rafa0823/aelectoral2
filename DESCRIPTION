@@ -33,6 +33,7 @@ Imports:
     sf,
     shades,
     stats,
+    stratification,
     stringr,
     tibble,
     tidyr

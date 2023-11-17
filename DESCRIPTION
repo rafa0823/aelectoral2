@@ -17,6 +17,7 @@ Imports:
     ClustGeo,
     colortools,
     dplyr,
+    dvmisc,
     forcats,
     ggplot2,
     ggrepel,
@@ -40,8 +41,6 @@ Suggests:
     janitor,
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0),
-    tidyverse
     testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr

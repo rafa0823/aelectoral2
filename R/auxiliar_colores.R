@@ -29,9 +29,10 @@ colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, ti
     mutate(max_votacion = max(c_across(matches(glue::glue("{prefijo}_{partidos}_{eleccion}")))))
 
   # Funciones de color
-  funciones_color <- map(unique(bd[[glue::glue("ganador_{eleccion}")]]),
-                         ~colorRamp(colors = c("white",colores_saturados[[.x]]), space = "Lab") %>%
-                           leaflet::colorNumeric(domain = c(0, max(bd$max_votacion))))
+  funciones_color <- map(unique(bd[[glue::glue("ganador_{eleccion}")]]), ~{
+    colorRamp(colors = c("white",colores_saturados[[.x]]), space = "Lab") %>%
+      leaflet::colorNumeric(domain = c(0, max(bd$max_votacion)))
+  })
   names(funciones_color) <- unique(bd[[glue::glue("ganador_{eleccion}")]])
 
   res <- bd %>%
@@ -65,7 +66,7 @@ degradar_color_partido <- function(bd_larga, nombre, variable, colores_nombrados
   res <- bd_larga %>%
     mutate(color=map2_chr(!!enquo(nombre), !!enquo(variable),~funciones_color[[.x]](.y)))
   return(res)
-  }
+}
 
 asociar_colores <- function(partidos) {
   paleta <- paleta |>
@@ -82,9 +83,9 @@ obtener_color <- function(bd, c_principal, var){
   bd <- bd %>% mutate(col := !!rlang::sym(var))
 
   colorear <- leaflet::colorQuantile(grDevices::colorRamp(c(no_principal,"white", c_principal),
-                                      space = "Lab",bias=1.5,
-                                      interpolate="spline"),
-                            domain = bd[["col"]], n = 10)
+                                                          space = "Lab",bias=1.5,
+                                                          interpolate="spline"),
+                                     domain = bd[["col"]], n = 10)
 
   bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
 }

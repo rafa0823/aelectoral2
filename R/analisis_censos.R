@@ -57,18 +57,20 @@ calcular_irs <- function(bd, electoral, nivel, c_principal){
 
   pred <- predict(cp, newdata = base)
   pred <- as.data.frame(pred)
-  if(sum(cp$PC1) > 0) {
-    irs <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) + abs(min(pred$PC1))
-  } else{
-    irs <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1 + abs(min(pred$PC1))
-  }
+  pc1_pos <- pred$PC1 + abs(min(pred$PC1))
+  irs <- (pc1_pos + mean(pc1_pos) / sd(pc1_pos))
   #El Método Dalenius Hodges forma estratos en los cuales la varianza es mínima intragrupos y máxima
   #intergrupos.
   ja <- stratification::strata.cumrootf(irs, CV = 0.05, Ls = 5)
   #Necesitamos incluir un valor antes y otro después de los breaks para que 'cut' entienda que debe incluir
   #los valores menores al límite inferior y mayores al límite superior.
   intervalo <- c(-Inf, ja$bh, Inf)
-  labels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto")
+  if(sum(cp$PC1) > 0) {
+    labels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto")
+  } else {
+    labels = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
+    c_principal <-last(colortools::complementary(c_principal))
+  }
 
   base <- bind_cols(base |> select(all_of(nivel)), rezago = irs) |>
     mutate(quant_rezago = cut(irs,
@@ -76,7 +78,7 @@ calcular_irs <- function(bd, electoral, nivel, c_principal){
                               labels = labels,
                               include.lowest = T),
            quant_rezago = factor(quant_rezago, levels = labels)
-           ) |>
+    ) |>
     obtener_color(c_principal = c_principal, "rezago")
 
   return(base)

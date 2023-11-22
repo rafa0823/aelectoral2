@@ -365,7 +365,7 @@ extraer_partidos <- function(bd, eleccion, tipo){
 crear_indice <- function(bd, partido, nivel){
   bd_partido <- bd |>
     as_tibble() |>
-    select(all_of(nivel), contains(c(glue::glue("{partido}_")))) |>
+    select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
     na.omit()
 
   pca_modelo <- bd_partido |>

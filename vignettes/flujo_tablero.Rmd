@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(aelectoral2)
-library(tidyverse)
+library(dplyr)
 library(leaflet)
 ```
 
@@ -84,4 +84,106 @@ tablero$info$shp |>
 tablero$obtener_nombres_elecciones()
 
 ```
+
+## Distrito local 37 EDOMEX
+
+```{r}
+elecciones <- c("pm_18", "dl_18", "df_18", "pm_21", "df_21", "dl_21")
+partidos <- c("morena", "pan", "pri", "mc", "prd", "pes", "pt", "pvem",
+              "panal", "fxm", "rsp", "total")
+
+bd <- Electoral$new("gb_17", entidad = "mex", partidos = partidos)
+bd$partido("gb_17")
+bd$voto_relativo("bd_partido", "gb_17")
+bd$calcular_ganador("bd_partido", "gb_17")
+bd$obtener_degradado_ganador(base = "bd_partido", eleccion = "gb_17")
+
+walk(elecciones, ~{
+  bd$agregar_bd(.x)
+  bd$partido(.x)
+  bd$voto_relativo("bd_partido", .x)
+  bd$calcular_ganador("bd_partido", .x)
+  bd$obtener_degradado_ganador(base = "bd_partido", eleccion = .x)
+})
+
+shp <- ElectoralSHP$new(unidad = "secc_22", entidad = "mex")
+# Se genera un solo tibble asociado al mapa
+bd$colapsar_base("bd_partido", filtro = shp$shp$secc_22_mex |>
+                   filter(distritol_22 == "15_37") |>
+                   as_tibble() |>
+                   select(seccion))
+
+#Se genera el índice para todos los partidos definidos al principio del código
+bd$obtener_indice_completo("bd_partido")
+bd$calcular_irs(ano = "2020", base = "bd_partido")
+
+bd$añadir_leyenda("bd_partido")
+
+bd$fusionar_shp(shp = shp$shp$secc_22_mex, base = "bd_partido")
+
+tablero <- Tablero$new(info_seccion = bd)
+
+tablero$obtener_nombres_elecciones()
+
+bd <- tablero
+
+```
+
+## Clase Edomex
+
+```{r}
+elecciones <- c("pm_18", "dl_18", "df_18")
+partidos <- c("morena", "pan", "pri", "total")
+
+bd <- Electoral$new("gb_17", entidad = "mex", partidos = partidos)
+bd$partido("gb_17")
+bd$voto_relativo("bd_partido", "gb_17")
+bd$calcular_ganador("bd_partido", "gb_17")
+bd$obtener_degradado_ganador(base = "bd_partido", eleccion = "gb_17")
+
+purrr::walk(elecciones, ~{
+  bd$agregar_bd(.x)
+  bd$partido(.x)
+  bd$voto_relativo("bd_partido", .x)
+  bd$calcular_ganador("bd_partido", .x)
+  bd$obtener_degradado_ganador(base = "bd_partido", eleccion = .x)
+})
+
+shp <- ElectoralSHP$new(unidad = "secc_22", entidad = "mex")
+shp$agregar_shp("mun_22", entidad = "mex")
+shp$agregar_shp("df_22", entidad = "mex")
+# Se genera un solo tibble asociado al mapa
+bd$colapsar_base("bd_partido", filtro = shp$shp$secc_22_mex |>
+                   as_tibble() |>
+                   select(seccion))
+
+#Se genera el índice para todos los partidos definidos al principio del código
+bd$obtener_indice_completo("bd_partido")
+# bd$calcular_irs(ano = "2020", base = "bd_partido")
+
+bd$añadir_leyenda("bd_partido")
+
+bd$fusionar_shp(shp = shp$shp$secc_22_mex, base = "bd_partido")
+
+tablero <- Tablero$new(info_seccion = bd)
+
+tablero$agregar_eleccion(elecciones = c("gb_17", elecciones),
+                         nivel = "municipio_22",
+                         bd_relacion = shp$shp$secc_22_mex |>
+                           as_tibble() |>
+                           select(seccion, municipio_22),
+                         shp = shp$shp$mun_22_mex
+)
+
+tablero$agregar_eleccion(elecciones = c("gb_17", elecciones),
+                         nivel = "distritof_22",
+                         bd_relacion = shp$shp$secc_22_mex |>
+                           as_tibble() |>
+                           select(seccion, distritof_22),
+                         shp = shp$shp$df_22_mex
+)
+
+```
+
+
 

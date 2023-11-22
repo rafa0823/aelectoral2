@@ -516,7 +516,7 @@ rm(dl15)
 # GB_13 -------------------------------------------------------------------
 library(tidyverse)
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2023/Gobernador/mexico_normal_casilla.csv"
-
+path <- "~/Downloads/mexico_normal_casilla.csv"
 # Funciones ---------------------------------------------------------------
 
 homologar_bd <- function(bd, estado, nombre_estado){
@@ -543,6 +543,7 @@ gb_23 <- read_csv(path) |>
   rename(
     estado = id_estado,
     distritol_23 = id_distrito_local,
+    delfina = pvem_pt_morena,
     nombre_distritol_23 = cabecera_distrital_local,
     nombre_municipio_23 = municipio,
     municipio_23 = id_municipio,

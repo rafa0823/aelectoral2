@@ -300,12 +300,12 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                              inner_join(filtro, by = self$nivel[length(self$nivel)])
                                          }
 
-                                         self[[base]] <- aux |>
-                                           rename_with(~gsub("total", "participacion", .x), contains("total"))
-
-                                         self$partidos <- gsub("total", "participacion", self$partidos)
-
-                                         names(self$colores)[names(self$colores) == "total"] <- "participacion"
+                                         self[[base]] <- aux #|>
+                                         #   rename_with(~gsub("total", "participacion", .x), contains("total"))
+                                         #
+                                         # self$partidos <- gsub("total", "participacion", self$partidos)
+                                         #
+                                         # names(self$colores)[names(self$colores) == "total"] <- "participacion"
                                        },
                                        #' @description Especifica un color degradado según el número de votos obtenidos por el partido ganador.
                                        #' Se recomienda ampliamente usar la función con el parámetro tipo = "relativo" y con partidos específicos.
@@ -351,13 +351,20 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        obtener_indice_completo = function(base){
                                          ind <- names(self$colores) |>
                                            purrr::map2(self$colores, ~{
-                                             aux <- crear_indice(self[[base]], .x, nivel = self$nivel)
+                                             aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
                                              aux <- colorear_indice(aux, c_principal = .y, var = .x)
                                              aux <- crear_quantiles(aux, .x)
                                            })
 
                                          self[[base]] <- self[[base]] |>
-                                           left_join(reduce(ind, left_join, by = self$nivel), by = self$nivel)
+                                           left_join(reduce(ind, left_join, by = self$nivel[length(self$nivel)]),
+                                                     by = self$nivel[length(self$nivel)])
+
+                                         self$analisis <- self$analisis |>
+                                           tibble::add_row(eleccion = "todas",
+                                                           nivel = self$nivel[length(self$nivel)],
+                                                           analisis = "obtener_indice_completo",
+                                                           parametros = list(list(base = base)))
                                        },
                                        añadir_leyenda = function(base){
                                          self[[base]] <- self[[base]] |>
@@ -474,7 +481,7 @@ Tablero <- R6::R6Class("Tablero",
 
                                ana_aux |>
                                  nrow() |> seq_len() |>
-                                 walk(~{
+                                 purrr::walk(~{
                                    aux <- ana_aux |>
                                      slice(.x)
                                    ana <- aux$analisis
@@ -491,6 +498,15 @@ Tablero <- R6::R6Class("Tablero",
                            #luego pensamos cómo hacerle para quitar bd_partido y ponerlo como parametro por si se requiere bd o bd_candidato
 
                            self$info$colapsar_base("bd_partido")
+
+                           if("obtener_indice_completo" %in% analisis$analisis) {
+                             params <- analisis |>
+                               filter(analisis == "obtener_indice_completo") |>
+                               pull(parametros) |>
+                               purrr::flatten()
+
+                             do.call(self$info$obtener_indice_completo, params)
+                           }
 
                            if("calcular_irs" %in% analisis$analisis) {
                              params <- analisis |>

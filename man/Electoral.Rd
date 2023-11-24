@@ -52,7 +52,6 @@ bd \%>\%  agregar_manual(df_21, "seccion")
 \item \href{#method-Electoral-obtener_degradado_ganador}{\code{Electoral$obtener_degradado_ganador()}}
 \item \href{#method-Electoral-obtener_indice_completo}{\code{Electoral$obtener_indice_completo()}}
 \item \href{#method-Electoral-añadir_leyenda}{\code{Electoral$añadir_leyenda()}}
-\item \href{#method-Electoral-obtener_nombres_elecciones}{\code{Electoral$obtener_nombres_elecciones()}}
 \item \href{#method-Electoral-calcular_irs}{\code{Electoral$calcular_irs()}}
 \item \href{#method-Electoral-clone}{\code{Electoral$clone()}}
 }
@@ -409,15 +408,6 @@ Los colores nombrados tienen que estar ligados a todos los partidos ganadores de
 \subsection{Method \code{añadir_leyenda()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Electoral$añadir_leyenda(base)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Electoral-obtener_nombres_elecciones"></a>}}
-\if{latex}{\out{\hypertarget{method-Electoral-obtener_nombres_elecciones}{}}}
-\subsection{Method \code{obtener_nombres_elecciones()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Electoral$obtener_nombres_elecciones(base)}\if{html}{\out{</div>}}
 }
 
 }

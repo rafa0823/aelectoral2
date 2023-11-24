@@ -15,6 +15,7 @@ Al shp leído se le pude agregar otrabase de datos
 \item \href{#method-Tablero-new}{\code{Tablero$new()}}
 \item \href{#method-Tablero-agregar_eleccion}{\code{Tablero$agregar_eleccion()}}
 \item \href{#method-Tablero-reiniciar_info}{\code{Tablero$reiniciar_info()}}
+\item \href{#method-Tablero-obtener_nombres_elecciones}{\code{Tablero$obtener_nombres_elecciones()}}
 \item \href{#method-Tablero-clone}{\code{Tablero$clone()}}
 }
 }
@@ -42,6 +43,15 @@ Al shp leído se le pude agregar otrabase de datos
 \subsection{Method \code{reiniciar_info()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$reiniciar_info()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Tablero-obtener_nombres_elecciones"></a>}}
+\if{latex}{\out{\hypertarget{method-Tablero-obtener_nombres_elecciones}{}}}
+\subsection{Method \code{obtener_nombres_elecciones()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Tablero$obtener_nombres_elecciones()}\if{html}{\out{</div>}}
 }
 
 }

@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(tidyverse)
 library(aelectoral2)
 library(dplyr)
 library(leaflet)
@@ -98,7 +99,7 @@ bd$voto_relativo("bd_partido", "gb_17")
 bd$calcular_ganador("bd_partido", "gb_17")
 bd$obtener_degradado_ganador(base = "bd_partido", eleccion = "gb_17")
 
-walk(elecciones, ~{
+purrr::walk(elecciones, ~{
   bd$agregar_bd(.x)
   bd$partido(.x)
   bd$voto_relativo("bd_partido", .x)
@@ -134,7 +135,7 @@ bd <- tablero
 ```{r}
 elecciones <- c("pm_18", "dl_18", "df_18")
 partidos <- c("morena", "pan", "pri", "total")
-
+  
 bd <- Electoral$new("gb_17", entidad = "mex", partidos = partidos)
 bd$partido("gb_17")
 bd$voto_relativo("bd_partido", "gb_17")

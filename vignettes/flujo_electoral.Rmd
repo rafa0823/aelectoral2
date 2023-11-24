@@ -19,6 +19,7 @@ En esta viñeta se desarolla el *happy path* para generar todos los insumos requ
 ### Vectores base
 
 ```{r}
+library(tidyverse)
 library(aelectoral2)
 elecciones <- c("pm_18", "dl_18", "df_18", "pm_21", "df_21", "dl_21")
 partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
@@ -43,7 +44,7 @@ bd$obtener_degradado_ganador(base = "bd_partido", eleccion = "gb_18")
 
 ```{r}
 #Obtención de columnas relevantes para todas las elecciones requeridas
-walk(elecciones, ~{
+purrr::walk(elecciones, ~{
   bd$agregar_bd(.x)
   bd$partido(.x)
   bd$voto_relativo("bd_partido", .x)

@@ -31,6 +31,8 @@ censo_df22 <- censo |>
   summarise(across(where(is.numeric), ~sum(.x, na.rm = T)),
                                        .by = c(entidad, distritof_22))
 
+readr::write_rds(censo_df22, "inst/censo/distritof_22_2020.rda")
+
 censo_dl22 <- censo |>
   left_join(relacion) |>
   filter(!is.na(distritol_22)) |>

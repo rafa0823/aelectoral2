@@ -349,11 +349,15 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                              tipo = tipo)))
                                        },
                                        obtener_indice_completo = function(base){
-                                         ind <- names(self$colores) |>
-                                           purrr::map2(self$colores, ~{
+                                         ind <- setdiff(names(self$colores), "rezago") |>
+                                           purrr::map2(setdiff(self$colores, "#140a8c"), ~{
+                                             tryCatch(
+                                               {
                                              aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
                                              aux <- colorear_indice(aux, c_principal = .y, var = .x)
                                              aux <- crear_quantiles(aux, .x)
+                                               }
+                                             )
                                            })
 
                                          self[[base]] <- self[[base]] |>

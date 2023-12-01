@@ -1,9 +1,9 @@
 ## code to prepare `modificacion_censo` dataset goes here
 library(readr)
 
-
 # Cargar bases ------------------------------------------------------------
-path <- "../telectoral.edomex/data-raw/mex_cen_2020.csv"
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INEGI/Censo 2020/Datos geografico/ITER_NALCSV20.csv"
+# Edomex ------------------------------------------------------------------
 ## Censo
 censo_mex <- read_csv(path) |>
   janitor::clean_names() |>
@@ -28,4 +28,22 @@ setdiff(v2, v1)
 censo_mex <- censo_mex |>
   left_join(mex_mun, join_by(nom_mun == nombre_municipio_21)) |>
   mutate(mun = gsub("15_", "", municipio_21))
+
+# Jalisco -----------------------------------------------------------------
+
+# jal <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "jal", llaves = "municipio_21")
+# jal_mun <- jal$todas[["pm_21"]] |>
+#   distinct(municipio_21, nombre_municipio)
+
+# cdmx --------------------------------------------------------------------
+
+# cdmx <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "cdmx", llaves = "municipio_21")
+# cdmx_mun <- cdmx$bd |>
+#   distinct(municipio_21, nombre_municipio_21)
+
+# Morelos -----------------------------------------------------------------
+
+# mor <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "mor", llaves = "municipio_21")
+# mor_mun <- mor$todas[["pm_21"]] |>
+#   distinct(municipio_21, municipio)
 

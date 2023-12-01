@@ -264,7 +264,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "voto_relativo",
                                                            parametros = list(list(base = base,
-                                                                             eleccion = eleccion)))
+                                                                                  eleccion = eleccion)))
 
                                        },
                                        #' @description Calcula el partido ganador por nivel entre los partidos disponibles
@@ -283,7 +283,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            tibble::add_row(eleccion = eleccion,
                                                            nivel = self$nivel[length(self$nivel)], analisis = "calcular_ganador",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-                                                                             tipo = tipo)))
+                                                                                  tipo = tipo)))
                                        },
                                        #' @description Une todas las bases de datos que conformen la lista de la 'base'
                                        #' @param nivel es el nivel de agregación por el cual se van a unir las bases. El valor tiene que ser un símbolo (sin comillas).
@@ -346,16 +346,17 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "obtener_degradado_ganador",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-                                                                             tipo = tipo)))
+                                                                                  tipo = tipo)))
                                        },
                                        obtener_indice_completo = function(base){
+                                         #Esto está parchado hasta que el vector de colores no tenga rezago
                                          ind <- setdiff(names(self$colores), "rezago") |>
                                            purrr::map2(setdiff(self$colores, "#140a8c"), ~{
                                              tryCatch(
                                                {
-                                             aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
-                                             aux <- colorear_indice(aux, c_principal = .y, var = .x)
-                                             aux <- crear_quantiles(aux, .x)
+                                                 aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
+                                                 aux <- colorear_indice(aux, c_principal = .y, var = .x)
+                                                 aux <- crear_quantiles(aux, .x)
                                                }
                                              )
                                            })
@@ -392,7 +393,9 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                   c_principal = c_principal),
                                                      self$nivel[length(self$nivel)])
 
-                                         self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
+                                         if(!"rezago" %in% self$colores){
+                                           self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
+                                         }
 
                                          self$analisis <- self$analisis |>
                                            tibble::add_row(eleccion = NULL,
@@ -532,6 +535,17 @@ Tablero <- R6::R6Class("Tablero",
                          obtener_nombres_elecciones = function(){
                            self$nombres_elecciones <- nombres_elecciones |>
                              filter(eleccion %in% na.omit(unique(self$info$analisis$eleccion)))
+                         },
+                         cambiar_nombre_participacion = function(){
+                           self$info$nivel |>
+                             purrr::walk(~{
+                               self$info$shp[[.x]] <- self$info$shp[[.x]] |>
+                                 rename_with(~gsub("total", "participacion", .x), contains("total"))
+
+                               self$info$partidos <- gsub("total", "participacion", self$info$partidos)
+
+                               names(self$info$colores)[names(self$info$colores) == "total"] <- "participacion"
+                             })
                          }
                        )
 )

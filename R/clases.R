@@ -289,14 +289,14 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @return Regresa una única tibble con todas las bases de datos unidas como columnas
                                        colapsar_base = function(base, filtro = NULL){
                                          aux <- self[[base]] |>
-                                           reduce(left_join, self$nivel[length(self$nivel)])
+                                           reduce(full_join, self$nivel[length(self$nivel)])
 
                                          if(!is.null(filtro)){
-                                           aux <- aux |>
-                                             inner_join(filtro, by = self$nivel[length(self$nivel)])
+                                           aux <- select(as_tibble(filtro), contains(self$nivel)) |>
+                                             left_join(aux, by = self$nivel[length(self$nivel)])
 
-                                           self$bd <- self$bd |>
-                                             inner_join(filtro, by = self$nivel[length(self$nivel)])
+                                           self$bd <- select(as_tibble(filtro), contains(self$nivel)) |>
+                                             left_join(self$bd, by = self$nivel[length(self$nivel)])
                                          }
 
                                          self[[base]] <- aux
@@ -387,7 +387,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                   c_principal = c_principal),
                                                      self$nivel[length(self$nivel)])
 
-                                         if(!"rezago" %in% self$colores){
+                                         if(!"rezago" %in% names(self$colores)){
                                            self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
                                          }
 
@@ -428,16 +428,15 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                     left_join(claves |>
                                                 select(contains("distritol")) |>
                                                          distinct(),
-                                              join_by(distritol_22 == distritol)) |>
+                                              join_by(distritol_22)) |>
                                     left_join(claves |>
                                                 select(contains("distritof")) |>
                                                 distinct(),
-                                              join_by(distritof_22 == distritof)) |>
+                                              join_by(distritof_22)) |>
                                     left_join(claves |>
                                                 select(contains("municipio")) |>
                                                 distinct(),
-                                              join_by(municipio_22 == municipio))
-
+                                              join_by(municipio_22))
                                 }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
@@ -447,6 +446,19 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               agregar_shp = function(unidad, entidad = NULL){
                                 if(!entidad %in% self$entidades) self$entidades <- self$entidades %>% append(entidad)
                                 aux <- leer_shp(unidad, entidad)
+                                if (unidad == "dl_22"){
+                                  aux <- aux |>
+                                    left_join(claves |>
+                                                select(contains("distritol_22")) |>
+                                                distinct(),
+                                              join_by("distritol_22"))
+                                } else if(unidad == "df_22"){
+                                  aux <- aux |>
+                                    left_join(claves |>
+                                                select(contains("distritof_22")) |>
+                                                distinct(),
+                                              join_by("distritof_22"))
+                                }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
                               #'@description

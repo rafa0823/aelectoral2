@@ -52,6 +52,7 @@ censo_mun <- read_csv(csv, na = "*") |>
 censo_mun <- censo_mun |>
   filter(nom_loc == "Total del Municipio") |>
   left_join(relacion_ine_inegi, join_by(entidad, mun)) |>
+  mutate(municipio_22 = if_else(is.na(municipio_22), paste(entidad, mun, sep = "_"), municipio_22)) |>
   select(entidad, municipio_22, nom_mun, pobtot:vph_sintic)
 
 readr::write_rds(censo_mun, "inst/censo/municipio_22_2020.rda")

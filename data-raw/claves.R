@@ -73,9 +73,27 @@ clave_mex <- read_csv(path) |>
          municipio_22 = sprintf("15_%03s", municipio_22)) |>
   left_join(df)
 
+
+# Morelos -----------------------------------------------------------------
+
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/MOR/MOR_PEL_2021/AYUNTAMIENTOS_csv/2021_SEE_AYUN_MOR_SEC.csv"
+clave_mor <- read_csv(path) |>
+  janitor::clean_names() |>
+  distinct(seccion,
+           nombre_distritol_22 = cabecera_distrital_local,
+           distritol_22 = id_distrito_local,
+           nombre_municipio_22 = municipio,
+           municipio_22 = id_municipio) |>
+  mutate(seccion = sprintf("17_%04s", seccion),
+         distritol_22 = sprintf("17_%02s", distritol_22),
+         nombre_distritol_22 = paste(gsub("17_", "", distritol_22), nombre_distritol_22),
+         municipio_22 = sprintf("17_%03s", municipio_22)) |>
+  left_join(df)
+
 claves <- claves |>
-  bind_rows(clave_cdmx) |>
-  bind_rows(clave_chis) |>
-  bind_rows(clave_mex)
+  bind_rows(clave_mor)
+#   bind_rows(clave_cdmx) |>
+#   bind_rows(clave_chis) |>
+#   bind_rows(clave_mex)
 
 usethis::use_data(claves, overwrite = TRUE)

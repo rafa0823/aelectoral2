@@ -351,9 +351,16 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                  aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
                                                  aux <- colorear_indice(aux, c_principal = .y, var = .x)
                                                  aux <- crear_quantiles(aux, .x)
+                                                 aux  # return the successfully processed result
+                                               },
+                                               error = function(e) {
+                                                 warning(sprintf("Error in processing %s with color %s: %s", .x, .y, e$message))
+                                                 NULL  # return NULL or some other indication of the error
                                                }
                                              )
                                            })
+
+                                         ind <- Filter(function(x) !is.null(x), ind)
 
                                          self[[base]] <- self[[base]] |>
                                            left_join(reduce(ind, left_join, by = self$nivel[length(self$nivel)]),
@@ -427,7 +434,7 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                   aux <- aux |>
                                     left_join(claves |>
                                                 select(contains("distritol")) |>
-                                                         distinct(),
+                                                distinct(),
                                               join_by(distritol_22)) |>
                                     left_join(claves |>
                                                 select(contains("distritof")) |>
@@ -486,10 +493,14 @@ Tablero <- R6::R6Class("Tablero",
                        public = list(
                          info = NULL,
                          nombres_elecciones = NA,
+                         graficas = NA,
+                         aux = NA,
                          initialize = function(info_seccion){
                            self$info <- info_seccion$clone()
 
                            self$reiniciar_info()
+
+                           self$graficas <- Graficas$new(self)
                          },
                          agregar_eleccion = function(elecciones, nivel, bd_relacion, shp){
                            self$info$bd <- self$info$bd |>
@@ -572,6 +583,86 @@ Tablero <- R6::R6Class("Tablero",
 
                                names(self$info$colores)[names(self$info$colores) == "total"] <- "participacion"
                              })
+                         },
+                         fitrar = function(nivel = "municipio_22", unidad = NULL){
+                          shp <- self$info$shp[[nivel]]
+                          shp_secc <- self$info$shp[["seccion"]]
+                          general <- self$info$bd
+
+                          if(!is.null(unidad)){
+                            shp <- shp |>
+                              filter(.data[[nivel]] == unidad)
+                            shp_secc <- shp_secc |>
+                              filter(.data[[nivel]] == unidad)
+                            general <- general |>
+                              filter(seccion %in% shp_secc$seccion)
+                          }
+
+                          self$aux <- list(shp_secc = shp_secc, shp = shp, general = general)
+
                          }
                        )
 )
+
+Graficas <-  R6::R6Class("Graficas",
+                         public = list(
+                           tab = NULL,
+                           initialize = function(tablero){
+                             self$tab = tablero
+                           },
+                           mapa = function(seccion, fill, linewidth = 0.6, labels = F){
+                             nivel = if_else(seccion == T, "shp_secc", "shp")
+                             mapa <- crear_mapa(self$tab$aux[[nivel]], glue::glue("col_{fill}"), linewidth = linewidth)
+                             if(labels == T){
+                               var <- names(self$tab$aux[[nivel]])[grepl("nombre", names(self$tab$aux[[nivel]]))]
+                               mapa <- mapa +
+                                 ggsflabel::geom_sf_label_repel(data = self$tab$aux[[nivel]], aes(label = .data[[var]]))
+                             }
+                               return(mapa)
+                           },
+                           secciones_ganadas = function(bd = self$tab$aux$shp_secc, eleccion, eje_x = "", eje_y = ""){
+                             procesar_secciones_ganadas(bd, eleccion) |>
+                               graficar_barras(x = "ganador", y = "pct", fill = "ganador", label = "label", colores = self$tab$info$colores,
+                                               eje_x = eje_x, eje_y = eje_y)
+                           },
+                           voto_relativo = function(partido = self$tab$info$partidos, eleccion, eje_x = "", eje_y = ""){
+                             obtener_absolutos(self$tab$aux$shp, eleccion) |>
+                               tidyr::pivot_longer(cols = everything()) |>
+                               mutate(name = gsub(glue::glue('ele|_|{eleccion}'), "", name)) |>
+                               calcular_relativos(partidos = partidos, nominal = nominal(bd = self$tab$aux$general, eleccion)) |>
+                               graficar_barras(x = "name", y = "pct", fill = "name",
+                                               label = "label", colores = self$tab$info$colores,
+                                               eje_x = eje_x, eje_y = eje_y)
+                           },
+                           distribucion_participacion = function(eleccion, eje_x = "", eje_y = ""){
+                             self$tab$aux$shp |>
+                               as_tibble() |>
+                               filter(!is.na(.data[[glue::glue("ganador_{eleccion}")]])) |>
+                               graficar_violin(x = glue::glue("ganador_{eleccion}"),
+                                               y = glue::glue("pct_participacion_{eleccion}"), fill = glue::glue("ganador_{eleccion}"),
+                                               colores = self$tab$info$colores, eje_x = eje_x, eje_y = eje_y)
+                           },
+                           sankey = function(bd = self$tab$aux$shp_secc, elecciones = self$tab$nombres_elecciones$eleccion){
+                             procesar_sankey(bd = bd, elecciones = elecciones) |>
+                               ejecutar_sankey(colores = self$tab$info$colores)
+                           },
+                           pointrange = function(indice, variables){
+                             if(variables == "partidos"){
+                              procesar_pointrange(bd = self$tab$aux$shp, indice = indice,
+                                                   partidos = self$tab$info$partidos, partido = T) |>
+                                 graficar_pointrange(eje_x = indice,grupo = variables,
+                                                     indice = indice, colores = self$tab$info$colores)
+
+                             } else if (variables == "eleccion"){
+                               procesar_pointrange(bd = self$tab$aux$shp, indice = indice,
+                                                          partidos = self$tab$info$partidos,
+                                                          elecciones = self$tab$nombres_elecciones$eleccion,
+                                                          partido = F
+                                                          ) |>
+                                 graficar_pointrange(eje_x = indice, grupo = variables,
+                                                     indice = indice, colores = self$tab$nombres_elecciones$color)
+
+                             }
+                           }
+                         ))
+

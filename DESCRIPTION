@@ -21,6 +21,7 @@ Imports:
     forcats,
     ggplot2,
     ggrepel,
+    ggsflabel,
     glue,
     grDevices,
     infer,

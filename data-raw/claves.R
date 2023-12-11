@@ -90,10 +90,28 @@ clave_mor <- read_csv(path) |>
          municipio_22 = sprintf("17_%03s", municipio_22)) |>
   left_join(df)
 
-claves <- claves |>
-  bind_rows(clave_mor)
 #   bind_rows(clave_cdmx) |>
 #   bind_rows(clave_chis) |>
 #   bind_rows(clave_mex)
+
+# Puebla ------------------------------------------------------------------
+
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/PUE/AYUNTAMIENTOS_csv/2021_SEE_AYUN_PUE_CAS.csv"
+
+clave_pue <- read_csv(path) |>
+  janitor::clean_names() |>
+  distinct(seccion,
+           nombre_distritol_22 = cabecera_distrital_local,
+           distritol_22 = id_distrito_local,
+           nombre_municipio_22 = municipio,
+           municipio_22 = id_municipio) |>
+  mutate(seccion = sprintf("21_%04s", seccion),
+         distritol_22 = sprintf("21_%02s", distritol_22),
+         nombre_distritol_22 = paste(gsub("21_", "", distritol_22), nombre_distritol_22),
+         municipio_22 = sprintf("21_%03s", municipio_22)) |>
+  left_join(df)
+
+claves <- claves |>
+  bind_rows(clave_pue)
 
 usethis::use_data(claves, overwrite = TRUE)

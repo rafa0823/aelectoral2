@@ -113,4 +113,37 @@ relacion_ine_inegi <- bind_rows(censo_cdmx, censo_jal, censo_mex, censo_mor) |>
   mutate(municipio_21 = paste(entidad, municipio_21, sep = "_")) |>
   rename(municipio_22 = municipio_21)
 
+# Modificar Censo Puebla --------------------------------------------------
+
+pue <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "pue", llaves = "municipio_21")
+pue_mun <- pue$todas[["pm_21"]] |>
+  distinct(municipio_21, nombre_municipio_21)
+
+
+censo_pue <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(entidad =="21", !is.na(longitud)) |>
+  mutate(nom_mun = stringi::stri_trans_general(toupper(nom_mun), id = 'latin-ascii')
+  )
+
+# Revisar que los nombres coincidan_CDMX ---------------------------------------
+
+v7 <- unique(censo_pue$nom_mun)
+v8 <- pue_mun$nombre_municipio_21
+
+setdiff(v7, v8)
+setdiff(v8, v7)
+
+# Sobreescribir_mor -----------------------------------------------------------
+censo_pue <- censo_pue |>
+  mutate(nom_mun = case_when(nom_mun == "CANADA MORELOS" ~ "CAÑADA MORELOS",
+                             nom_mun == "SAN ANTONIO CANADA" ~ "SAN ANTONIO CAÑADA",
+                             T ~ nom_mun)) |>
+  left_join(pue_mun, join_by(nom_mun == nombre_municipio_21)) |>
+  mutate(municipio_22 = paste(entidad, gsub("21_", "", municipio_21), sep = "_")) |>
+  distinct(entidad, mun, municipio_22)
+
+relacion_ine_inegi <- bind_rows(relacion_ine_inegi, censo_pue)
+
+
 usethis::use_data(relacion_ine_inegi, overwrite = T)

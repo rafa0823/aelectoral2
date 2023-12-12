@@ -584,7 +584,7 @@ Tablero <- R6::R6Class("Tablero",
                                names(self$info$colores)[names(self$info$colores) == "total"] <- "participacion"
                              })
                          },
-                         fitrar = function(nivel = "municipio_22", unidad = NULL){
+                         filtrar = function(nivel = "municipio_22", unidad = NULL){
                           shp <- self$info$shp[[nivel]]
                           shp_secc <- self$info$shp[["seccion"]]
                           general <- self$info$bd
@@ -663,6 +663,17 @@ Graficas <-  R6::R6Class("Graficas",
                                                      indice = indice, colores = self$tab$nombres_elecciones$color)
 
                              }
+                           },
+                           tiles = function(y, low = "#118ab2", high = "#ef476f"){
+                             graficar_tiles(bd = self$tab$aux$shp_secc,
+                                            x = "quant_participacion",
+                                            y = glue::glue("quant_{y}"),
+                                            low = low,
+                                            high = high,
+                                            name = "Coincidencias",
+                                            eje_x = "Índice de participación",
+                                            eje_y = glue::glue("Índice {y}")
+                                            )
                            }
                          ))
 

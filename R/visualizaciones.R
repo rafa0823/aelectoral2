@@ -138,3 +138,36 @@ graficar_pointrange <- function(bd, eje_x, grupo, colores, indice, texto = 12) {
     ) +
     theme_minimal(base_size = texto)
 }
+
+graficar_tiles <- function(bd, x, y, low, high, name, eje_x, eje_y, size = 12){
+  bd <- bd |>
+    as_tibble() |>
+    count(var1 = .data[[x]], var2 = .data[[y]]) |>
+    na.omit()
+
+  ggplot(bd, aes(x = var1, y = var2, fill = n)) +
+    geom_tile(color = "white", lwd = 1.5) +
+    scale_fill_gradient2(low = low, mid = "white", high = high, midpoint = mean(bd$n),
+                         name = name, na.value = "gray33") +
+    guides(
+      fill = guide_colorbar(
+        barwidth = unit(5, 'cm'),
+        barheight = unit(0.25, 'cm'),
+        title.position = 'top'
+      )
+    ) +
+    labs(x = eje_x,
+         y = eje_y,
+         title = "",
+         subtitle = "") +
+    theme_minimal(base_size = size) +
+    theme(panel.grid = element_blank(),
+          plot.title.position = 'plot',
+          plot.subtitle = element_text(
+            margin = margin(b = 0.5, unit = 'cm')
+          ),
+          legend.position = c(0.37, 1.3),
+          legend.direction = 'horizontal') +
+    coord_cartesian(expand = FALSE)
+}
+

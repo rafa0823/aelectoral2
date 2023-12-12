@@ -145,5 +145,60 @@ censo_pue <- censo_pue |>
 
 relacion_ine_inegi <- bind_rows(relacion_ine_inegi, censo_pue)
 
+# Modificar Censo Tabasco --------------------------------------------------
+
+tab <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "tab", llaves = "municipio_21")
+tab_mun <- tab$todas[["pm_21"]] |>
+  distinct(municipio_21, nombre_municipio_21)
+
+censo_tab <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(entidad == "27", !is.na(longitud)) |>
+  mutate(nom_mun = stringi::stri_trans_general(toupper(nom_mun), id = 'latin-ascii')
+  )
+
+# Revisar que los nombres coincidan_CDMX ---------------------------------------
+
+v7 <- unique(censo_tab$nom_mun)
+v8 <- tab_mun$nombre_municipio_21
+
+setdiff(v7, v8)
+setdiff(v8, v7)
+
+# Sobreescribir_mor -----------------------------------------------------------
+censo_tab <- censo_tab |>
+  left_join(tab_mun, join_by(nom_mun == nombre_municipio_21)) |>
+  mutate(municipio_22 = paste(entidad, gsub("27_", "", municipio_21), sep = "_")) |>
+  distinct(entidad, mun, municipio_22)
+
+relacion_ine_inegi <- bind_rows(relacion_ine_inegi, censo_tab)
+
+# Censo Yucatán -----------------------------------------------------------
+bd <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "yuc", llaves = "municipio_21")
+bd_mun <- bd$todas[["pm_21"]] |>
+  distinct(municipio_21, nombre_municipio_21)
+
+censo <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(entidad == "31", !is.na(longitud)) |>
+  mutate(nom_mun = stringi::stri_trans_general(toupper(nom_mun), id = 'latin-ascii')
+  )
+
+# Revisar que los nombres coincidan_CDMX ---------------------------------------
+
+v7 <- unique(censo$nom_mun)
+v8 <- bd_mun$nombre_municipio_21
+
+setdiff(v7, v8)
+setdiff(v8, v7)
+
+# Sobreescribir_mor -----------------------------------------------------------
+censo <- censo |>
+  left_join(bd_mun, join_by(nom_mun == nombre_municipio_21)) |>
+  mutate(municipio_22 = paste(entidad, gsub("31_", "", municipio_21), sep = "_")) |>
+  distinct(entidad, mun, municipio_22)
+
+relacion_ine_inegi <- bind_rows(relacion_ine_inegi, censo)
+
 
 usethis::use_data(relacion_ine_inegi, overwrite = T)

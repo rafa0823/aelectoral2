@@ -95,7 +95,6 @@ clave_mor <- read_csv(path) |>
 #   bind_rows(clave_mex)
 
 # Puebla ------------------------------------------------------------------
-
 path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/PUE/AYUNTAMIENTOS_csv/2021_SEE_AYUN_PUE_CAS.csv"
 
 clave_pue <- read_csv(path) |>
@@ -111,7 +110,46 @@ clave_pue <- read_csv(path) |>
          municipio_22 = sprintf("21_%03s", municipio_22)) |>
   left_join(df)
 
+# TABASCO -----------------------------------------------------------------
+
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/TAB/TAB_PEL_2021/AYUNTAMIENTOS_csv/2021_SEE_AYUN_TAB_CAS.csv"
+
+clave_tab <- read_csv(path) |>
+  janitor::clean_names() |>
+  distinct(seccion,
+           nombre_distritol_22 = cabecera_distrital_local,
+           distritol_22 = id_distrito_local,
+           nombre_municipio_22 = municipio,
+           municipio_22 = id_municipio) |>
+  mutate(seccion = sprintf("27_%04s", seccion),
+         distritol_22 = sprintf("27_%02s", distritol_22),
+         nombre_distritol_22 = paste(gsub("27_", "", distritol_22), nombre_distritol_22),
+         municipio_22 = sprintf("27_%03s", municipio_22)) |>
+  left_join(df)
+
+
 claves <- claves |>
-  bind_rows(clave_pue)
+  bind_rows(clave_tab)
+
+
+# Yucatán -----------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/YUC/YUC_PEL_2021/AYUNTAMIENTOS_csv/2021_SEE_AYUN_YUC_CAS.csv"
+
+clave_yuc <- read_csv(path) |>
+  janitor::clean_names() |>
+  distinct(seccion,
+           nombre_distritol_22 = cabecera_distrital_local,
+           distritol_22 = id_distrito_local,
+           nombre_municipio_22 = municipio,
+           municipio_22 = id_municipio) |>
+  mutate(seccion = sprintf("31_%04s", seccion),
+         distritol_22 = sprintf("31_%02s", distritol_22),
+         nombre_distritol_22 = paste(gsub("31_", "", distritol_22), nombre_distritol_22),
+         municipio_22 = sprintf("31_%03s", municipio_22)) |>
+  left_join(df)
+
+
+claves <- claves |>
+  bind_rows(clave_yuc)
 
 usethis::use_data(claves, overwrite = TRUE)

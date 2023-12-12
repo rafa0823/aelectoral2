@@ -443,7 +443,10 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                     left_join(claves |>
                                                 select(contains("municipio")) |>
                                                 distinct(),
-                                              join_by(municipio_22))
+                                              join_by(municipio_22)) |>
+                                    mutate(nombre_distritol_22 = if_else(is.na(nombre_distritol_22), distritol_22, nombre_distritol_22),
+                                           nombre_distritof_22 = if_else(is.na(nombre_distritof_22), distritof_22, nombre_distritof_22),
+                                           nombre_municipio_22 = if_else(is.na(nombre_municipio_22), municipio_22, nombre_municipio_22))
                                 }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
@@ -585,20 +588,20 @@ Tablero <- R6::R6Class("Tablero",
                              })
                          },
                          filtrar = function(nivel = "municipio_22", unidad = NULL){
-                          shp <- self$info$shp[[nivel]]
-                          shp_secc <- self$info$shp[["seccion"]]
-                          general <- self$info$bd
+                           shp <- self$info$shp[[nivel]]
+                           shp_secc <- self$info$shp[["seccion"]]
+                           general <- self$info$bd
 
-                          if(!is.null(unidad)){
-                            shp <- shp |>
-                              filter(.data[[nivel]] == unidad)
-                            shp_secc <- shp_secc |>
-                              filter(.data[[nivel]] == unidad)
-                            general <- general |>
-                              filter(seccion %in% shp_secc$seccion)
-                          }
+                           if(!is.null(unidad)){
+                             shp <- shp |>
+                               filter(.data[[nivel]] == unidad)
+                             shp_secc <- shp_secc |>
+                               filter(.data[[nivel]] == unidad)
+                             general <- general |>
+                               filter(seccion %in% shp_secc$seccion)
+                           }
 
-                          self$aux <- list(shp_secc = shp_secc, shp = shp, general = general)
+                           self$aux <- list(shp_secc = shp_secc, shp = shp, general = general)
 
                          }
                        )
@@ -618,7 +621,7 @@ Graficas <-  R6::R6Class("Graficas",
                                mapa <- mapa +
                                  ggsflabel::geom_sf_label_repel(data = self$tab$aux[[nivel]], aes(label = .data[[var]]))
                              }
-                               return(mapa)
+                             return(mapa)
                            },
                            secciones_ganadas = function(bd = self$tab$aux$shp_secc, eleccion, eje_x = "", eje_y = ""){
                              procesar_secciones_ganadas(bd, eleccion) |>
@@ -648,17 +651,17 @@ Graficas <-  R6::R6Class("Graficas",
                            },
                            pointrange = function(indice, variables){
                              if(variables == "partidos"){
-                              procesar_pointrange(bd = self$tab$aux$shp, indice = indice,
+                               procesar_pointrange(bd = self$tab$aux$shp, indice = indice,
                                                    partidos = self$tab$info$partidos, partido = T) |>
                                  graficar_pointrange(eje_x = indice,grupo = variables,
                                                      indice = indice, colores = self$tab$info$colores)
 
                              } else if (variables == "eleccion"){
                                procesar_pointrange(bd = self$tab$aux$shp, indice = indice,
-                                                          partidos = self$tab$info$partidos,
-                                                          elecciones = self$tab$nombres_elecciones$eleccion,
-                                                          partido = F
-                                                          ) |>
+                                                   partidos = self$tab$info$partidos,
+                                                   elecciones = self$tab$nombres_elecciones$eleccion,
+                                                   partido = F
+                               ) |>
                                  graficar_pointrange(eje_x = indice, grupo = variables,
                                                      indice = indice, colores = self$tab$nombres_elecciones$color)
 
@@ -673,7 +676,7 @@ Graficas <-  R6::R6Class("Graficas",
                                             name = "Coincidencias",
                                             eje_x = "Índice de participación",
                                             eje_y = glue::glue("Índice {y}")
-                                            )
+                             )
                            }
                          ))
 

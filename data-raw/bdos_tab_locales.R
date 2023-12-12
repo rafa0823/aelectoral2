@@ -43,9 +43,9 @@ aux <- read_csv(path) |>
   rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
   # rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   homologar_bd(estado = "27", "TABASCO") |>
-  mutate(distritol_18 = sprintf("27_%02s", distritol_18),
-         municipio_18 = sprintf("27_%03s", municipio_18),
-         seccion = sprintf("27_%04s", seccion)) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 
@@ -74,9 +74,9 @@ aux <- read_csv(path) |>
   rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
   rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   homologar_bd(estado = "27", "TABASCO") |>
-  mutate(distritol_18 = sprintf("27_%02s", distritol_18),
-         municipio_18 = sprintf("27_%03s", municipio_18),
-         seccion = sprintf("27_%04s", seccion)) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 
@@ -105,9 +105,9 @@ aux <- read_csv(path) |>
   rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
   rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   homologar_bd(estado = "27", "TABASCO") |>
-  mutate(distritol_18 = sprintf("27_%02s", distritol_18),
-         municipio_18 = sprintf("27_%03s", municipio_18),
-         seccion = sprintf("27_%04s", seccion)) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 
@@ -141,9 +141,9 @@ aux <- read_csv(path) |>
   rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
   # rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   homologar_bd(estado = "27", "TABASCO") |>
-  mutate(distritol_21 = sprintf("27_%02s", distritol_21),
-         municipio_21 = sprintf("27_%03s", municipio_21),
-         seccion = sprintf("27_%04s", seccion)) |>
+  mutate(distritol_21 = sprintf("%02s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_21:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 
@@ -177,9 +177,9 @@ aux <- read_csv(path) |>
   rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
   # rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   homologar_bd(estado = "27", "TABASCO") |>
-  mutate(distritol_21 = sprintf("27_%02s", distritol_21),
-         municipio_21 = sprintf("27_%03s", municipio_21),
-         seccion = sprintf("27_%04s", seccion)) |>
+  mutate(distritol_21 = sprintf("%02s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_21:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 

@@ -46,9 +46,9 @@ aux <- read_csv(path) |>
   rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
   homologar_bd(estado = id_estado, nombre_estado = ) |>
-  mutate(distritol_18 = sprintf(glue::glue("{id_estado}_%02s"), distritol_18),
-         municipio_18 = sprintf(glue::glue("{id_estado}_%03s"), municipio_18),
-         seccion = sprintf(glue::glue("{id_estado}_%04s"), seccion)) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 
@@ -81,9 +81,9 @@ aux <- read_csv(path) |>
   rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
   homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>
-  mutate(distritol_18 = sprintf(glue::glue("{id_estado}_%02s"), distritol_18),
-         municipio_18 = sprintf(glue::glue("{id_estado}_%03s"), municipio_18),
-         seccion = sprintf(glue::glue("{id_estado}_%04s"), seccion)) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 
@@ -116,9 +116,9 @@ aux <- read_csv(path) |>
   rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
   rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
   homologar_bd(estado = id_estado, nombre_estado = ) |>
-  mutate(distritol_18 = sprintf(glue::glue("{id_estado}_%02s"), distritol_18),
-         municipio_18 = sprintf(glue::glue("{id_estado}_%03s"), municipio_18),
-         seccion = sprintf(glue::glue("{id_estado}_%04s"), seccion)) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 
@@ -151,9 +151,9 @@ aux <- read_csv(path) |>
   rename_with(~gsub("_nay_", "_panal_", .x), contains("_nay_")) |>
   # rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
   homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>
-  mutate(distritol_21 = sprintf(glue::glue("{id_estado}_%02s"), distritol_21),
-         municipio_21 = sprintf(glue::glue("{id_estado}_%03s"), municipio_21),
-         seccion = sprintf(glue::glue("{id_estado}_%04s"), seccion)) |>
+  mutate(distritol_21 = sprintf("%02s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_21:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion) |>
   mutate(ele_prd_panal_pm_21 = ele_prd_panal_pm_21 + ele_prd_panal_2_pm_21) |>
@@ -189,9 +189,9 @@ aux <- read_csv(path) |>
   rename_with(~gsub("_nay_", "_panal_", .x), contains("_nay_")) |>
   # rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
   homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>
-  mutate(distritol_21 = sprintf(glue::glue("{id_estado}_%02s"), distritol_21),
-         municipio_21 = sprintf(glue::glue("{id_estado}_%03s"), municipio_21),
-         seccion = sprintf(glue::glue("{id_estado}_%04s"), seccion)) |>
+  mutate(distritol_21 = sprintf("%02s", distritol_21),
+         municipio_21 = sprintf("%03s", municipio_21),
+         seccion = sprintf("%04s", seccion)) |>
   select(estado, nombre_estado, distritol_21:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion)
 

@@ -38,11 +38,6 @@ Electoral <- R6::R6Class("Electoral",
                                        #' @param partidos Aquellos partidos para los cuales se van a realizar todas las operaciones de aelectoral en las que acote el número de partidos.
                                        #' @return Un data frame con la elección seleccionada
                                        #' @export
-                                       #' @examples
-                                       #' bd <- Electoral$new("df_21", entidad = "dgo",
-                                       #' llaves = c("seccion", "distritof", "distritol", "municipio"),
-                                       #' extranjero = T, especial = "repartir")
-
                                        initialize = function(eleccion,
                                                              entidad,
                                                              nivel = "seccion",
@@ -106,7 +101,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
                                        #'
                                        #' @return La lista de coaliciones que hubieron en la elección señalada.
-                                       #' @examples
                                        coalicion = function(eleccion){
                                          if(!eleccion %in% names(self$todas)) stop("Favor de agregar la elección primero con el método agregar_bd")
 
@@ -123,7 +117,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
                                        #'
                                        #' @return Elección con los votos repartidos por alianza
-                                       #' @examples
                                        partido = function(eleccion){
                                          aux_c <- self$bd %>% repartir_coalicion(nivel = self$nivel[length(self$nivel)], eleccion = eleccion)
 
@@ -144,7 +137,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
                                        #'
                                        #' @return Una base datos con los votos repartidos por candidato.
-                                       #' @examples
                                        candidato = function(alianzas, eleccion){
                                          aux_c <- repartir_candidato(bd = self$bd_partido[[eleccion]],
                                                                      alianzas, self$nivel[length(self$nivel)], eleccion)
@@ -159,9 +151,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
                                        #'
                                        #' @return Tibble de la base de datos con la nueva elección resumidas por sección
-                                       #' @examples
-                                       #'  bd$agregar_bd(eleccion = "pm_21", extraordinaria = c(eleccion = "pmext_21", entidad = "mex"))
-
                                        agregar_bd = function(eleccion){
 
                                          add <- leer_base(eleccion = eleccion,
@@ -194,8 +183,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param by variable por la que se une las bds
                                        #'
                                        #' @return
-                                       #' @examples
-                                       #' bd %>%  agregar_manual(df_21, "seccion")
                                        agregar_manual = function(bd, by){
                                          self$bd <- self$bd %>% full_join(
                                            bd, by = by
@@ -208,7 +195,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' @param accion se puede dejar como están, repartir o eliminar
                                        #'
                                        #' @return Tibble de la bd
-                                       #' @examples
                                        accion_especiales = function(bd, accion){
                                          if(!is.null(accion)){
                                            if(accion == "eliminar"){
@@ -371,7 +357,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            analisis = "obtener_indice_completo",
                                                            parametros = list(list(base = base)))
                                        },
-                                       añadir_leyenda = function(base){
+                                       anadir_leyenda = function(base){
                                          self[[base]] <- self[[base]] |>
                                            left_join(crear_label(self[[base]], nivel = self$nivel), by = self$nivel)
                                        },

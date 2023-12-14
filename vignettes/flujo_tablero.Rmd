@@ -14,10 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-
-```
-
 ## Creación de clase Electoral con los objetos requeridos
 ```{r}
 elecciones <- c("gb_18", "pm_18", "dl_18", "df_18", "dl_21", "df_21")

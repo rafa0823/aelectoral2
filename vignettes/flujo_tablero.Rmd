@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 ## Creación de clase Electoral con los objetos requeridos
 ```{r}
+devtools::load_all()
+
 elecciones <- c("gb_18", "pm_18", "dl_18", "df_18", "dl_21", "df_21")
 partidos <- c("morena", "pan", "pri", "mc", "prd", "pvem", "pt", "total")
 

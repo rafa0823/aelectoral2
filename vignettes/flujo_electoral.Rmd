@@ -30,6 +30,7 @@ partidos <- c("morena", "pan", "pri", "mc", "prd", "total")
 Dada la nueva configuración de aelectoral2 crear una clase requiere que se tenga claridad de cuáles son los partidos 
 para los que se desea el análisis. Sin embargo, en primera instancia no es necesario incluirlo. 
 ```{r}
+devtools::load_all()
 # Obtención de columnas relevantes para una elección
 bd <- Electoral$new("gb_18", entidad = "cdmx", partidos = partidos)
 bd$partido("gb_18")

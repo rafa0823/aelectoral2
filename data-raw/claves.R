@@ -1,11 +1,54 @@
 ## code to prepare `claves` dataset goes here
 library(readr)
 library(dplyr)
+
+path <- "~/Google Drive/Mi unidad/claves_distritos.xlsx"
+claves <- readxl::read_excel(path) |>
+  mutate(entidad = sprintf("%02s", entidad),
+         across(where(is.numeric), ~paste(entidad, sprintf("%02s", .x), sep = "_")),
+         nombre_distritol_22 = paste(stringr::str_sub(distritol_22, 4,5), nombre_distritol_22),
+         nombre_distritof_22 = paste(stringr::str_sub(distritof_22, 4,5), nombre_distritof_22))
+
+usethis::use_data(claves, overwrite = T)
+
+# Municipios -----------------------------------------------------------------
+claves_mun <- tibble(municipio_22 = NA, nombre_municipio_22 = NA)
+claves_mun <- diccionario$abreviatura |>
+  purrr::map(~{
+    shp <- ElectoralSHP$new(unidad = "mun_22", entidad =  .x)
+    mun <- shp$shp[[1]] |>
+      as_tibble() |>
+      select(contains("municipio"))
+
+    return(mun)
+  })
+
+claves_mun <- claves_mun |>
+  reduce(bind_rows)
+
+usethis::use_data(claves_mun)
+# Juntar municipios y distritos -------------------------------------------
+
+claves <- bind_cols(claves, claves_mun)
+
+
+
+
+
+
+
+
+
+
+
+
 df <- read_rds("inst/electoral/nacional/df_21.rda") |>
   as_tibble() |>
   transmute(seccion = paste(estado, seccion, sep = "_"),
             nombre_distritof_22 = paste(distritof, nombre_distritof),
             distritof_22 = paste(estado, sprintf("%02s", distritof), sep = "_"))
+
+
 
 
 # clave Jalisco -----------------------------------------------------------
@@ -130,6 +173,25 @@ clave_tab <- read_csv(path) |>
 
 claves <- claves |>
   bind_rows(clave_tab)
+
+# Corrección nombres dl ---------------------------------------------------
+
+tabasco_correg <- tibble(
+  entidad = "27",
+  distritol_22 = sprintf("%02s", c(1:21)),
+  nombre_distritol_22 = c("HUIMANGUILLO", "CARDENAS", "CARDENAS", "CENTLA", rep("CENTRO", 6),
+                          "COMACALCO", "COMACALCO", "CUNDUACAN", "MACUSPANA", "HUIMANGUILLO",
+                          "MACUSPANA", "JALAPA DE MENDEZ", "NACAJUCA", "PARAISO", "TEAPA",
+                          "TENOSIQUE"),
+  distritof_22 = c(""),
+  nombre_distritof_22 = c("")
+)
+
+claves |>
+  left_join(tabasco_correg, join_by(distritol_22)) |>
+  mutate(nombre_distritol_22 = if_else(!is.na(temp), temp, nombre_distritol_22)) |>
+  select(-temp) |>
+  filter(distritol_22 == "27_18")
 
 
 # Yucatán -----------------------------------------------------------------

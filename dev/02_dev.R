@@ -18,8 +18,11 @@ usethis::use_data_raw("bdos_mor_auxiliares")
 usethis::use_data_raw("bdos_ver_locales")
 usethis::use_data_raw("bdos_ver_auxiliares")
 usethis::use_data_raw("bdos_jal_locales")
+<<<<<<< HEAD
 usethis::use_data_raw("bdos_tab_locales")
 usethis::use_data_raw("bdos_yuc_locales")
+=======
+>>>>>>> origin/master
 usethis::use_data_raw("bdos_jal_auxiliares")
 usethis::use_data_raw("resultados")
 usethis::use_data_raw("paleta")

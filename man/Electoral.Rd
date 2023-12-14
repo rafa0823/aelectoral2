@@ -412,6 +412,15 @@ Los colores nombrados tienen que estar ligados a todos los partidos ganadores de
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Electoral-obtener_nombres_elecciones"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-obtener_nombres_elecciones}{}}}
+\subsection{Method \code{obtener_nombres_elecciones()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$obtener_nombres_elecciones(base)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Electoral-calcular_irs"></a>}}
 \if{latex}{\out{\hypertarget{method-Electoral-calcular_irs}{}}}
 \subsection{Method \code{calcular_irs()}}{

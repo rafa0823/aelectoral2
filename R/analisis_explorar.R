@@ -393,7 +393,6 @@ crear_indice <- function(bd, partido, nivel){
       return(as_tibble(bd_partido))
 }
 
-
 #' @title Creación de paletas para índice
 #' @description
 #' Añade una nueva columna a la base de datos. Recibe una variable de tipo índice, calcula el color complementario

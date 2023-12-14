@@ -264,7 +264,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            analisis = "voto_relativo",
                                                            parametros = list(list(base = base,
                                                                                   eleccion = eleccion)))
-
                                        },
                                        #' @description Calcula el partido ganador por nivel entre los partidos disponibles
                                        #' @param base Es la base de datos que será modificada
@@ -497,9 +496,7 @@ Tablero <- R6::R6Class("Tablero",
                          aux = NA,
                          initialize = function(info_seccion){
                            self$info <- info_seccion$clone()
-
                            self$reiniciar_info()
-
                            self$graficas <- Graficas$new(self)
                          },
                          agregar_eleccion = function(elecciones, nivel, bd_relacion, shp){
@@ -676,4 +673,3 @@ Graficas <-  R6::R6Class("Graficas",
                              )
                            }
                          ))
-

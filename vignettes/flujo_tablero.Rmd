@@ -75,5 +75,5 @@ tablero$agregar_eleccion(elecciones = c("pm_21", elecciones),
 tablero$obtener_nombres_elecciones()
 
 tablero$cambiar_nombre_participacion()
-
 ```
+

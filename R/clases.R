@@ -434,19 +434,16 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                   aux <- aux |>
                                     left_join(claves |>
                                                 select(contains("distritol")) |>
-                                                distinct(),
+                                                na.omit(),
                                               join_by(distritol_22)) |>
                                     left_join(claves |>
                                                 select(contains("distritof")) |>
-                                                distinct(),
+                                                na.omit(),
                                               join_by(distritof_22)) |>
-                                    left_join(claves |>
-                                                select(contains("municipio")) |>
-                                                distinct(),
-                                              join_by(municipio_22)) |>
-                                    mutate(nombre_distritol_22 = if_else(is.na(nombre_distritol_22), distritol_22, nombre_distritol_22),
-                                           nombre_distritof_22 = if_else(is.na(nombre_distritof_22), distritof_22, nombre_distritof_22),
-                                           nombre_municipio_22 = if_else(is.na(nombre_municipio_22), municipio_22, nombre_municipio_22))
+                                    left_join(claves_mun, join_by(municipio_22)) #|>
+                                    # mutate(nombre_distritol_22 = if_else(is.na(nombre_distritol_22), distritol_22, nombre_distritol_22),
+                                    #        nombre_distritof_22 = if_else(is.na(nombre_distritof_22), distritof_22, nombre_distritof_22),
+                                    #        nombre_municipio_22 = if_else(is.na(nombre_municipio_22), municipio_22, nombre_municipio_22))
                                 }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
@@ -460,13 +457,13 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                   aux <- aux |>
                                     left_join(claves |>
                                                 select(contains("distritol_22")) |>
-                                                distinct(),
+                                                na.omit(),
                                               join_by("distritol_22"))
                                 } else if(unidad == "df_22"){
                                   aux <- aux |>
                                     left_join(claves |>
                                                 select(contains("distritof_22")) |>
-                                                distinct(),
+                                                na.omit(),
                                               join_by("distritof_22"))
                                 }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))

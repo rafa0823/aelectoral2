@@ -237,7 +237,7 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
     pivot_longer(cols = matches(cross(list(partido, eleccion)) %>%
                                   map_chr(.f = ~.x %>% unlist() %>% paste(collapse="_")) %>%
                                   paste("ele",., sep="_")),
-                 names_to = c("partido","eleccion", "año"),
+                 names_to = c("partido","eleccion", "ano"),
                  values_to =  "votos",
                  names_prefix = "ele_",
                  names_sep = "_"
@@ -245,7 +245,7 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
   valor_referencia <- max(bd$votos, na.rm = T)
   bd <- degradar_color_partido(bd, nombre=partido, variable = votos, colores_nombrados = colores_nombrados,valor_maximo = valor_referencia)
   res <- bd %>%
-    split(list(.$partido,.$eleccion, .$año)) %>%
+    split(list(.$partido,.$eleccion, .$ano)) %>%
     map(~{
       bd <- left_join(shp,
                       .x,by="seccion") %>%
@@ -254,7 +254,7 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
       ggplot() +
         geom_sf(data=bd, aes(fill=color), size=0) +
         scale_fill_identity() +
-        labs( title = glue::glue("{toupper(unique(bd$eleccion))} 20{unique(bd$año)}"))
+        labs( title = glue::glue("{toupper(unique(bd$eleccion))} 20{unique(bd$ano)}"))
 
     })
 
@@ -283,10 +283,10 @@ graficar_totales_eleccion <- function (bd, colores_nombrados, eleccion, grupo = 
 
   bd <- bd %>% pivot_longer(cols = starts_with("ele"),
                             names_to = c("partido",
-                                         "eleccion", "año"), names_prefix = "ele_", names_sep = "_",
+                                         "eleccion", "ano"), names_prefix = "ele_", names_sep = "_",
                             values_to = "resultado") %>%
     mutate(eleccion = toupper(eleccion),
-           eleccion = paste(eleccion, año, sep = " "),
+           eleccion = paste(eleccion, ano, sep = " "),
            eleccion = forcats::fct_relevel(eleccion,
                                            c("GB 17", "DF 18", "DL 18", "PM 18", "PR 18", "DF 21",
                                              "DL 21", "PM 21"))

@@ -46,7 +46,7 @@ bd$colapsar_base("bd_partido", filtro = shp$shp$secc_22_jal |>
 bd$obtener_indice_completo("bd_partido")
 bd$calcular_irs(ano = "2020", base = "bd_partido")
 
-bd$añadir_leyenda("bd_partido")
+bd$anadir_leyenda("bd_partido")
 
 bd$fusionar_shp(shp = shp$shp$secc_22_jal, base = "bd_partido")
 

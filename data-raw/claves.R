@@ -2,8 +2,8 @@
 library(readr)
 library(dplyr)
 
-path <- "~/Google Drive/Mi unidad/claves_distritos.xlsx"
-claves <- readxl::read_excel(path) |>
+path <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyxbdhZzFPh0ZH35fdh6YIt-rIPk9CPYlQpHBNIBR0doVkBRyyhbbRP1c2yCh31g/pub?output=csv"
+claves <- readr::read_csv(path) |>
   mutate(entidad = sprintf("%02s", entidad),
          across(where(is.numeric), ~paste(entidad, sprintf("%02s", .x), sep = "_")),
          nombre_distritol_22 = paste(stringr::str_sub(distritol_22, 4,5), nombre_distritol_22),

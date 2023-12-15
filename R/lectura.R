@@ -161,7 +161,6 @@ leer_shp <- function(unidad, entidad){
 #' @param bd Base de datos que se va a unir con el shapefile
 #'
 #' @return Un shp unido con bd
-#' @examples join_shp_bd(secc_21, df_21)
 join_shp_bd <- function(shp, bd){
   shp %>% left_join(bd)
 }

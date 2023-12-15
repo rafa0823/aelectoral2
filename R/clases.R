@@ -145,7 +145,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            append(list(aux_c) %>% purrr::set_names(eleccion))
 
                                        },
-
                                        #'@description
                                        #'Agrega una base de datos de la elección señalada y se la pega a la elección que se haya leído con obtener_bd.
                                        #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
@@ -178,10 +177,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                                        #' @description
                                        #'Basada en la función full_join, se juntan bases de datos.
-                                       #'
                                        #' @param bd base de datos que que se quiere juntar
                                        #' @param by variable por la que se une las bds
-                                       #'
                                        #' @return
                                        agregar_manual = function(bd, by){
                                          self$bd <- self$bd %>% full_join(
@@ -425,10 +422,7 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                                 select(contains("distritof")) |>
                                                 na.omit(),
                                               join_by(distritof_22)) |>
-                                    left_join(claves_mun, join_by(municipio_22)) #|>
-                                    # mutate(nombre_distritol_22 = if_else(is.na(nombre_distritol_22), distritol_22, nombre_distritol_22),
-                                    #        nombre_distritof_22 = if_else(is.na(nombre_distritof_22), distritof_22, nombre_distritof_22),
-                                    #        nombre_municipio_22 = if_else(is.na(nombre_municipio_22), municipio_22, nombre_municipio_22))
+                                    left_join(claves_mun, join_by(municipio_22))
                                 }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
@@ -471,9 +465,8 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
 #' Se inicia leyendo un shp
 #'
 #' @details
-#' Al shp leído se le pude agregar otrabase de datos
+#' Al shp leído se le pude agregar otra base de datos
 #'
-
 Tablero <- R6::R6Class("Tablero",
                        public = list(
                          info = NULL,

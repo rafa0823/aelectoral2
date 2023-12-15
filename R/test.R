@@ -5,9 +5,7 @@
 #' @param patron la variable de la que se quiere el resultado
 #'
 #' @return El resultado electoral con el método señalado
-#' @examples
-#' aux <- mex$bd %>% repartir_coalicion(nivel = "distritof_21", eleccion = "df_21")
-#' t_nac(aux, "partido", "morena_")
+
 t_nac <- function(bd, tipo, patron){
   tipo <- match.arg(tipo, c("candidato","partido"))
 

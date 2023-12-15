@@ -431,7 +431,7 @@ crear_label <- function(bd, nivel){
     tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
     tidyr::separate(col = name, into = c("basura", "partido", "eleccion", "ano")) |>
     mutate(
-      partido = if_else(partido == "total", "Participación", toupper(partido)),
+      partido = if_else(partido == "total", "Participacion", toupper(partido)),
       label = glue::glue("Votos {partido}: {value}")) |>
     summarise(label_v = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
 
@@ -453,7 +453,7 @@ crear_label <- function(bd, nivel){
       tidyr::separate(col = name, into = c("basura", "partido")) |>
       mutate(label = glue::glue("Indice {toupper(partido)}: {value}")) |>
       summarise(label_ind = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel))) |>
-      mutate(label_ind_2 = paste("Sección:", stringr::str_sub(seccion, -4, -1), "<br>", label_ind))
+      mutate(label_ind_2 = paste("Seccion:", stringr::str_sub(seccion, -4, -1), "<br>", label_ind))
 
   }
 
@@ -462,7 +462,7 @@ crear_label <- function(bd, nivel){
     { if (exists("indice")) left_join(., indice, by = join_by(!!sym(nivel))) else . } %>%
     transmute(!!rlang::sym(nivel),
               eleccion = paste(eleccion, ano, sep = "_"),
-              label = paste(glue::glue("Sección: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>"),
+              label = paste(glue::glue("Seccion: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>"),
               label_ind_2) |>
     tidyr::pivot_wider(id_cols = !!rlang::sym(nivel), names_from = eleccion, values_from = label) |>
     rename_with(~paste0("label_", .x), -!!rlang::sym(nivel)) %>%

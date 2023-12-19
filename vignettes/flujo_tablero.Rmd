@@ -27,7 +27,7 @@ bd$voto_relativo("bd_partido", "pm_21")
 bd$calcular_ganador("bd_partido", "pm_21")
 bd$obtener_degradado_ganador(base = "bd_partido", eleccion = "pm_21")
 
-walk(elecciones, ~{
+purrr::walk(elecciones, ~{
   bd$agregar_bd(.x)
   bd$partido(.x)
   bd$voto_relativo("bd_partido", .x)

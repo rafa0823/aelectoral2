@@ -580,12 +580,26 @@ Tablero <- R6::R6Class("Tablero",
                        )
 )
 
+#' Clase R6 para procesar y graficar los datos electorales
+#'
+#' @description
+#' Se inicia definiendo la unidad geográfica de trabajo mediante el método $filtrar.
+#' Se puede definir un nivel y una unidad geográfica.
+#'
+#' @details
+#' Algunas funciones tienen parámetros espécificos, pero otras solo tienes que llamarlas y usan los datos ya incluidos en la clase tablero.
+#'
 Graficas <-  R6::R6Class("Graficas",
                          public = list(
                            tab = NULL,
+                           #' Initialize: Obtener los datos incorporados en clase
+                           #' @description
+                           #' Recupera los datos de la clase tablero
+                           #' @export
                            initialize = function(tablero){
                              self$tab = tablero
                            },
+                           #'
                            mapa = function(seccion, fill, linewidth = 0.6, labels = F){
                              nivel = if_else(seccion == T, "shp_secc", "shp")
                              mapa <- crear_mapa(self$tab$aux[[nivel]], glue::glue("col_{fill}"), linewidth = linewidth)
@@ -601,7 +615,7 @@ Graficas <-  R6::R6Class("Graficas",
                                graficar_barras(x = "ganador", y = "pct", fill = "ganador", label = "label", colores = self$tab$info$colores,
                                                eje_x = eje_x, eje_y = eje_y)
                            },
-                           voto_relativo = function(partido = self$tab$info$partidos, eleccion, eje_x = "", eje_y = ""){
+                           voto_relativo = function(partidos = self$tab$info$partidos, eleccion, eje_x = "", eje_y = ""){
                              obtener_absolutos(self$tab$aux$shp, eleccion) |>
                                tidyr::pivot_longer(cols = everything()) |>
                                mutate(name = gsub(glue::glue('ele|_|{eleccion}'), "", name)) |>
@@ -611,7 +625,7 @@ Graficas <-  R6::R6Class("Graficas",
                                                eje_x = eje_x, eje_y = eje_y)
                            },
                            distribucion_participacion = function(eleccion, eje_x = "", eje_y = ""){
-                             self$tab$aux$shp |>
+                             self$tab$aux$shp_secc |>
                                as_tibble() |>
                                filter(!is.na(.data[[glue::glue("ganador_{eleccion}")]])) |>
                                graficar_violin(x = glue::glue("ganador_{eleccion}"),

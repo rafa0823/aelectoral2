@@ -366,6 +366,7 @@ crear_indice <- function(bd, partido, nivel){
       bd_partido <- bd |>
         as_tibble() |>
         select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
+        mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0))) |>
         na.omit()
 
       pca_modelo <- bd_partido |>

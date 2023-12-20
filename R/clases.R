@@ -359,32 +359,39 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            left_join(crear_label(self[[base]], nivel = self$nivel), by = self$nivel)
                                        },
                                        calcular_irs = function(ano, base = NULL, c_principal = "#140a8c"){
+                                         tryCatch(
+                                           {
+                                             if("list" %in% class(self[[base]])){
+                                               stop("No se ha ejecutado la función self$colapsar_base")
+                                             }
 
-                                         if("list" %in% class(self[[base]])){
-                                           stop("No se ha ejecutado la función self$colapsar_base")
-                                         }
+                                             self$censo <- leer_censo(ano = ano,
+                                                                      entidad = self$entidad,
+                                                                      nivel = self$nivel[length(self$nivel)])
 
-                                         self$censo <- leer_censo(ano = ano,
-                                                                  entidad = self$entidad,
-                                                                  nivel = self$nivel[length(self$nivel)])
+                                             self[[base]] <-
+                                               self[[base]] |>
+                                               left_join(calcular_irs(bd = self$censo,
+                                                                      electoral = self[[base]],
+                                                                      nivel = self$nivel[length(self$nivel)],
+                                                                      c_principal = c_principal),
+                                                         self$nivel[length(self$nivel)])
 
-                                         self[[base]] <-
-                                           self[[base]] |>
-                                           left_join(calcular_irs(bd = self$censo,
-                                                                  electoral = self[[base]],
-                                                                  nivel = self$nivel[length(self$nivel)],
-                                                                  c_principal = c_principal),
-                                                     self$nivel[length(self$nivel)])
+                                             if(!"rezago" %in% names(self$colores)){
+                                               self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
+                                             }
 
-                                         if(!"rezago" %in% names(self$colores)){
-                                           self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
-                                         }
-
-                                         self$analisis <- self$analisis |>
-                                           tibble::add_row(eleccion = NULL,
-                                                           nivel = self$nivel[length(self$nivel)],
-                                                           analisis = "calcular_irs",
-                                                           parametros = list(list(ano = ano, base = base, c_principal = c_principal)))
+                                             self$analisis <- self$analisis |>
+                                               tibble::add_row(eleccion = NULL,
+                                                               nivel = self$nivel[length(self$nivel)],
+                                                               analisis = "calcular_irs",
+                                                               parametros = list(list(ano = ano, base = base, c_principal = c_principal)))
+                                           },
+                                           error = function(e) {
+                                             warning(e$message)
+                                             NULL  # return NULL or some other indication of the error
+                                           }
+                                         )
                                        }
                          ))
 

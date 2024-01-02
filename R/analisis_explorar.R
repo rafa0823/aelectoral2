@@ -363,35 +363,36 @@ extraer_partidos <- function(bd, eleccion, tipo){
 #' Si la base de datos tiene más de uno, se pueden incluir dentro de la función.
 #'
 crear_indice <- function(bd, partido, nivel){
-  bd_partido <- bd |>
-    as_tibble() |>
-    select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
-    na.omit()
+      bd_partido <- bd |>
+        as_tibble() |>
+        select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
+        na.omit()
 
-  pca_modelo <- bd_partido |>
-    select(-all_of(nivel)) |>
-    stats::prcomp(scale. = T)
+      pca_modelo <- bd_partido |>
+        select(-all_of(nivel)) |>
+        stats::prcomp(scale. = T)
 
-  aux <- pca_modelo %>%
-    broom::tidy(matrix = "rotation") %>%
-    tidyr::pivot_wider(names_from = "PC", names_prefix = "PC",
-                       values_from = "value")
+      aux <- pca_modelo %>%
+        broom::tidy(matrix = "rotation") %>%
+        tidyr::pivot_wider(names_from = "PC", names_prefix = "PC",
+                           values_from = "value")
 
-  pred <- predict(pca_modelo, newdata = bd_partido)
-  pred <- as.data.frame(pred)
-  if(sum(aux$PC1) > 0) {
-    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1))
-  } else{
-    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1
-  }
-  bd_partido <- cbind(bd_partido, ind = ind)
+      pred <- predict(pca_modelo, newdata = bd_partido)
+      pred <- as.data.frame(pred)
+      if(sum(aux$PC1) > 0) {
+        ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1))
+      } else{
+        ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1
+      }
+      bd_partido <- cbind(bd_partido, ind = ind)
 
-  bd_partido <- bd_partido |>
-    select(all_of(nivel), ind) |>
-    rename_with(~glue::glue("{partido}"), ind)
+      bd_partido <- bd_partido |>
+        select(all_of(nivel), ind) |>
+        rename_with(~glue::glue("{partido}"), ind)
 
-  return(as_tibble(bd_partido))
+      return(as_tibble(bd_partido))
 }
+
 
 #' @title Creación de paletas para índice
 #' @description

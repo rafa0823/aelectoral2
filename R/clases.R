@@ -231,7 +231,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                          self$bd <- eliminar_votoExtranjero(self$bd)
                                        },
                                        fusionar_shp = function(shp, base){
-
                                          if("list" %in% class(self[[base]])){
                                            stop("No se ha ejecutado la función self$colapsar_base")
                                          }
@@ -264,7 +263,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "voto_relativo",
                                                            parametros = list(list(base = base,
-                                                                             eleccion = eleccion)))
+                                                                                  eleccion = eleccion)))
 
                                        },
                                        #' @description Calcula el partido ganador por nivel entre los partidos disponibles
@@ -283,29 +282,24 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                            tibble::add_row(eleccion = eleccion,
                                                            nivel = self$nivel[length(self$nivel)], analisis = "calcular_ganador",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-                                                                             tipo = tipo)))
+                                                                                  tipo = tipo)))
                                        },
                                        #' @description Une todas las bases de datos que conformen la lista de la 'base'
                                        #' @param nivel es el nivel de agregación por el cual se van a unir las bases. El valor tiene que ser un símbolo (sin comillas).
                                        #' @return Regresa una única tibble con todas las bases de datos unidas como columnas
                                        colapsar_base = function(base, filtro = NULL){
                                          aux <- self[[base]] |>
-                                           reduce(left_join, self$nivel[length(self$nivel)])
+                                           reduce(full_join, self$nivel[length(self$nivel)])
 
                                          if(!is.null(filtro)){
-                                           aux <- aux |>
-                                             inner_join(filtro, by = self$nivel[length(self$nivel)])
+                                           aux <- select(as_tibble(filtro), contains(self$nivel)) |>
+                                             left_join(aux, by = self$nivel[length(self$nivel)])
 
-                                           self$bd <- self$bd |>
-                                             inner_join(filtro, by = self$nivel[length(self$nivel)])
+                                           self$bd <- select(as_tibble(filtro), contains(self$nivel)) |>
+                                             left_join(self$bd, by = self$nivel[length(self$nivel)])
                                          }
 
-                                         self[[base]] <- aux #|>
-                                         #   rename_with(~gsub("total", "participacion", .x), contains("total"))
-                                         #
-                                         # self$partidos <- gsub("total", "participacion", self$partidos)
-                                         #
-                                         # names(self$colores)[names(self$colores) == "total"] <- "participacion"
+                                         self[[base]] <- aux
                                        },
                                        #' @description Especifica un color degradado según el número de votos obtenidos por el partido ganador.
                                        #' Se recomienda ampliamente usar la función con el parámetro tipo = "relativo" y con partidos específicos.
@@ -346,14 +340,19 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                            nivel = self$nivel[length(self$nivel)],
                                                            analisis = "obtener_degradado_ganador",
                                                            parametros = list(list(base = base, eleccion = eleccion,
-                                                                             tipo = tipo)))
+                                                                                  tipo = tipo)))
                                        },
                                        obtener_indice_completo = function(base){
-                                         ind <- names(self$colores) |>
-                                           purrr::map2(self$colores, ~{
-                                             aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
-                                             aux <- colorear_indice(aux, c_principal = .y, var = .x)
-                                             aux <- crear_quantiles(aux, .x)
+                                         #Esto está parchado hasta que el vector de colores no tenga rezago
+                                         ind <- setdiff(names(self$colores), "rezago") |>
+                                           purrr::map2(setdiff(self$colores, "#140a8c"), ~{
+                                             tryCatch(
+                                               {
+                                                 aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
+                                                 aux <- colorear_indice(aux, c_principal = .y, var = .x)
+                                                 aux <- crear_quantiles(aux, .x)
+                                               }
+                                             )
                                            })
 
                                          self[[base]] <- self[[base]] |>
@@ -388,7 +387,9 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                                                   c_principal = c_principal),
                                                      self$nivel[length(self$nivel)])
 
-                                         self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
+                                         if(!"rezago" %in% names(self$colores)){
+                                           self$colores <- append(self$colores, purrr::set_names(c_principal, "rezago"))
+                                         }
 
                                          self$analisis <- self$analisis |>
                                            tibble::add_row(eleccion = NULL,
@@ -422,6 +423,21 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               initialize = function(unidad, entidad){
                                 self$entidades <- entidad
                                 aux <- leer_shp(unidad, entidad)
+                                if(unidad == "secc_22") {
+                                  aux <- aux |>
+                                    left_join(claves |>
+                                                select(contains("distritol")) |>
+                                                         distinct(),
+                                              join_by(distritol_22)) |>
+                                    left_join(claves |>
+                                                select(contains("distritof")) |>
+                                                distinct(),
+                                              join_by(distritof_22)) |>
+                                    left_join(claves |>
+                                                select(contains("municipio")) |>
+                                                distinct(),
+                                              join_by(municipio_22))
+                                }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
                               print = function(){
@@ -430,6 +446,19 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               agregar_shp = function(unidad, entidad = NULL){
                                 if(!entidad %in% self$entidades) self$entidades <- self$entidades %>% append(entidad)
                                 aux <- leer_shp(unidad, entidad)
+                                if (unidad == "dl_22"){
+                                  aux <- aux |>
+                                    left_join(claves |>
+                                                select(contains("distritol_22")) |>
+                                                distinct(),
+                                              join_by("distritol_22"))
+                                } else if(unidad == "df_22"){
+                                  aux <- aux |>
+                                    left_join(claves |>
+                                                select(contains("distritof_22")) |>
+                                                distinct(),
+                                              join_by("distritof_22"))
+                                }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
                               #'@description
@@ -463,7 +492,6 @@ Tablero <- R6::R6Class("Tablero",
                            self$reiniciar_info()
                          },
                          agregar_eleccion = function(elecciones, nivel, bd_relacion, shp){
-
                            self$info$bd <- self$info$bd |>
                              dplyr::left_join(bd_relacion,
                                               by = self$info$nivel[[1]])
@@ -526,8 +554,24 @@ Tablero <- R6::R6Class("Tablero",
                            self$info$bd_partido <- list()
                          },
                          obtener_nombres_elecciones = function(){
+                           nombres <- tibble(nombres = c("Sección", "Municipio", "Distrito local", "Distrito federal"),
+                                             niveles = c("seccion", "municipio_22", "distritol_22", "distritof_22"))
+
                            self$nombres_elecciones <- nombres_elecciones |>
                              filter(eleccion %in% na.omit(unique(self$info$analisis$eleccion)))
+
+                           self$info$nivel <- set_names(self$info$nivel, filter(nombres, niveles %in% self$info$nivel)$nombres)
+                         },
+                         cambiar_nombre_participacion = function(){
+                           self$info$nivel |>
+                             purrr::walk(~{
+                               self$info$shp[[.x]] <- self$info$shp[[.x]] |>
+                                 rename_with(~gsub("total", "participacion", .x), contains("total"))
+
+                               self$info$partidos <- gsub("total", "participacion", self$info$partidos)
+
+                               names(self$info$colores)[names(self$info$colores) == "total"] <- "participacion"
+                             })
                          }
                        )
 )

@@ -9,11 +9,9 @@ d0_d1 <- function(bd, shp, K, tipo = "gower"){
     gower <- cluster::daisy(ele_log |>
                               filter(municipio != "E") |>
                               select(starts_with("ele_")), metric = "gower")
-
     d0 <- gower |>
       as.matrix() |>
       as.dist()
-
   } else{
     d0 <- ele_log |>
       filter(municipio != "E") |>

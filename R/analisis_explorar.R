@@ -237,7 +237,7 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
     pivot_longer(cols = matches(cross(list(partido, eleccion)) %>%
                                   map_chr(.f = ~.x %>% unlist() %>% paste(collapse="_")) %>%
                                   paste("ele",., sep="_")),
-                 names_to = c("partido","eleccion", "año"),
+                 names_to = c("partido","eleccion", "ano"),
                  values_to =  "votos",
                  names_prefix = "ele_",
                  names_sep = "_"
@@ -245,7 +245,7 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
   valor_referencia <- max(bd$votos, na.rm = T)
   bd <- degradar_color_partido(bd, nombre=partido, variable = votos, colores_nombrados = colores_nombrados,valor_maximo = valor_referencia)
   res <- bd %>%
-    split(list(.$partido,.$eleccion, .$año)) %>%
+    split(list(.$partido,.$eleccion, .$ano)) %>%
     map(~{
       bd <- left_join(shp,
                       .x,by="seccion") %>%
@@ -254,7 +254,7 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
       ggplot() +
         geom_sf(data=bd, aes(fill=color), size=0) +
         scale_fill_identity() +
-        labs( title = glue::glue("{toupper(unique(bd$eleccion))} 20{unique(bd$año)}"))
+        labs( title = glue::glue("{toupper(unique(bd$eleccion))} 20{unique(bd$ano)}"))
 
     })
 
@@ -283,10 +283,10 @@ graficar_totales_eleccion <- function (bd, colores_nombrados, eleccion, grupo = 
 
   bd <- bd %>% pivot_longer(cols = starts_with("ele"),
                             names_to = c("partido",
-                                         "eleccion", "año"), names_prefix = "ele_", names_sep = "_",
+                                         "eleccion", "ano"), names_prefix = "ele_", names_sep = "_",
                             values_to = "resultado") %>%
     mutate(eleccion = toupper(eleccion),
-           eleccion = paste(eleccion, año, sep = " "),
+           eleccion = paste(eleccion, ano, sep = " "),
            eleccion = forcats::fct_relevel(eleccion,
                                            c("GB 17", "DF 18", "DL 18", "PM 18", "PR 18", "DF 21",
                                              "DL 21", "PM 21"))
@@ -363,34 +363,35 @@ extraer_partidos <- function(bd, eleccion, tipo){
 #' Si la base de datos tiene más de uno, se pueden incluir dentro de la función.
 #'
 crear_indice <- function(bd, partido, nivel){
-  bd_partido <- bd |>
-    as_tibble() |>
-    select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
-    na.omit()
+      bd_partido <- bd |>
+        as_tibble() |>
+        select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
+        mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0))) |>
+        na.omit()
 
-  pca_modelo <- bd_partido |>
-    select(-all_of(nivel)) |>
-    stats::prcomp(scale. = T)
+      pca_modelo <- bd_partido |>
+        select(-all_of(nivel)) |>
+        stats::prcomp(scale. = T)
 
-  aux <- pca_modelo %>%
-    broom::tidy(matrix = "rotation") %>%
-    tidyr::pivot_wider(names_from = "PC", names_prefix = "PC",
-                       values_from = "value")
+      aux <- pca_modelo %>%
+        broom::tidy(matrix = "rotation") %>%
+        tidyr::pivot_wider(names_from = "PC", names_prefix = "PC",
+                           values_from = "value")
 
-  pred <- predict(pca_modelo, newdata = bd_partido)
-  pred <- as.data.frame(pred)
-  if(sum(aux$PC1) > 0) {
-    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1))
-  } else{
-    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1
-  }
-  bd_partido <- cbind(bd_partido, ind = ind)
+      pred <- predict(pca_modelo, newdata = bd_partido)
+      pred <- as.data.frame(pred)
+      if(sum(aux$PC1) > 0) {
+        ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1))
+      } else{
+        ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1
+      }
+      bd_partido <- cbind(bd_partido, ind = ind)
 
-  bd_partido <- bd_partido |>
-    select(all_of(nivel), ind) |>
-    rename_with(~glue::glue("{partido}"), ind)
+      bd_partido <- bd_partido |>
+        select(all_of(nivel), ind) |>
+        rename_with(~glue::glue("{partido}"), ind)
 
-  return(as_tibble(bd_partido))
+      return(as_tibble(bd_partido))
 }
 
 #' @title Creación de paletas para índice
@@ -431,7 +432,7 @@ crear_label <- function(bd, nivel){
     tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
     tidyr::separate(col = name, into = c("basura", "partido", "eleccion", "ano")) |>
     mutate(
-      partido = if_else(partido == "total", "Participación", toupper(partido)),
+      partido = if_else(partido == "total", "Participacion", toupper(partido)),
       label = glue::glue("Votos {partido}: {value}")) |>
     summarise(label_v = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel), eleccion, ano))
 
@@ -453,7 +454,7 @@ crear_label <- function(bd, nivel){
       tidyr::separate(col = name, into = c("basura", "partido")) |>
       mutate(label = glue::glue("Indice {toupper(partido)}: {value}")) |>
       summarise(label_ind = paste(label, collapse = "<br>"), .by = c(!!rlang::sym(nivel))) |>
-      mutate(label_ind_2 = paste("Sección:", stringr::str_sub(seccion, -4, -1), "<br>", label_ind))
+      mutate(label_ind_2 = paste("Seccion:", stringr::str_sub(seccion, -4, -1), "<br>", label_ind))
 
   }
 
@@ -462,7 +463,7 @@ crear_label <- function(bd, nivel){
     { if (exists("indice")) left_join(., indice, by = join_by(!!sym(nivel))) else . } %>%
     transmute(!!rlang::sym(nivel),
               eleccion = paste(eleccion, ano, sep = "_"),
-              label = paste(glue::glue("Sección: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>"),
+              label = paste(glue::glue("Seccion: {stringr::str_sub(seccion, -4, -1)}"), label_g, label_v, label_ind, sep = "<br>"),
               label_ind_2) |>
     tidyr::pivot_wider(id_cols = !!rlang::sym(nivel), names_from = eleccion, values_from = label) |>
     rename_with(~paste0("label_", .x), -!!rlang::sym(nivel)) %>%

@@ -31,6 +31,8 @@ censo_df22 <- censo |>
   summarise(across(where(is.numeric), ~sum(.x, na.rm = T)),
                                        .by = c(entidad, distritof_22))
 
+readr::write_rds(censo_df22, "inst/censo/distritof_22_2020.rda")
+
 censo_dl22 <- censo |>
   left_join(relacion) |>
   filter(!is.na(distritol_22)) |>
@@ -41,7 +43,6 @@ readr::write_rds(censo_dl22, "inst/censo/distritol_22_2020.rda")
 
 
 # censo por municipio -----------------------------------------------------
-
 csv <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INEGI/Censo 2020/Datos geografico/ITER_NALCSV20.csv"
 censo_mun <- read_csv(csv, na = "*") |>
   janitor::clean_names()
@@ -49,8 +50,9 @@ censo_mun <- read_csv(csv, na = "*") |>
 # IMPORTANTE!!!!! hacer relación de municipio inegi y municipio ine
 
 censo_mun <- censo_mun |>
-  mutate(municipio_22 = paste(entidad, mun, sep = "_")) |>
   filter(nom_loc == "Total del Municipio") |>
+  left_join(relacion_ine_inegi, join_by(entidad, mun)) |>
+  mutate(municipio_22 = if_else(is.na(municipio_22), paste(entidad, mun, sep = "_"), municipio_22)) |>
   select(entidad, municipio_22, nom_mun, pobtot:vph_sintic)
 
 readr::write_rds(censo_mun, "inst/censo/municipio_22_2020.rda")

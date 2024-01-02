@@ -1,8 +1,6 @@
 ## code to prepare `claves` dataset goes here
 library(readr)
 library(dplyr)
-<<<<<<< HEAD
-=======
 
 path <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyxbdhZzFPh0ZH35fdh6YIt-rIPk9CPYlQpHBNIBR0doVkBRyyhbbRP1c2yCh31g/pub?output=csv"
 claves <- readr::read_csv(path) |>
@@ -44,7 +42,6 @@ claves <- bind_cols(claves, claves_mun)
 
 
 
->>>>>>> 796f4b8e7d49c05c709ccca91828984dd46f23a6
 df <- read_rds("inst/electoral/nacional/df_21.rda") |>
   as_tibble() |>
   transmute(seccion = paste(estado, seccion, sep = "_"),
@@ -52,11 +49,6 @@ df <- read_rds("inst/electoral/nacional/df_21.rda") |>
             distritof_22 = paste(estado, sprintf("%02s", distritof), sep = "_"))
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 796f4b8e7d49c05c709ccca91828984dd46f23a6
 # clave Jalisco -----------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/JALISCO/JAL_PEL_2021/AYUNTAMIENTOS_csv/jalisco_normal_casilla.csv"
 clave_jal <- read_csv(path) |>
@@ -122,12 +114,6 @@ clave_mex <- read_csv(path) |>
          municipio_22 = sprintf("15_%03s", municipio_22)) |>
   left_join(df)
 
-<<<<<<< HEAD
-claves <- claves |>
-  bind_rows(clave_cdmx) |>
-  bind_rows(clave_chis) |>
-  bind_rows(clave_mex)
-=======
 
 # Morelos -----------------------------------------------------------------
 
@@ -225,6 +211,5 @@ clave_yuc <- read_csv(path) |>
 
 claves <- claves |>
   bind_rows(clave_yuc)
->>>>>>> 796f4b8e7d49c05c709ccca91828984dd46f23a6
 
 usethis::use_data(claves, overwrite = TRUE)

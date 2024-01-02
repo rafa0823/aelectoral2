@@ -5,7 +5,6 @@
 #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
 #' @return Base de datos repartida
-#' @examples elf$bd %>% repartir_coalicion(nivel = nivel, eleccion = eleccion)
 #'
 repartir_coalicion <- function(bd, nivel, eleccion){
   if(sum(is.na(bd[[nivel]]))>0) bd <- bd %>% mutate(!!rlang::sym(nivel) := tidyr::replace_na(!!rlang::sym(nivel),"E"))
@@ -55,7 +54,6 @@ repartir_coalicion <- function(bd, nivel, eleccion){
 #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #'
 #' @return Base de datos repartida por candidato
-#' @examples repartir_candidato(bd = self$bd_partido[[eleccion]], alianzas, nivel, eleccion)
 repartir_candidato <- function(bd, al, nivel, eleccion){
   al <- al %>% na.omit
   partidos_alianza <- al %>% distinct(coalicion) %>% pull(coalicion)

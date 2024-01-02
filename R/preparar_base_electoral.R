@@ -10,22 +10,23 @@
 #' #' @examples
 #'
 #'
-#' repartir_coalicion <- function(bd, identificadores, partido){
-#'   # names(tempo %>% select(matches("e{1,}")))
-#'   res <- bd %>%
-#'     select(any_of({{identificadores}}),
-#'            matches(glue::glue("_{partido}\\b")) | matches(glue::glue("_{partido}_"))) %>%
-#'     pivot_longer(!any_of({{identificadores}}),
-#'                  names_to="partido_coalicion",
-#'                  values_to="nvotos") %>%
-#'
-#'     mutate(npartidos=stringr::str_count(partido_coalicion, pattern = "_"),
-#'            votos_repartidos=nvotos/npartidos) %>%
-#'     group_by(across({{identificadores}})) %>%
-#'     summarise("ele_{partido}":=sum(votos_repartidos, na.rm=T))
-#'
-#'   return(res)
-#' }
+
+ # repartir_coalicion <- function(bd, identificadores, partido){
+ #   # names(tempo %>% select(matches("e{1,}")))
+ #   res <- bd %>%
+ #     select(any_of({{identificadores}}),
+ #            matches(glue::glue("_{partido}\\b")) | matches(glue::glue("_{partido}_"))) %>%
+ #     pivot_longer(!any_of({{identificadores}}),
+ #                  names_to="partido_coalicion",
+ #                  values_to="nvotos") %>%
+ #
+ #     mutate(npartidos=stringr::str_count(partido_coalicion, pattern = "_"),
+ #            votos_repartidos=nvotos/npartidos) %>%
+ #     group_by(across({{identificadores}})) %>%
+ #     summarise("ele_{partido}":=sum(votos_repartidos, na.rm=T))
+ #
+ #   return(res)
+ # }
 
 #' Title
 #'

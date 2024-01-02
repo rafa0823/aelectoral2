@@ -7,12 +7,17 @@ path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INEGI/Ce
 
 # Edomex ------------------------------------------------------------------
 ## Censo_EDOMEX
+
+# Cargar bases ------------------------------------------------------------
+## Censo
+
 censo_mex <- read_csv(path) |>
   janitor::clean_names() |>
   filter(entidad == 15, !is.na(longitud)) |>
   mutate(nom_mun = stringi::stri_trans_general(toupper(nom_mun), id = 'latin-ascii'),
          nom_mun = if_else(nom_mun == "ACAMBAY DE RUIZ CASTANEDA", "ACAMBAY DE RUIZ CASTAÑEDA", nom_mun))
-## INE_EDOMEX
+
+## INE
 mex <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "mex", llaves = "municipio_21")
 mex_mun <- mex$bd |>
   distinct(municipio_21, nombre_municipio_21)
@@ -24,6 +29,7 @@ v2 <- mex_mun$nombre_municipio_21
 
 setdiff(v1, v2)
 setdiff(v2, v1)
+
 # Sobreescribir_EDOMEX -----------------------------------------------------------
 censo_mex <- censo_mex |>
   left_join(mex_mun, join_by(nom_mun == nombre_municipio_21)) |>
@@ -112,5 +118,93 @@ censo_mor <- censo_mor |>
 relacion_ine_inegi <- bind_rows(censo_cdmx, censo_jal, censo_mex, censo_mor) |>
   mutate(municipio_21 = paste(entidad, municipio_21, sep = "_")) |>
   rename(municipio_22 = municipio_21)
+
+# Modificar Censo Puebla --------------------------------------------------
+
+pue <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "pue", llaves = "municipio_21")
+pue_mun <- pue$todas[["pm_21"]] |>
+  distinct(municipio_21, nombre_municipio_21)
+
+
+censo_pue <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(entidad =="21", !is.na(longitud)) |>
+  mutate(nom_mun = stringi::stri_trans_general(toupper(nom_mun), id = 'latin-ascii')
+  )
+
+# Revisar que los nombres coincidan_CDMX ---------------------------------------
+
+v7 <- unique(censo_pue$nom_mun)
+v8 <- pue_mun$nombre_municipio_21
+
+setdiff(v7, v8)
+setdiff(v8, v7)
+
+# Sobreescribir_mor -----------------------------------------------------------
+censo_pue <- censo_pue |>
+  mutate(nom_mun = case_when(nom_mun == "CANADA MORELOS" ~ "CAÑADA MORELOS",
+                             nom_mun == "SAN ANTONIO CANADA" ~ "SAN ANTONIO CAÑADA",
+                             T ~ nom_mun)) |>
+  left_join(pue_mun, join_by(nom_mun == nombre_municipio_21)) |>
+  mutate(municipio_22 = paste(entidad, gsub("21_", "", municipio_21), sep = "_")) |>
+  distinct(entidad, mun, municipio_22)
+
+relacion_ine_inegi <- bind_rows(relacion_ine_inegi, censo_pue)
+
+# Modificar Censo Tabasco --------------------------------------------------
+
+tab <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "tab", llaves = "municipio_21")
+tab_mun <- tab$todas[["pm_21"]] |>
+  distinct(municipio_21, nombre_municipio_21)
+
+censo_tab <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(entidad == "27", !is.na(longitud)) |>
+  mutate(nom_mun = stringi::stri_trans_general(toupper(nom_mun), id = 'latin-ascii')
+  )
+
+# Revisar que los nombres coincidan_CDMX ---------------------------------------
+
+v7 <- unique(censo_tab$nom_mun)
+v8 <- tab_mun$nombre_municipio_21
+
+setdiff(v7, v8)
+setdiff(v8, v7)
+
+# Sobreescribir_mor -----------------------------------------------------------
+censo_tab <- censo_tab |>
+  left_join(tab_mun, join_by(nom_mun == nombre_municipio_21)) |>
+  mutate(municipio_22 = paste(entidad, gsub("27_", "", municipio_21), sep = "_")) |>
+  distinct(entidad, mun, municipio_22)
+
+relacion_ine_inegi <- bind_rows(relacion_ine_inegi, censo_tab)
+
+# Censo Yucatán -----------------------------------------------------------
+bd <- aelectoral2::Electoral$new(eleccion = "pm_21", entidad = "yuc", llaves = "municipio_21")
+bd_mun <- bd$todas[["pm_21"]] |>
+  distinct(municipio_21, nombre_municipio_21)
+
+censo <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(entidad == "31", !is.na(longitud)) |>
+  mutate(nom_mun = stringi::stri_trans_general(toupper(nom_mun), id = 'latin-ascii')
+  )
+
+# Revisar que los nombres coincidan_CDMX ---------------------------------------
+
+v7 <- unique(censo$nom_mun)
+v8 <- bd_mun$nombre_municipio_21
+
+setdiff(v7, v8)
+setdiff(v8, v7)
+
+# Sobreescribir_mor -----------------------------------------------------------
+censo <- censo |>
+  left_join(bd_mun, join_by(nom_mun == nombre_municipio_21)) |>
+  mutate(municipio_22 = paste(entidad, gsub("31_", "", municipio_21), sep = "_")) |>
+  distinct(entidad, mun, municipio_22)
+
+relacion_ine_inegi <- bind_rows(relacion_ine_inegi, censo)
+
 
 usethis::use_data(relacion_ine_inegi, overwrite = T)

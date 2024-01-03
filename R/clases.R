@@ -209,7 +209,6 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                        #' Elimina el voto en el extanjero. Esta función filtra las secciones que son 0000.
                                        #'
                                        #' @return Devuelve el tibble de la elección sin los votos en el extanjero
-                                       #' @examples
                                        eliminar_votoExtranjero = function(){
                                          self$bd <- eliminar_votoExtranjero(self$bd)
                                        },
@@ -416,7 +415,6 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               #'
                               #' @return Una lista con shapefiles
                               #' @export
-                              #' @examples
                               initialize = function(unidad, entidad){
                                 self$entidades <- entidad
                                 aux <- leer_shp(unidad, entidad)
@@ -459,8 +457,6 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               #' Junta shapefiles
                               #' @param nivel Si la base que se va a juntar es por seccion, municipio, distrito, etc
                               #' @param bd base de datos que se le quiere pegar al shp
-                              #'
-                              #' @examples
                               juntar_bd = function(nivel, bd){
                                 self$shp[[nivel]] <- join_shp_bd(self$shp[[nivel]], bd)
                               }

@@ -9,7 +9,7 @@
 #' @return tibble de la base electoral
 #' @examples leer_base(eleccion = eleccion,entidad = entidad, tipo_eleccion = self$tipo_eleccion)
 leer_base <- function(eleccion, entidad, tipo_eleccion){
-  estado <- if_else(grepl("df_|pr_|cp_",eleccion), "nacional",entidad)
+  estado <- if_else(grepl("df_|pr_|cp_|sen_",eleccion), "nacional",entidad)
   res <- readr::read_rds(system.file(glue::glue("electoral/{estado}/{eleccion}.rda"),
                                      package = "aelectoral2",
                                      mustWork = TRUE)) %>% tibble::as_tibble()

@@ -417,15 +417,15 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               #' @export
                               initialize = function(unidad, entidad){
                                 self$entidades <- entidad
-                                aux <- leer_shp(unidad, entidad)
+                                aux <- leer_shp(unidad, self$entidades)
                                 if(unidad == "secc_22") {
                                   aux <- aux |>
                                     left_join(claves |>
-                                                select(contains("distritol")) |>
+                                                distinct(distritol_22, nombre_distritol_22) |>
                                                 na.omit(),
                                               join_by(distritol_22)) |>
                                     left_join(claves |>
-                                                select(contains("distritof")) |>
+                                                distinct(distritof_22, nombre_distritof_22) |>
                                                 na.omit(),
                                               join_by(distritof_22)) |>
                                     left_join(claves_mun, join_by(municipio_22))
@@ -441,13 +441,13 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                                 if (unidad == "dl_22"){
                                   aux <- aux |>
                                     left_join(claves |>
-                                                select(contains("distritol_22")) |>
+                                                distinct(distritol_22, nombre_distritol_22) |>
                                                 na.omit(),
                                               join_by("distritol_22"))
                                 } else if(unidad == "df_22"){
                                   aux <- aux |>
                                     left_join(claves |>
-                                                select(contains("distritof_22")) |>
+                                                distinct(distritof_22, nombre_distritof_22) |>
                                                 na.omit(),
                                               join_by("distritof_22"))
                                 }

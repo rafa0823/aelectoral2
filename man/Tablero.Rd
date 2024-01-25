@@ -2,12 +2,22 @@
 % Please edit documentation in R/clases.R
 \name{Tablero}
 \alias{Tablero}
-\title{Clase R6 para leer y unir shapefiles}
+\title{Clase R6 para replicar las operaciones de la clase Electoral para otros niveles: municipio, distrito local, distrito federal}
 \description{
-Se inicia leyendo un shp
+Esta clase requiere una clase Electoral. Dicha clase tiene un registro de qué métodos fueron utilizados, mismo que son replicados para el nuevo nivel de interés
 }
-\details{
-Al shp leído se le pude agregar otrabase de datos
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{info}}{objeto que recoge todos los elementos de la clase Electoral}
+
+\item{\code{nombres_elecciones}}{objeto que guarda la relación entre la elección seleccionada 'pm_21' y su nombre 'Presidente municipal 21'}
+
+\item{\code{graficas}}{objeto que incorpora las funciones de la clase `Graficar`}
+
+\item{\code{aux}}{objeto que recoge las bases transformadas por la función `Tablero$filtrar`}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -16,6 +26,8 @@ Al shp leído se le pude agregar otrabase de datos
 \item \href{#method-Tablero-agregar_eleccion}{\code{Tablero$agregar_eleccion()}}
 \item \href{#method-Tablero-reiniciar_info}{\code{Tablero$reiniciar_info()}}
 \item \href{#method-Tablero-obtener_nombres_elecciones}{\code{Tablero$obtener_nombres_elecciones()}}
+\item \href{#method-Tablero-cambiar_nombre_participacion}{\code{Tablero$cambiar_nombre_participacion()}}
+\item \href{#method-Tablero-filtrar}{\code{Tablero$filtrar()}}
 \item \href{#method-Tablero-clone}{\code{Tablero$clone()}}
 }
 }
@@ -23,24 +35,47 @@ Al shp leído se le pude agregar otrabase de datos
 \if{html}{\out{<a id="method-Tablero-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-new}{}}}
 \subsection{Method \code{new()}}{
+esta clase replica todo lo hecho en la clase Electoral para otros niveles de agregación
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$new(info_seccion)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{info_seccion}}{es un único parámetro que es la clase Electoral}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Tablero-agregar_eleccion"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-agregar_eleccion}{}}}
 \subsection{Method \code{agregar_eleccion()}}{
+replica todas las operaciones realizadas para el nivel seccional a los niveles seleccionados
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$agregar_eleccion(elecciones, nivel, bd_relacion, shp)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{elecciones}}{elecciones para las que hay que obtener el análisis}
+
+\item{\code{nivel}}{nivel de agregación para el que se quiere el análisis}
+
+\item{\code{bd_relacion}}{base que sirve de puente entre las secciones y el nivel que se desea.}
+
+\item{\code{shp}}{archivos al cual se le añadirán los datos colapsados. Debe ser del mismo nivel que el parámetro 'nivel'}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Tablero-reiniciar_info"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-reiniciar_info}{}}}
 \subsection{Method \code{reiniciar_info()}}{
+reinicia la bd_partido
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$reiniciar_info()}\if{html}{\out{</div>}}
 }
@@ -50,10 +85,40 @@ Al shp leído se le pude agregar otrabase de datos
 \if{html}{\out{<a id="method-Tablero-obtener_nombres_elecciones"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-obtener_nombres_elecciones}{}}}
 \subsection{Method \code{obtener_nombres_elecciones()}}{
+Genera un objeto auxiliar para mejorar el nombre de los niveles que se han incluido en la clase
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$obtener_nombres_elecciones()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Tablero-cambiar_nombre_participacion"></a>}}
+\if{latex}{\out{\hypertarget{method-Tablero-cambiar_nombre_participacion}{}}}
+\subsection{Method \code{cambiar_nombre_participacion()}}{
+cambia todos los lugar donde aparezca la columna "total" para que se llame "participación"
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Tablero$cambiar_nombre_participacion()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Tablero-filtrar"></a>}}
+\if{latex}{\out{\hypertarget{method-Tablero-filtrar}{}}}
+\subsection{Method \code{filtrar()}}{
+crea una lista con los objetos filtrados
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Tablero$filtrar(nivel = "municipio_22", unidad = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{nivel}}{del conjunto de niveles incluidos en la clase, cuál se quiere filtrar}
+
+\item{\code{unidad}}{por si se quiere especificar una unidad del nivel}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Tablero-clone"></a>}}

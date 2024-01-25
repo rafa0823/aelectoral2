@@ -38,7 +38,6 @@ t_nac <- function(bd, tipo, patron){
 #' @param seleccion que selección de acuerdo con el nivel se requiere
 #'
 #' @return  Resultado electoral por nivel
-#' @examples mex$bd %>%  t_nivel("candidato", "ele_morena_dl_21", estado = 15, nivel = "estado",  seleccion = "15")
 t_nivel <- function(bd, tipo, patron, estado, nivel, seleccion){
   tipo <- match.arg(tipo, c("candidato","partido"))
 

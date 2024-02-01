@@ -1,61 +1,70 @@
-#' Title
+#' Relativiza el censo
 #'
-#' @param bd base de datos electoral
+#' Función de poca utilidad, se valorará su remoción
 #'
-#' @return
-#' @export
+#' @param bd
 #'
-#' @examples
-relativizar_censo <- function(bd){
+relativizar_censo <- function(bd) {
   dicc <- diccionario_censo20 %>%
     dplyr::filter(!is.na(denominador),
-                  denominador!="-")
+                  denominador != "-")
   dicc <- dicc %>%
-    filter(glue::glue("cen_{variable}") %in% names(bd),
-           glue::glue("cen_{denominador}") %in% names(bd)
+    filter(
+      glue::glue("cen_{variable}") %in% names(bd),
+      glue::glue("cen_{denominador}") %in% names(bd)
     )
-  res <- purrr::map_dfc(.x=unique(dicc$denominador),
-                        ~{
+  res <- purrr::map_dfc(.x = unique(dicc$denominador),
+                        ~ {
                           numerador <- dicc %>%
-                            dplyr::filter(denominador==.x) %>%
+                            dplyr::filter(denominador == .x) %>%
                             pull(variable)
-                          denominador=glue::glue("cen_{.x}")
+                          denominador = glue::glue("cen_{.x}")
                           bd <- bd %>%
                             select(glue::glue("cen_{numerador}"), denominador) %>%
                             mutate(across(everything(),
-                                          ~.x/!!rlang::sym(denominador))) %>%
-                            select(-denominador)})
+                                          ~ .x / !!rlang::sym(denominador))) %>%
+                            select(-denominador)
+                        })
 
   res <- bd %>%
     select(-names(res)) %>%
     bind_cols(res)
 
-
   return(res)
-
 }
 
-calcular_irs <- function(bd, electoral, nivel, c_principal){
+#' Calcula el índice de rezago para la elección y nivel deseado.
+#'
+#' Añade a la base electoral en cuestión y al nivel seleccionado en el momento el cálculo de rezago social.
+#'
+#' @param bd Censo cargado para nivel en cuestión
+#' @param electoral Base electoral cargada en el flujo de la clase Electoral
+#' @param nivel nivel seleccionado: Sección, Municipio, Distrito local, Distrito Federal
+#' @param c_principal color que se utilizará para representar el bajo rezago y permitirá obtener el complemento para el bajo rezago
+#' @return Una base con dos columnas adicionales: el cálculo del índice de rezago y el degradado de color asociado
+#' @export
+calcular_irs <- function(bd, electoral, nivel, c_principal) {
   base <- bd %>%
     semi_join(electoral, nivel) |>
-    transmute(!!rlang::sym(nivel),
-              i_analf = p15ym_an/p_15ymas,
-              i_asistesc = (p6a11_noa + p12a14noa) / (p_6a11+ p_12a14),
-              i_edbasinc = (p15ym_se + p15pri_in + p15pri_co + p15sec_in) / p_15ymas,
-              i_sdsalud = psinder / pobtot,
-              i_ptierra =  vph_pisoti / vivparh_cv,
-              i_nosan = 1-((vph_excsa + vph_letr) / vivparh_cv),
-              i_noagua = vph_aguafv / vivparh_cv,
-              i_nodren = vph_nodren / vivparh_cv,
-              i_noelec = vph_s_elec / vivparh_cv,
-              i_nolav = 1-( vph_lavad / vivparh_cv),
-              i_noref = 1-( vph_refri / vivparh_cv)
+    transmute(
+      !!rlang::sym(nivel),
+      i_analf = p15ym_an / p_15ymas,
+      i_asistesc = (p6a11_noa + p12a14noa) / (p_6a11 + p_12a14),
+      i_edbasinc = (p15ym_se + p15pri_in + p15pri_co + p15sec_in) / p_15ymas,
+      i_sdsalud = psinder / pobtot,
+      i_ptierra =  vph_pisoti / vivparh_cv,
+      i_nosan = 1 - ((vph_excsa + vph_letr) / vivparh_cv),
+      i_noagua = vph_aguafv / vivparh_cv,
+      i_nodren = vph_nodren / vivparh_cv,
+      i_noelec = vph_s_elec / vivparh_cv,
+      i_nolav = 1 - (vph_lavad / vivparh_cv),
+      i_noref = 1 - (vph_refri / vivparh_cv)
     ) |>
     filter_all(all_vars(!is.na(.)))
 
-  cp <- prcomp(select(base, -all_of(nivel)), scale.=T )
+  cp <- stats::prcomp(select(base,-all_of(nivel)), scale. = T)
 
-  pred <- predict(cp, newdata = base)
+  pred <- stats::predict(cp, newdata = base)
   pred <- as.data.frame(pred)
   pc1_pos <- pred$PC1 + abs(min(pred$PC1))
   irs <- (pc1_pos + mean(pc1_pos) / sd(pc1_pos))
@@ -65,23 +74,24 @@ calcular_irs <- function(bd, electoral, nivel, c_principal){
   #Necesitamos incluir un valor antes y otro después de los breaks para que 'cut' entienda que debe incluir
   #los valores menores al límite inferior y mayores al límite superior.
   intervalo <- c(-Inf, ja$bh, Inf)
-  if(sum(cp$PC1) > 0) {
+  if (sum(cp$PC1) > 0) {
     labels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto")
   } else {
     labels = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
-    c_principal <-last(colortools::complementary(c_principal))
+    c_principal <- last(colortools::complementary(c_principal))
   }
 
   base <- bind_cols(base |> select(all_of(nivel)), rezago = irs) |>
-    mutate(quant_rezago = cut(irs,
-                              breaks = intervalo,
-                              labels = labels,
-                              include.lowest = T),
-           quant_rezago = factor(quant_rezago, levels = labels)
+    mutate(
+      quant_rezago = cut(
+        irs,
+        breaks = intervalo,
+        labels = labels,
+        include.lowest = T
+      ),
+      quant_rezago = factor(quant_rezago, levels = labels)
     ) |>
     obtener_color(c_principal = c_principal, "rezago")
 
   return(base)
-
 }
-

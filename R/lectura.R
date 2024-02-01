@@ -7,7 +7,6 @@
 #' @param tipo_eleccion Por default es "MR" refiriéndose a mayoría relativa.
 #'
 #' @return tibble de la base electoral
-#' @examples leer_base(eleccion = eleccion,entidad = entidad, tipo_eleccion = self$tipo_eleccion)
 leer_base <- function(eleccion, entidad, tipo_eleccion){
   estado <- if_else(grepl("df_|pr_|cp_|sen_",eleccion), "nacional",entidad)
   res <- readr::read_rds(system.file(glue::glue("electoral/{estado}/{eleccion}.rda"),
@@ -24,15 +23,12 @@ leer_base <- function(eleccion, entidad, tipo_eleccion){
   return(res)
 }
 
-#' Función para leer censo
-#' Basada en la funcion read_rds del paquete readr
+#' Función para leer censo Basada en la funcion read_rds del paquete readr
 #'
 #' @param ano Es el año del censo
 #' @param entidad Cuando se requiere la información de todo el país se escribe "nacional", cuando es local se pone la abreviatura oficial de la entidad, por ejemplo "chis", "dgo", "mex".
 #' @param nivel Unidad geográfica en la que se requiere la información del censo
 #' @return tibble de la base del censo
-#' @examples leer_censo(ano = 2020, entidad = "nacional", nivel = "seccion")
-
 leer_censo <- function(ano, entidad, nivel){
   res <- readr::read_rds(system.file(glue::glue("censo/{nivel}_{ano}.rda"),
                                      package = "aelectoral2",
@@ -59,7 +55,6 @@ leer_censo <- function(ano, entidad, nivel){
 #' @param bd_e Base de datos electoral a la ue se le van a pegar las coaliciones por partido.
 #'
 #' @return Regresa un data frame de alianzas
-#' @examples leer_alianza(nivel, eleccion, self$entidad, self$bd)
 
 leer_alianza <- function(nivel, eleccion, entidad, bd_e){
   estado <- if_else(grepl("df_|pr_",eleccion), "nacional",entidad)
@@ -67,24 +62,29 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
   if(estado == "nacional") {
     res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{eleccion}.rda"),
                                        package = "aelectoral2",
-                                       mustWork = TRUE)) %>% tibble::as_tibble()
+                                       mustWork = TRUE)) %>%
+      tibble::as_tibble()
 
     if(entidad != "nacional"){
       nombre <- aelectoral2::diccionario %>%
         filter(abreviatura == !!entidad) %>%
         pull(id_estado) %>%
         stringr::str_pad(width = 2, pad = "0")
+
       res <- res %>%
         filter(estado == !!nombre)
     }} else{
       res <- readr::read_rds(system.file(glue::glue("alianzas/{estado}/{eleccion}.rda"),
                                          package = "aelectoral2",
-                                         mustWork = TRUE)) %>% tibble::as_tibble()
+                                         mustWork = TRUE)) |>
+        tibble::as_tibble()
     }
 
-  res <- res %>% select(-any_of(c("eleccion", "nombre_estado", "candidatura_comun")))
+  res <- res |>
+    select(-any_of(c("eleccion", "nombre_estado", "candidatura_comun")))
 
-  nivel_sep <- stringr::str_split(names(res)[2], pattern = "_") %>% pluck(1,1)
+  nivel_sep <- stringr::str_split(names(res)[2], pattern = "_") |>
+    pluck(1,1)
 
   w <- switch(nivel_sep, municipio = 3, distritof = 2, distritol = 2, estado = 2)
 
@@ -106,14 +106,12 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
   return(alianzas)
 }
 #' Base de datos que resume agrupando por las llaves
-#'Basada en la función summarise
 #'
 #' @param bd Base de datos que se quiere reducir
 #' @param completa base de datos electoral
 #' @param llaves Son las claves cartográficas de los niveles. Por default la unidad mínima es sección y está acompañada de estado.
 #'
 #' @return Data frame
-#' @examples add %>% reducir(self$bd, self$llaves)
 reducir <- function(bd, completa, llaves){
 
   llaves_bd <- NULL
@@ -142,7 +140,7 @@ reducir <- function(bd, completa, llaves){
 #' @param entidad el estado de donde es
 #'
 #' @return shp
-#' @examples leer_shp(unidad, entidad)
+#' @export
 leer_shp <- function(unidad, entidad){
   if(entidad == "nacional") id <- aelectoral2::diccionario %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0") else{
     id <- aelectoral2::diccionario %>% filter(abreviatura %in% !!entidad) %>% pull(id_estado) %>% stringr::str_pad(width = 2, pad = "0")
@@ -159,7 +157,7 @@ leer_shp <- function(unidad, entidad){
 #' Funcion basada en left_join
 #' @param shp Base de datos de tipo shp
 #' @param bd Base de datos que se va a unir con el shapefile
-#'
+#' @export
 #' @return Un shp unido con bd
 join_shp_bd <- function(shp, bd){
   shp %>% left_join(bd)

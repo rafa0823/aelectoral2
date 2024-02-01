@@ -37,8 +37,6 @@ calcular_diferencias <- function(bd, partido, eleccion_referencia, eleccion_cont
   return(res)
 }
 
-
-
 #' Title
 #' Obtiene el porcentaje de votos obtenidos por partidos con respecto a la lista nominal
 #'
@@ -49,8 +47,6 @@ calcular_diferencias <- function(bd, partido, eleccion_referencia, eleccion_cont
 #'
 #' @return base de datos con cada una de las votaciones totales por partido en las elecciones solicitadas
 #' @export
-#' @import dplyr purrr
-#' @examples
 calcular_votos_relativos <- function(bd, partido, eleccion, grupo){
   res  <- map(eleccion,
               ~{
@@ -79,7 +75,6 @@ calcular_votos_relativos <- function(bd, partido, eleccion, grupo){
 #' @return base de datos con cada una de las votaciones totales por partido en las elecciones solicitadas
 #' @export
 #' @import dplyr purrr
-#' @examples
 calcular_votos_totales <- function(bd, partido, eleccion, grupo=NULL){
   res <- bd %>% {if(!rlang::quo_is_null(enquo(grupo))) bd %>% group_by({{grupo}}) else .} %>%
     summarise(across(matches(cross(list(partido, eleccion)) %>%
@@ -89,8 +84,6 @@ calcular_votos_totales <- function(bd, partido, eleccion, grupo=NULL){
 
   return(res)
 }
-
-
 #' Title
 #' Obtiene el partido ganador para cada una de las observaciones de la base. Puede ser sección, municipio o distrito
 #' @param bd base de datos con resultados electorales
@@ -99,7 +92,6 @@ calcular_votos_totales <- function(bd, partido, eleccion, grupo=NULL){
 #' @return base de datos con una columna que indica el partido ganador de cada eleccion referida
 #' @export
 #' @import dplyr purrr
-#' @examples
 ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL){
   if(is.null(partido)){
     partido <- extraer_partidos(bd, eleccion, tipo)
@@ -131,7 +123,6 @@ ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL){
 #' @return gráfica de modelo pca
 #' @export
 #' @import dplyr purrr ggplot2
-#' @examples
 crear_mapa_electoral <- function(bd,
                                  eleccion,
                                  año,
@@ -173,8 +164,6 @@ crear_mapa_electoral <- function(bd,
   return(res)
 }
 
-
-
 #' Title
 #' Se obtiene una gráfica con las cantidades de secciones ganadas por cada uno de los partidos en cada elección.
 #' De esta manera, al comparar una elección con otra vemos las secciones que un partido ganó en una elección pero no en otra y qué partido ganó dichas secciones.
@@ -184,8 +173,6 @@ crear_mapa_electoral <- function(bd,
 #' @import dplyr purrr ggplot2
 #' @return Se obtiene una gráfica con el comparativo de las cantidades de secciones ganadas por cada uno de los partidos en cada elección.
 #' @export
-#'
-#' @examples
 graficar_sankey_ganadores <- function(bd, elecciones, unidad_analisis){
   bd <- elecciones %>%
     map(~bd %>% ganador_eleccion(eleccion = .x)) %>%
@@ -196,7 +183,7 @@ graficar_sankey_ganadores <- function(bd, elecciones, unidad_analisis){
                 .fn = ~stringr::str_remove(.x,"ganador_") %>%
                   stringr::str_to_upper() %>%
                   stringr::str_replace(pattern = "_", replacement = "-")) %>%
-    make_long(-{{unidad_analisis}}) %>%
+    ggsankey::make_long(-{{unidad_analisis}}) %>%
     mutate(node=forcats::fct_lump(node, n=6,other_level = "Otros"),
            next_node=forcats::fct_lump(next_node, n=6,other_level = "Otros"),
     )
@@ -206,17 +193,14 @@ graficar_sankey_ganadores <- function(bd, elecciones, unidad_analisis){
                  next_node = next_node,
                  color =factor(node),
                  fill = factor(node))) +
-    geom_sankey(flow.alpha=.5) +
+    ggsankey::geom_sankey(flow.alpha=.5) +
     scale_fill_manual(values = colores_partidos, name="Partidos")+
     scale_color_manual(values = colores_partidos, guide="none")
-
-
 }
 
-
-#' Title
-#' grafica una cloropeta con la distribución del apoyo del partido solicitado.
-#' una vez coloreada la sección se hace un degradado en función de la intensidad con la que dicho partido resultó ganador.
+#' Grafica una cloropeta con la distribución del apoyo del partido solicitado.
+#' @description
+#' Una vez coloreada la sección se hace un degradado en función de la intensidad con la que dicho partido resultó ganador.
 #' Es decir, se colorea más fuerte mientras mayor haya sido la victoria y menos fuerte si fue una sección muy competida.
 #' @param bd base de datos con resultados electorales
 #' @param shp archivo .shp con el polígono del nivel de observación correspondiente
@@ -226,7 +210,6 @@ graficar_sankey_ganadores <- function(bd, elecciones, unidad_analisis){
 #' @import dplyr purrr ggplot2
 #' @return mapa con la intensidad de apoyo por partido
 #' @export
-#' @examples
 graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
   partido <- names(colores_nombrados)
   bd <- calcular_votos_relativos(bd=bd,
@@ -234,13 +217,13 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
                                  eleccion=eleccion,
                                  grupo = !!rlang::enquo(grupo))
   bd <- bd %>%
-    pivot_longer(cols = matches(cross(list(partido, eleccion)) %>%
-                                  map_chr(.f = ~.x %>% unlist() %>% paste(collapse="_")) %>%
-                                  paste("ele",., sep="_")),
-                 names_to = c("partido","eleccion", "ano"),
-                 values_to =  "votos",
-                 names_prefix = "ele_",
-                 names_sep = "_"
+    tidyr::pivot_longer(cols = matches(cross(list(partido, eleccion)) %>%
+                                         map_chr(.f = ~.x %>% unlist() %>% paste(collapse="_")) %>%
+                                         paste("ele",., sep="_")),
+                        names_to = c("partido","eleccion", "ano"),
+                        values_to =  "votos",
+                        names_prefix = "ele_",
+                        names_sep = "_"
     )
   valor_referencia <- max(bd$votos, na.rm = T)
   bd <- degradar_color_partido(bd, nombre=partido, variable = votos, colores_nombrados = colores_nombrados,valor_maximo = valor_referencia)
@@ -261,12 +244,6 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
   return(res)
 }
 
-
-
-
-
-
-#' Title
 #' Gráfica de líneas con el total de votos comparándolos entre elecciones.
 #' @param bd base de datos con resultados electorales
 #' @param colores_nombrados vector compuesto con los nombres de partidos y colores que le corresponden
@@ -275,8 +252,6 @@ graficar_cloropeta <- function(bd, shp, colores_nombrados, eleccion, grupo){
 #' @import dplyr purrr ggplot2
 #' @return Grafica de líneas con los totales de las elecciones solicitadas
 #' @export
-#'
-#' @examples
 graficar_totales_eleccion <- function (bd, colores_nombrados, eleccion, grupo = NULL)
 {
   partido <- names(colores_nombrados)
@@ -302,17 +277,15 @@ graficar_totales_eleccion <- function (bd, colores_nombrados, eleccion, grupo = 
   return(grafica)
 }
 
-#' Title
+#' Prueba el grado de indepencia del ganador
 #'
 #' @param bd base con resultados electorales y una columna adicional con el ganador de cada sección
 #' @param ganador partido del que se busca analizar la independencia de su resultado
 #' @param eleccion elección elegida para analizar
 #' @param ... variables del censo de las que se busca analizar la independencia
 #'
-#' @return
+#' @return bd
 #' @export
-#'
-#' @examples
 probar_independencia_ganador <-function(bd, ganador, eleccion, ...){
   bd <- bd %>% mutate(triunfo=as.factor(!!sym(glue::glue("ganador_{eleccion}"))==ganador))
   dots <- enquos(...)
@@ -337,6 +310,14 @@ probar_independencia_ganador <-function(bd, ganador, eleccion, ...){
   return(res)
 }
 
+#' Extrae los partidos en una base
+#'
+#' @param bd es la base a evaluar
+#' @param eleccion elección seleccionada
+#' @param tipo si los datos están en términos relativos o absolutos
+#'
+#' @return vector con los partidos seleccionados
+#' @export
 extraer_partidos <- function(bd, eleccion, tipo){
   prefijo <- if_else(tipo == "relativo", "pct_", "ele_")
   bd %>%
@@ -359,41 +340,40 @@ extraer_partidos <- function(bd, eleccion, tipo){
 #' La función estandariza los resultados para que no importe el signo de los datos.
 #' @param bd Base de datos en términos relativos
 #' @param partido variable para la cual se quiere calcular el índice.
-#' @param nivel El nivel de agregación en el que se encuentran los datos.
-#' Si la base de datos tiene más de uno, se pueden incluir dentro de la función.
-#'
+#' @param nivel El nivel de agregación en el que se encuentran los datos. Si la base de datos tiene más de uno, se pueden incluir dentro de la función.
+#' @return base con columnas añadidas de cada partido para el cual se calculó el índice
+#' @export
 crear_indice <- function(bd, partido, nivel){
-      bd_partido <- bd |>
-        as_tibble() |>
-        select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
-        mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0))) |>
-        na.omit()
+  bd_partido <- bd |>
+    as_tibble() |>
+    select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
+    mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0))) |>
+    na.omit()
 
-      pca_modelo <- bd_partido |>
-        select(-all_of(nivel)) |>
-        stats::prcomp(scale. = T)
+  pca_modelo <- bd_partido |>
+    select(-all_of(nivel)) |>
+    stats::prcomp(scale. = T)
 
-      aux <- pca_modelo %>%
-        broom::tidy(matrix = "rotation") %>%
-        tidyr::pivot_wider(names_from = "PC", names_prefix = "PC",
-                           values_from = "value")
+  aux <- pca_modelo %>%
+    broom::tidy(matrix = "rotation") %>%
+    tidyr::pivot_wider(names_from = "PC", names_prefix = "PC",
+                       values_from = "value")
 
-      pred <- predict(pca_modelo, newdata = bd_partido)
-      pred <- as.data.frame(pred)
-      if(sum(aux$PC1) > 0) {
-        ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1))
-      } else{
-        ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1
-      }
-      bd_partido <- cbind(bd_partido, ind = ind)
+  pred <- predict(pca_modelo, newdata = bd_partido)
+  pred <- as.data.frame(pred)
+  if(sum(aux$PC1) > 0) {
+    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1))
+  } else{
+    ind <- (pred$PC1 + mean(pred$PC1) / sd(pred$PC1)) *-1
+  }
+  bd_partido <- cbind(bd_partido, ind = ind)
 
-      bd_partido <- bd_partido |>
-        select(all_of(nivel), ind) |>
-        rename_with(~glue::glue("{partido}"), ind)
+  bd_partido <- bd_partido |>
+    select(all_of(nivel), ind) |>
+    rename_with(~glue::glue("{partido}"), ind)
 
-      return(as_tibble(bd_partido))
+  return(as_tibble(bd_partido))
 }
-
 
 #' @title Creación de paletas para índice
 #' @description
@@ -402,21 +382,35 @@ crear_indice <- function(bd, partido, nivel){
 #' @param bd Base de datos con columna de índice.
 #' @param c_principal el color que tomará el valor más alto del índice
 #' @param var la variable de tipo índice a la que se le asociará el color.
+#' @export
 
 colorear_indice <- function(bd, c_principal, var){
   no_principal <- last(colortools::complementary(c_principal, plot = F))
 
-  bd <- bd %>% mutate(col := !!rlang::sym(var))
+  bd <- bd |>
+    mutate(col := !!rlang::sym(var))
 
-  colorear <- leaflet::colorQuantile(colorRamp(c(no_principal,"white", c_principal),
+  colorear <- leaflet::colorQuantile(grDevices::colorRamp(c(no_principal,"white", c_principal),
                                                space = "Lab",bias=1.5,
                                                interpolate="spline"),
                                      domain = bd[["col"]], n = 10)
 
-  bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
-
+  bd |>
+    mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) |>
+    select(-col)
 }
 
+#' Divide los datos en 4 cuantiles
+#'
+#' @description
+#' Función auxiliar a `crear_indice`, divide el índice obtenido en 4 grupos y lo convierte en factor.
+#'
+#'
+#' @param bd Base con la variable que se quiere clasificar
+#' @param partido partido para el cual se quiere realizar la clasificación
+#' @param grupos Número de grupos en los que se quiere clasificar los datos. 4 es el valor default.
+#' @return Un base de datos con una columna adicional, cuyo nombre comenzará con 'quant'
+#' @export
 crear_quantiles <- function(bd, partido, grupos = 4){
   bd |>
     mutate(quant = dvmisc::create_qgroups(!!rlang::sym(partido), groups = grupos),
@@ -424,6 +418,13 @@ crear_quantiles <- function(bd, partido, grupos = 4){
     rename_with(~glue::glue("quant_{partido}"), quant)
 }
 
+#' Crea la label para el leaflet con todas las variables que se suelen considerar relevantes en un flujo.
+#'
+#' @param bd Base que contiene todas las variables relevantes
+#' @param nivel Alguna de las siguientes opciones: seccion, municipio, distrito local o distrito federal
+#'
+#' @return la base original con una columna adicional con la label.
+#' @export
 crear_label <- function(bd, nivel){
   votos <- bd |>
     as_tibble() |>

@@ -515,9 +515,11 @@ rm(dl15)
 
 # GB_13 -------------------------------------------------------------------
 library(tidyverse)
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2023/Gobernador/mexico_normal_casilla.csv"
-path <- "~/Downloads/mexico_normal_casilla.csv"
 # Funciones ---------------------------------------------------------------
+
+estado <- "mex"
+nombre_estado <- "MEXICO"
+id_estado <- "15"
 
 homologar_bd <- function(bd, estado, nombre_estado){
   bd |>
@@ -538,33 +540,52 @@ homologar_bd <- function(bd, estado, nombre_estado){
 }
 
 # Procesamiento -----------------------------------------------------------
-gb_23 <- read_csv(path) |>
+path <- "~/Downloads/MEX_PEL_2023/GUBERNATURA_csv/2023_SEE_GOB_MEX_CAS.csv"
+
+eleccion <- "gb_23"
+
+aux <- read_csv(path) |>
   janitor::clean_names() |>
+  rename_with(~gsub("num_votos_", "", .x), contains("num_votos_")) |>
+  rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
   rename(
-    estado = id_estado,
+    noreg = can_nreg,
+    total = total_votos,
+    nominal = lista_nominal,
     distritol_23 = id_distrito_local,
-    delfina = pvem_pt_morena,
     nombre_distritol_23 = cabecera_distrital_local,
     nombre_municipio_23 = municipio,
-    municipio_23 = id_municipio,
-    validos = num_votos_validos,
-    noreg = num_votos_can_nreg,
-    nulos = num_votos_nulos,
-    total = total_votos,
-    nominal = lista_nominal
-  ) |>
-  rename_with(~gsub("naem", "panal", .x), contains("naem")) |>
-  mutate(
-    estado = as.character(estado),
-    distritol_23 = sprintf("%03s", distritol_23),
-    municipio_23 = sprintf("%03s", municipio_23),
-    seccion = sprintf("%04s", seccion),
-    seccion = if_else(grepl("V", casilla), "9999", seccion)
-  ) |>
-  homologar_bd(estado = "15", nombre_estado = "MEXICO") |>
-  select(-c(circunscripcion, estatus_acta:ruta_acta)) |>
+    municipio_23 = id_municipio) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
+  rename_with(~gsub("_naem_", "_panal_", .x), contains("_naem_")) |>
+  # rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
+  homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>
+  mutate(distritol_23 = sprintf("%02s", distritol_23),
+         municipio_23 = sprintf("%03s", municipio_23),
+         seccion = sprintf("%04s", seccion)) |>
+  rename(ele_delfina_gb_23 = ele_pvem_pt_morena_gb_23) |>
+  relocate(ele_delfina_gb_23, .before = ele_pan_gb_23) |>
+  rowwise() |>
+  mutate(ele_adm_gb_23 = sum(c(ele_pan_gb_23, ele_pri_gb_23, ele_prd_gb_23, ele_panal_gb_23,
+                               ele_pan_pri_prd_panal_gb_23, ele_pan_pri_prd_gb_23, ele_pan_pri_panal_gb_23,
+                               ele_pan_prd_panal_gb_23, ele_pri_prd_panal_gb_23, ele_pan_pri_gb_23,
+                               ele_pan_prd_gb_23, ele_pan_panal_gb_23, ele_pri_prd_gb_23,
+                               ele_pri_panal_gb_23, ele_prd_panal_gb_23), na.rm = TRUE)) |>
+  ungroup() |>
+  relocate(ele_adm_gb_23, .after = ele_delfina_gb_23) |>
+  select(estado, nombre_estado, distritol_23:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
   relocate(clave_casilla, .after = seccion) |>
-  rename_with(~paste("ele", .x, "gb_23", sep = "_"), pan:nominal)
+  select(-c(ele_pan_gb_23, ele_pri_gb_23, ele_prd_gb_23, ele_panal_gb_23,
+            ele_pan_pri_prd_panal_gb_23, ele_pan_pri_prd_gb_23, ele_pan_pri_panal_gb_23,
+            ele_pan_prd_panal_gb_23, ele_pri_prd_panal_gb_23, ele_pan_pri_gb_23,
+            ele_pan_prd_gb_23, ele_pan_panal_gb_23, ele_pri_prd_gb_23,
+            ele_pri_panal_gb_23, ele_prd_panal_gb_23))
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
 
 gb_23 |>
   count(nchar(clave_casilla))

@@ -1,5 +1,5 @@
 
-#' Title
+#' Obtener degradado de variable seleccionada
 #'
 #' @param bd base con resultados electorales y una columna adicional con el ganador de cada sección
 #' @param eleccion elección elegida para analizar
@@ -7,10 +7,9 @@
 #' @param grupo nivel de observación de la gráfica (secciones, municipios, distritos)
 #' @param saturacion nivel de saturación de la paleta de color
 #'
-#' @return
+#' @return base con columnas adicionales
 #' @export
 #'
-#' @examples
 colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, tipo, saturacion=.9){
   prefijo <- if_else(tipo == "relativo", "pct", "ele")
   # Partidos
@@ -53,21 +52,25 @@ colorear_ganador_degradado <- function(bd,eleccion, colores_nombrados, grupo, ti
 #' @param variable unidad de interés que se desea analizar (votos, pocentaje, etc)
 #' @param colores_nombrados vector compuesto con los nombres de partidos y colores que le corresponden
 #' @param valor_maximo valor máximo que toma la generación de degradados
-#'
-#' @return
-#' @export
-#' @examples
+#' @importFrom grDevices colorRamp
 degradar_color_partido <- function(bd_larga, nombre, variable, colores_nombrados, valor_maximo=1){
   partidos <- names(colores_nombrados)
   funciones_color <- map(partidos,
                          ~colorRamp(colors = c("white",colores_nombrados[[.x]]), space = "Lab") %>%
                            leaflet::colorNumeric(domain = c(0, valor_maximo)))
   names(funciones_color) <- unique(partidos)
-  res <- bd_larga %>%
-    mutate(color=map2_chr(!!enquo(nombre), !!enquo(variable),~funciones_color[[.x]](.y)))
+  res <- bd_larga |>
+    mutate(color = map2_chr(!!enquo(nombre), !!enquo(variable),~funciones_color[[.x]](.y)))
   return(res)
 }
 
+#' Asigna a un objeto de la clase los colores de los partidos seleccionados
+#'
+#' @param partidos
+#'
+#' @return Un vector nombrado con los colores de los partidos seleccionados
+#' @export
+#'
 asociar_colores <- function(partidos) {
   paleta <- paleta |>
     filter(partidos %in% !!partidos)

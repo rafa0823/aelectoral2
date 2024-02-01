@@ -14,13 +14,11 @@ Imports:
     broom,
     cluster,
     ClustGeo,
-    colortools,
     dplyr,
     dvmisc,
     forcats,
     ggplot2,
     ggrepel,
-    ggsflabel,
     glue,
     grDevices,
     infer,
@@ -38,6 +36,9 @@ Imports:
     stringr,
     tibble,
     tidyr
+Remotes:
+    yutannihilation/ggsflabel,
+    gastonstat/colortools
 Suggests: 
     janitor,
     knitr,
@@ -51,3 +52,4 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 License: MIT + file LICENSE
+

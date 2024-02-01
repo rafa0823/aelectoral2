@@ -80,15 +80,15 @@ asociar_colores <- function(partidos) {
   return(paleta$colores)
 }
 
-# obtener_color <- function(bd, c_principal, var){
-#   no_principal <-last(colortools::complementary(c_principal))
-#
-#   bd <- bd %>% mutate(col := !!rlang::sym(var))
-#
-#   colorear <- leaflet::colorQuantile(grDevices::colorRamp(c(no_principal,"white", c_principal),
-#                                                           space = "Lab",bias=1.5,
-#                                                           interpolate="spline"),
-#                                      domain = bd[["col"]], n = 10)
-#
-#   bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
-# }
+obtener_color <- function(bd, c_principal, var){
+  no_principal <-last(colortools::complementary(c_principal))
+
+  bd <- bd %>% mutate(col := !!rlang::sym(var))
+
+  colorear <- leaflet::colorQuantile(grDevices::colorRamp(c(no_principal,"white", c_principal),
+                                                          space = "Lab",bias=1.5,
+                                                          interpolate="spline"),
+                                     domain = bd[["col"]], n = 10)
+
+  bd %>% mutate(!!rlang::sym(glue::glue("col_{var}")) := colorear(col)) %>% select(-col)
+}

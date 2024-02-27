@@ -31,17 +31,6 @@ usethis::use_data(claves_mun)
 
 claves <- bind_cols(claves, claves_mun)
 
-
-
-
-
-
-
-
-
-
-
-
 df <- read_rds("inst/electoral/nacional/df_21.rda") |>
   as_tibble() |>
   transmute(seccion = paste(estado, seccion, sep = "_"),

@@ -49,8 +49,39 @@ bd_df_12 <- read_csv("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadís
 
 # FEDERALES -----------------------------------------------------------------------
 
-## Senado 2018
+## Senado 2012
 
+path <-  "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/Resultados definitivos/Federal/2012/Senador_casilla.csv"
+sen_12 <- readr::read_csv(path, col_types = "c") |>
+  janitor::clean_names() |>
+  filter(tipo_casilla != "MEC") |>
+  rename(distritof_12 = distrito,
+         municipio_12 = municipio,
+         total = votos,
+         nominal = lista_nominal,
+         noreg = no_reg,
+  ) |>
+  select(-c(lista_nominal_casilla)) |>
+  mutate(estado = sprintf("%02d", estado),
+         distritof_12 = sprintf("%03d", distritof_12),
+         municipio_12 = sprintf("%03d", municipio_12),
+         seccion = sprintf("%04d", seccion)) |>
+  relocate(c(orden:total), .after = pt_mc) |>
+  relocate(municipio_12, .after = distritof_12)
+
+sen_12_c <- sen_12 |>
+  filter(nchar(clave_casilla) == 11)
+
+sen_12_e <- sen_12 |>
+  filter(nchar(clave_casilla) != 11) |>
+  mutate(clave_casilla = glue::glue("{estado}{seccion}{tipo_casilla}{sprintf('%02s', id_casilla)}{sprintf('%02s', ext_contigua)}"))
+
+sen_12 <- bind_rows(sen_12_c, sen_12_e)
+
+readr::write_rds(sen_12, "inst/electoral/nacional/sen_12.rda")
+
+
+## Senado 2018
 path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Federal/2018/senadores/2018_SEE_SEN_MR_NAL_CAS.csv"
 sen_18 <- read_csv(path) |>
   janitor::clean_names() |>

@@ -461,17 +461,37 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               initialize = function(unidad, entidad){
                                 self$entidades <- entidad
                                 aux <- leer_shp(unidad, self$entidades)
-                                if(unidad == "secc_22") {
-                                  aux <- aux |>
-                                    left_join(claves |>
-                                                distinct(distritol_22, nombre_distritol_22) |>
-                                                na.omit(),
-                                              join_by(distritol_22)) |>
-                                    left_join(claves |>
-                                                distinct(distritof_22, nombre_distritof_22) |>
-                                                na.omit(),
-                                              join_by(distritof_22)) |>
-                                    left_join(claves_mun, join_by(municipio_22))
+                                if(grepl("secc", unidad)) {
+                                  if(grepl("_23", unidad)){
+                                    claves <- claves |>
+                                      rename_with(~gsub("_22", "_23", .x))
+
+                                    claves_mun <- claves_mun |>
+                                      rename_with(~gsub("_22", "_23", .x))
+
+                                    aux <- aux |>
+                                      left_join(claves |>
+                                                  distinct(distritol_23, nombre_distritol_23) |>
+                                                  na.omit(),
+                                                join_by(distritol_23)) |>
+                                      left_join(claves |>
+                                                  distinct(distritof_23, nombre_distritof_23) |>
+                                                  na.omit(),
+                                                join_by(distritof_23)) |>
+                                      left_join(claves_mun, join_by(municipio_23))
+
+                                  } else if (grepl("_22", unidad)) {
+                                    aux <- aux |>
+                                      left_join(claves |>
+                                                  distinct(distritol_22, nombre_distritol_22) |>
+                                                  na.omit(),
+                                                join_by(distritol_22)) |>
+                                      left_join(claves |>
+                                                  distinct(distritof_22, nombre_distritof_22) |>
+                                                  na.omit(),
+                                                join_by(distritof_22)) |>
+                                      left_join(claves_mun, join_by(municipio_22))
+                                  }
                                 }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
@@ -486,18 +506,27 @@ ElectoralSHP <- R6::R6Class("ElectoralSHP",
                               agregar_shp = function(unidad, entidad = NULL){
                                 if(!entidad %in% self$entidades) self$entidades <- self$entidades %>% append(entidad)
                                 aux <- leer_shp(unidad, entidad)
-                                if (unidad == "dl_22"){
+                                if(grepl("_23", unidad)){
+                                  claves <- claves |>
+                                    rename_with(~gsub("_22", "_23", .x))
+                                  dl_v <- c("distritol_23", "nombre_distritol_23")
+                                  df_v <- c("distritof_23", "nombre_distritof_23")
+                                } else {
+                                  dl_v <- c("distritol_22", "nombre_distritol_22")
+                                  df_v <- c("distritof_22", "nombre_distritof_22")
+                                }
+                                if (grepl("dl", unidad)){
                                   aux <- aux |>
                                     left_join(claves |>
-                                                distinct(distritol_22, nombre_distritol_22) |>
-                                                na.omit(),
-                                              join_by("distritol_22"))
-                                } else if(unidad == "df_22"){
+                                                select(all_of(dl_v)) |>
+                                                distinct() |>
+                                                na.omit())
+                                } else if(grepl("df", unidad)){
                                   aux <- aux |>
                                     left_join(claves |>
-                                                distinct(distritof_22, nombre_distritof_22) |>
-                                                na.omit(),
-                                              join_by("distritof_22"))
+                                                select(all_of(df_v)) |>
+                                                distinct()  |>
+                                                na.omit())
                                 }
                                 self$shp <- self$shp %>% append(list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_")))
                               },
@@ -605,13 +634,22 @@ Tablero <- R6::R6Class("Tablero",
                          },
                          #' @description Genera un objeto auxiliar para mejorar el nombre de los niveles que se han incluido en la clase
                          obtener_nombres_elecciones = function(){
-                           nombres <- tibble(nombres = c("Sección", "Municipio", "Distrito local", "Distrito federal"),
-                                             niveles = c("seccion", "municipio_22", "distritol_22", "distritof_22"))
+                           nombres <- tibble(niveles = c("seccion",
+                                                         paste(rep(c("municipio", "distritol", "distritof"), 2), c("22", "23"), sep = "_"))) |>
+                             mutate(nombres = gsub("_22|_23", "", stringr::str_to_title(niveles)),
+                                    nombres = case_when(grepl("l", nombres) ~ "Distrito local",
+                                                        grepl("f", nombres) ~ "Distrito federal",
+                                                        T ~ nombres),
+                                    nombres = as.factor(nombres))
 
                            self$nombres_elecciones <- nombres_elecciones |>
                              filter(eleccion %in% na.omit(unique(self$info$analisis$eleccion)))
 
-                           self$info$nivel <- set_names(self$info$nivel, filter(nombres, niveles %in% self$info$nivel)$nombres)
+                           aux <- filter(nombres, niveles %in% self$info$nivel) |>
+                             arrange(desc(nombres))
+
+                           self$info$nivel <- aux$niveles |>
+                             set_names(aux$nombres)
                          },
                          #' @description cambia todos los lugar donde aparezca la columna "total" para que se llame "participación"
                          cambiar_nombre_participacion = function(){

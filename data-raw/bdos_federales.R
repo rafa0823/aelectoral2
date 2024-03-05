@@ -16,7 +16,6 @@ bd_pr_18 <- pr_18 <- read_excel("~/Dropbox (Selva)/Ciencia de datos/Consultorí
 
 setwd("~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadística/Recursos/Externos/Limpieza/Resultados definitivos/Federal/2018/diputados_federales")
 
-
 bd_df_18 <- list.files(full.names = T) %>%
   map_dfr(~{
     print(.x)
@@ -487,3 +486,54 @@ library(tidyverse)
 
 df_18 <- read_rds("inst/electoral/nacional/df_18.rda")
 df_18 %>% rename(estado = id_estado) %>% saveRDS("inst/electoral/nacional/df_18.rda")
+
+# PR - 06 -----------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/NAC/PRESIDENCIA_2006/2006_SEE_PRE_NAL_CAS.csv"
+pr_06 <- read_csv(path) |>
+  janitor::clean_names() |>
+  select(-c(circunscripcion, id_distrito:municipio)) |>
+  rename(estado = id_estado,
+         panal = nva_alianza,
+         noreg = num_votos_can_nreg,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal) |>
+  mutate(estado = sprintf("%02s", estado),
+         seccion = sprintf("%04s", seccion),
+         casilla = if_else(casilla == "B", "B01",casilla),
+         id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
+                                T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
+         tipo_casilla = substr(casilla, 1, 1),
+         ext_contigua = if_else(nchar(casilla) >= 4, stringr::str_extract_all(casilla,"(?<=C)(\\d+)"), list("0")),
+         clave_casilla = glue::glue("{estado}{stringr::str_pad(seccion,pad = '0', width = 4)}{tipo_casilla}{stringr::str_pad(id_casilla,pad = '0', width = 2)}{stringr::str_pad(ext_contigua,pad = '0', width = 2)}")) |>
+  rename_with(~paste("ele", .x, "pr", "06", sep = "_"),.cols = c(pan:nominal)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  relocate(casilla, .after = ruta_acta)
+
+write_rds(pr_06, "inst/electoral/nacional/pr_06.rda")
+
+# PR - 12 -----------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/NAC/PRESIDENCIA_2012/2012_SEE_PRE_NAL_CAS.csv"
+pr_12 <- read_csv(path) |>
+  janitor::clean_names() |>
+  filter(!grepl("M", casilla)) |>
+  select(-c(circunscripcion, id_distrito:municipio)) |>
+  rename(estado = id_estado,
+         panal = nva_alianza,
+         noreg = num_votos_can_nreg,
+         nulos = num_votos_nulos,
+         total = total_votos,
+         nominal = lista_nominal) |>
+  mutate(estado = sprintf("%02s", estado),
+         seccion = sprintf("%04s", seccion),
+         casilla = if_else(casilla == "B", "B01",casilla),
+         id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
+                                T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
+         tipo_casilla = substr(casilla, 1, 1),
+         ext_contigua = if_else(nchar(casilla) >= 4, stringr::str_extract_all(casilla,"(?<=C)(\\d+)"), list("0")),
+         clave_casilla = glue::glue("{estado}{stringr::str_pad(seccion,pad = '0', width = 4)}{tipo_casilla}{stringr::str_pad(id_casilla,pad = '0', width = 2)}{stringr::str_pad(ext_contigua,pad = '0', width = 2)}")) |>
+  rename_with(~paste("ele", .x, "pr", "12", sep = "_"),.cols = c(pan:nominal)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  relocate(casilla, .after = ruta_acta)
+
+write_rds(pr_12, "inst/electoral/nacional/pr_12.rda")

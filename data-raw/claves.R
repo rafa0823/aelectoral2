@@ -15,7 +15,7 @@ usethis::use_data(claves, overwrite = T)
 claves_mun <- tibble(municipio_22 = NA, nombre_municipio_22 = NA)
 claves_mun <- diccionario$abreviatura |>
   purrr::map(~{
-    shp <- ElectoralSHP$new(unidad = "mun_22", entidad =  .x)
+    shp <- ElectoralSHP$new(unidad = "mun_23", entidad =  .x)
     mun <- shp$shp[[1]] |>
       as_tibble() |>
       select(contains("municipio"))
@@ -24,9 +24,10 @@ claves_mun <- diccionario$abreviatura |>
   })
 
 claves_mun <- claves_mun |>
-  reduce(bind_rows)
+  reduce(bind_rows) |>
+  rename_with(~gsub("_23", "_22", .x))
 
-usethis::use_data(claves_mun)
+usethis::use_data(claves_mun, overwrite = T)
 # Juntar municipios y distritos -------------------------------------------
 
 claves <- bind_cols(claves, claves_mun)

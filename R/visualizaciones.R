@@ -116,7 +116,11 @@ procesar_pointrange <- function(bd, indice, partidos, elecciones = NULL) {
     group_var <- "partidos"
   } else {
     processed_data <- filtered_data |>
-      mutate(eleccion = factor(stringr::str_sub(eleccion, -5, -1), levels = elecciones))
+      mutate(eleccion = if_else(grepl("sen", eleccion),
+                                stringr::str_sub(eleccion, -6, -1),
+                                stringr::str_sub(eleccion, -5, -1)),
+             eleccion = factor(eleccion, levels = elecciones))
+
     group_var <- "eleccion"
   }
 
@@ -236,8 +240,8 @@ ejecutar_sankey <- function(bd, colores){
 #' @return objeto tipo ggplot
 #' @export
 graficar_pointrange <- function(bd, eje_x, grupo, colores, indice, size = 12) {
-  if(!(grupo %in% c("partidos", "elecciones"))) {
-    stop("Error: 'grupo' must be either 'partidos' or 'elecciones'")
+  if(!(grupo %in% c("partidos", "eleccion"))) {
+    stop("Error: 'grupo' must be either 'partidos' or 'eleccion'")
   }
   var <- if_else(grupo == "partidos", "Partidos", "Elecciones")
 

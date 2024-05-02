@@ -774,8 +774,8 @@ Graficas <-  R6::R6Class("Graficas",
                            #' @param variables determina si la gráfica va a ser de partidos o de elecciones, solo puede tomar "partidos" o "elecciones" como varlor.
                            #' @return objeto de ggplot
                            pointrange = function(indice, variables){
-                             if(!variables %in% c("partidos", "elecciones")) {
-                               stop("Error: N'mbre mi bro, chécate la documentación, 'variables' no puede tomar ese valor")
+                             if(!variables %in% c("partidos", "eleccion")) {
+                               stop("Error: Revisar qué parámetros están ingresando a la función")
                              }
 
                              if(variables == "partidos"){
@@ -784,7 +784,7 @@ Graficas <-  R6::R6Class("Graficas",
                                  graficar_pointrange(eje_x = indice,grupo = variables,
                                                      indice = indice, colores = self$tab$info$colores)
 
-                             } else if (variables == "elecciones"){
+                             } else if (variables == "eleccion"){
                                procesar_pointrange(bd = self$tab$aux$shp, indice = indice,
                                                    partidos = self$tab$info$partidos,
                                                    elecciones = self$tab$nombres_elecciones$eleccion
@@ -808,7 +808,7 @@ Graficas <-  R6::R6Class("Graficas",
                                             high = high,
                                             name = "Coincidencias",
                                             eje_x = "Índice de participación",
-                                            eje_y = glue::glue("Índice {y}")
+                                            eje_y = glue::glue("Índice {indice}")
                              )
                            }
                          ))

@@ -135,3 +135,79 @@ aux |>
 
 glimpse(aux)
 write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+# PM_18 -------------------------------------------------------------------
+# pm_21 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/computos/SONORA/SON_PEL_2018/AYUNTAMIENTOS_csv/2018_SEE_AYUN_SON_CAS.csv"
+
+eleccion <- "pm_18"
+
+aux <- read_csv(path) |>
+  janitor::clean_names() |>
+  rename_with(~gsub("num_votos_", "", .x), contains("num_votos_")) |>
+  rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
+  rename(
+    panal = na,
+    pes = es,
+    noreg = can_nreg,
+    total = total_votos,
+    nominal = lista_nominal,
+    distritol_18 = id_distrito_local,
+    nombre_distritol_18 = cabecera_distrital_local,
+    nombre_municipio_18 = municipio,
+    municipio_18 = id_municipio,
+    ccpanprd = c_comun_pan_prd,
+    ccpripvempanal = c_comun_pri_pvem_na) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
+  # rename_with(~gsub("_nay_", "_panal_", .x), contains("_nay_")) |>
+  rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
+  homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
+  select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
+  relocate(clave_casilla, .after = seccion)
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+# DL 18 -------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/computos/SONORA/SON_PEL_2018/DIPUTACIONES_LOC_MR_csv/2018_SEE_DIP_LOC_MR_SON_CAS.csv"
+
+eleccion <- "dl_18"
+
+aux <- read_csv(path) |>
+  janitor::clean_names() |>
+  rename_with(~gsub("num_votos_", "", .x), contains("num_votos_")) |>
+  rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
+  rename(
+    panal = na,
+    pes = es,
+    noreg = can_nreg,
+    total = total_votos,
+    nominal = lista_nominal,
+    distritol_18 = id_distrito_local,
+    nombre_distritol_18 = cabecera_distrital_local,
+    nombre_municipio_18 = municipio,
+    municipio_18 = id_municipio,
+    ccpripvempanal = c_comun_pri_pvem_na) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
+  # rename_with(~gsub("_nay_", "_panal_", .x), contains("_nay_")) |>
+  rename_with(~gsub("_na_", "_panal_", .x), contains("_na_")) |>
+  homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>
+  mutate(distritol_18 = sprintf("%02s", distritol_18),
+         municipio_18 = sprintf("%03s", municipio_18),
+         seccion = sprintf("%04s", seccion)) |>
+  select(estado, nombre_estado, distritol_18:clave_casilla, -c(circunscripcion, estatus_acta:ruta_acta)) |>
+  relocate(clave_casilla, .after = seccion)
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))

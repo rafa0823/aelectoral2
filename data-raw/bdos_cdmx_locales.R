@@ -202,3 +202,30 @@ aux |>
 dl_21 <- aux
 glimpse(dl_21)
 write_rds(dl_21, "inst/electoral/cdmx/dl_21.rda")
+
+# PM-15 -------------------------------------------------------------------
+
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/PEL/CDMX/2015/JEFE_DELEGACIONAL_csv/2015_SEE_JEF_DELEG_DF_CAS.csv"
+
+pm_15 <- readr::read_csv(path) |>
+  janitor::clean_names() |>
+  rename_with(~gsub("cand_", "", .x)) |>
+  rename_with(~gsub("nva_alianza", "panal", .x)) |>
+  rename_with(~gsub("num_votos_", "", .x)) |>
+  rename(noreg = can_nreg,
+         total = total_votos,
+         nominal = lista_nominal,
+         estado = id_estado) |>
+  mutate(nombre_estado = "CIUDAD DE MÉXICO",
+         estado = sprintf("%02s", estado),
+         seccion = sprintf("%04s", seccion)) |>
+  rename_with(~paste("ele", .x, "pm_15", sep = "_"), .cols = c(pan:nominal)) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
+  homologar_bd(estado = "09", nombre_estado = "CIUDAD DE MÉXICO") |>
+  relocate(clave_casilla, .before = seccion)
+
+pm_15 |>
+  count(nchar(clave_casilla))
+
+readr::write_rds(pm_15, "inst/electoral/cdmx/pm_15.rda")
+

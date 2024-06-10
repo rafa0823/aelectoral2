@@ -74,7 +74,7 @@ calcular_irs <- function(bd, electoral, nivel, c_principal) {
   #Necesitamos incluir un valor antes y otro después de los breaks para que 'cut' entienda que debe incluir
   #los valores menores al límite inferior y mayores al límite superior.
   intervalo <- c(-Inf, ja$bh, Inf)
-  if (sum(cp$PC1) > 0) {
+  if (sum(as_tibble(cp$rotation)$PC1) > 0) {
     labels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto")
   } else {
     labels = c("Muy alto", "Alto", "Medio", "Bajo", "Muy bajo")
@@ -91,7 +91,12 @@ calcular_irs <- function(bd, electoral, nivel, c_principal) {
       ),
       quant_rezago = factor(quant_rezago, levels = labels)
     ) |>
-    obtener_color(c_principal = c_principal, "rezago")
+    mutate(col_rezago = case_when(quant_rezago == "Muy bajo" ~ "#140A8C",
+                                  quant_rezago == "Bajo" ~ "#2F2A6B",
+                                  quant_rezago == "Medio" ~ "#ffffff",
+                                  quant_rezago == "Alto" ~ "#666B2A",
+                                  quant_rezago == "Muy alto" ~ "#828C0A"
+                                  ))
 
   return(base)
 }

@@ -14,3 +14,4 @@ ags_gb_16 <- read.csv('~/Dropbox (Selva)/Ciencia de datos/Consultoría Estadí
 ags_gb_16 %>% count(coaliciones)
 
 ags_gb_16 %>% write_rds("inst/alianzas/ags/ags_gb_16.rda")
+

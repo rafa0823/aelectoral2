@@ -1,12 +1,18 @@
-## code to prepare `bdos_mor_auxiliares` dataset goes here
-# pm24 --------------------------------------------------------------------
-entidad <- "mor"
+## code to prepare `bdos_bc_auxiliares` dataset goes here
+# Alianza PM 24 -----------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/PREP/Locales"
+files <- list.files(path, recursive = T, pattern = ".csv",full.names = T)
+files_cand <- subset(files, grepl("AYUN_CAND|AYUN_Cand", files))
+
+## Se debe de seguir la siguiente estructura: eleccion, estado, nombre_estado, municipio, coaliciones y un booleano de si es Candidatura Común
+
+entidad <- "camp"
 
 dicc <- aelectoral2::diccionario |>
   mutate(id_estado = sprintf("%02s", id_estado)) |>
   select(-abreviatura, nombre_estado = estado)
 
-pm_24 <- readr::read_csv(files_cand[[14]]) |>
+pm_24 <- readr::read_csv(files_cand[[3]]) |>
   janitor::clean_names() |>
   rename_with(~gsub("_local", "", .x), contains("_local")) |>
   select(-contains("suplente")) |>
@@ -15,17 +21,13 @@ pm_24 <- readr::read_csv(files_cand[[14]]) |>
   arrange(as.numeric(municipio)) |>
   mutate(candidatura = if_else(candidatura == "SIN REGISTRO", NA, candidatura)) |>
   na.omit() |>
-  filter(!grepl("CI|IND", partido_ci)) |>
+  filter(!grepl("IND", partido_ci)) |>
   filter((n() > 1 | grepl("-|_", partido_ci)), .by = candidatura) |>
   filter(nchar(partido_ci) == max(nchar(partido_ci)), .by = candidatura) |>
   transmute(eleccion = "pm_24",
             estado = sprintf("%02s", entidad),
             municipio = sprintf("%03s", municipio),
-            coalicion = tolower(gsub("CC_|COA_|C_", "", partido_ci)),
-            coalicion = gsub("-", "_", coalicion),
-            coalicion = if_else(coalicion == "mprogresa", "mc_progresa", coalicion),
-            candidatura_comun = if_else(grepl("CC_", partido_ci), T, NA)
-  ) |>
+            coalicion = tolower(gsub("C_", "", partido_ci))) |>
   left_join(dicc, join_by(estado == id_estado))
 
 carpetas <- list.files("inst/alianzas/")
@@ -36,3 +38,5 @@ if(!entidad %in% carpetas){
 } else{
   readr::write_rds(pm_24, glue::glue("inst/alianzas/{entidad}/pm_24.rda"))
 }
+
+

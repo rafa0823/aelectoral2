@@ -64,11 +64,15 @@ repartir_candidato <- function(bd, al, nivel, eleccion){
       partidos <- stringr::str_split(.x,"_") %>% purrr::pluck(1)
       p_vars <- paste("ele", partidos, eleccion, sep = "_")
 
-      candidato_c <- bd %>% filter(!!rlang::sym(nivel) %in% aux_n) %>% rowwise() %>%
+      candidato_c <- bd %>%
+        filter(!!rlang::sym(nivel) %in% aux_n) %>%
+        rowwise() %>%
         transmute(!!rlang::sym(nivel),
-                  !!rlang::sym(paste("cand",.x,eleccion, sep = "_")) := sum(c_across(all_of(p_vars)))) %>% ungroup
+                  !!rlang::sym(paste("cand",.x,eleccion, sep = "_")) := sum(c_across(all_of(p_vars)))) %>%
+        ungroup
 
-      sin_c <- bd %>% filter(!(!!rlang::sym(nivel) %in% aux_n)) %>%
+      sin_c <- bd %>%
+        filter(!(!!rlang::sym(nivel) %in% aux_n)) %>%
         select(all_of(c(nivel, p_vars)))
 
       res <- candidato_c %>%

@@ -1,19 +1,19 @@
-## code to prepare `bdos_mor_auxiliares` dataset goes here
+## code to prepare `bdos_oax_auxiliares` dataset goes here
 # pm24 --------------------------------------------------------------------
-entidad <- "mor"
+entidad <- "oax"
 
 dicc <- aelectoral2::diccionario |>
   mutate(id_estado = sprintf("%02s", id_estado)) |>
   select(-abreviatura, nombre_estado = estado)
 
-pm_24 <- readr::read_csv(files_cand[[14]]) |>
+pm_24 <- readr::read_csv(files_cand[[17]]) |>
   janitor::clean_names() |>
   rename_with(~gsub("_local", "", .x), contains("_local")) |>
   select(-contains("suplente")) |>
   rename_with(~gsub("_propietaria", "", .x), contains("_propietaria")) |>
   rename_with(~gsub("id_", "", .x), contains("id")) |>
   arrange(as.numeric(municipio)) |>
-  mutate(candidatura = if_else(candidatura == "SIN REGISTRO", NA, candidatura)) |>
+  mutate(candidatura = if_else(candidatura %in% c("SIN REGISTRO", "Registro cancelado"), NA, candidatura)) |>
   na.omit() |>
   filter(!grepl("CI|IND", partido_ci)) |>
   filter((n() > 1 | grepl("-|_", partido_ci)), .by = candidatura) |>

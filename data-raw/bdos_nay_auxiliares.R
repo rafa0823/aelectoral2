@@ -1,12 +1,12 @@
-## code to prepare `bdos_mor_auxiliares` dataset goes here
+## code to prepare `bdos_nay_auxiliares` dataset goes here
 # pm24 --------------------------------------------------------------------
-entidad <- "mor"
+entidad <- "nay"
 
 dicc <- aelectoral2::diccionario |>
   mutate(id_estado = sprintf("%02s", id_estado)) |>
   select(-abreviatura, nombre_estado = estado)
 
-pm_24 <- readr::read_csv(files_cand[[14]]) |>
+pm_24 <- readr::read_csv(files_cand[[15]]) |>
   janitor::clean_names() |>
   rename_with(~gsub("_local", "", .x), contains("_local")) |>
   select(-contains("suplente")) |>

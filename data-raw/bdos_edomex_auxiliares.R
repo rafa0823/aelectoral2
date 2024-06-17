@@ -127,3 +127,4 @@ alianzas_edomex_dl_15 <- c(1,2,4,5,6,seq(9,125))%>%
 
 
 alianzas_edomex_dl_15 %>% write_rds("inst/alianzas/mex/dl_15.rda")
+

@@ -1,12 +1,11 @@
-## code to prepare `bdos_mor_auxiliares` dataset goes here
-# pm24 --------------------------------------------------------------------
-entidad <- "mor"
+## code to prepare `bdos_slp_auxiliares` dataset goes here
+entidad <- "slp"
 
 dicc <- aelectoral2::diccionario |>
   mutate(id_estado = sprintf("%02s", id_estado)) |>
   select(-abreviatura, nombre_estado = estado)
 
-pm_24 <- readr::read_csv(files_cand[[14]]) |>
+pm_24 <- readr::read_csv(files_cand[[8]]) |>
   janitor::clean_names() |>
   rename_with(~gsub("_local", "", .x), contains("_local")) |>
   select(-contains("suplente")) |>
@@ -15,15 +14,14 @@ pm_24 <- readr::read_csv(files_cand[[14]]) |>
   arrange(as.numeric(municipio)) |>
   mutate(candidatura = if_else(candidatura == "SIN REGISTRO", NA, candidatura)) |>
   na.omit() |>
-  filter(!grepl("CI|IND", partido_ci)) |>
-  filter((n() > 1 | grepl("-|_", partido_ci)), .by = candidatura) |>
+  filter(!grepl("IND", partido_ci), !grepl("CANDIADATO|CANDIDATO", candidatura)) |>
+  filter((n() > 1 | grepl("-|_", partido_ci)), .by = c(municipio, candidatura)) |>
   filter(nchar(partido_ci) == max(nchar(partido_ci)), .by = candidatura) |>
   transmute(eleccion = "pm_24",
             estado = sprintf("%02s", entidad),
             municipio = sprintf("%03s", municipio),
             coalicion = tolower(gsub("CC_|COA_|C_", "", partido_ci)),
             coalicion = gsub("-", "_", coalicion),
-            coalicion = if_else(coalicion == "mprogresa", "mc_progresa", coalicion),
             candidatura_comun = if_else(grepl("CC_", partido_ci), T, NA)
   ) |>
   left_join(dicc, join_by(estado == id_estado))

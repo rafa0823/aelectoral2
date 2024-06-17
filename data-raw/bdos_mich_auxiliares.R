@@ -1,12 +1,11 @@
-## code to prepare `bdos_mor_auxiliares` dataset goes here
 # pm24 --------------------------------------------------------------------
-entidad <- "mor"
+entidad <- "mich"
 
 dicc <- aelectoral2::diccionario |>
   mutate(id_estado = sprintf("%02s", id_estado)) |>
   select(-abreviatura, nombre_estado = estado)
 
-pm_24 <- readr::read_csv(files_cand[[14]]) |>
+pm_24 <- readr::read_csv(files_cand[[13]]) |>
   janitor::clean_names() |>
   rename_with(~gsub("_local", "", .x), contains("_local")) |>
   select(-contains("suplente")) |>
@@ -23,7 +22,6 @@ pm_24 <- readr::read_csv(files_cand[[14]]) |>
             municipio = sprintf("%03s", municipio),
             coalicion = tolower(gsub("CC_|COA_|C_", "", partido_ci)),
             coalicion = gsub("-", "_", coalicion),
-            coalicion = if_else(coalicion == "mprogresa", "mc_progresa", coalicion),
             candidatura_comun = if_else(grepl("CC_", partido_ci), T, NA)
   ) |>
   left_join(dicc, join_by(estado == id_estado))

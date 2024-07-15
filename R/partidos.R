@@ -7,8 +7,12 @@
 #' @return Base de datos repartida
 #' @export
 repartir_coalicion <- function(bd, nivel, eleccion){
-  if(sum(is.na(bd[[nivel]]))>0) bd <- bd %>% mutate(!!rlang::sym(nivel) := tidyr::replace_na(!!rlang::sym(nivel),"E"))
+  if(sum(is.na(bd[[nivel]]))>0) {
+    bd <- bd %>%
+      mutate(!!rlang::sym(nivel) := tidyr::replace_na(!!rlang::sym(nivel),"E"))
+  }
 
+  ## Obtiene el número de partidos que forman parte de una alianza y divide el número de votos de la alianza entre los partidos
   pre <- bd %>%
     group_by(across(all_of(nivel))) %>%
     summarise(across(starts_with("ele_"), ~sum(.x,na.rm = T))) %>%
@@ -23,6 +27,7 @@ repartir_coalicion <- function(bd, nivel, eleccion){
       residuo = value %% num_partidos
     )
 
+  ## Asigna un ranking a cada partido dependiendo quién obtuvo más votos por sección
   r <- pre %>%
     filter(num_partidos == 1) %>%
     group_by(across(all_of(nivel))) %>%

@@ -3,6 +3,7 @@
 export(Electoral)
 export(ElectoralSHP)
 export(Graficas)
+export(anadir_cc)
 export(asociar_colores)
 export(calcular_diferencias)
 export(calcular_irs)

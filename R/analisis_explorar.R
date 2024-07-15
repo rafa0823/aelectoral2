@@ -50,7 +50,7 @@ calcular_diferencias <- function(bd, partido, eleccion_referencia, eleccion_cont
 calcular_votos_relativos <- function(bd, partido, eleccion, grupo){
   res  <- map(eleccion,
               ~{
-                sufijo <- paste("ele",partido, .x, sep = "_")
+                sufijo <- paste("ele", partido , .x, sep = "_")
                 nominal <-  paste("ele_nominal", .x, sep = "_")
                 bd %>%
                   group_by({{grupo}}) %>%
@@ -96,7 +96,6 @@ ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL){
   if(is.null(partido)){
     partido <- extraer_partidos(bd, eleccion, tipo)
   }
-
   res <- bd %>%
     select(nivel, matches(glue::glue("ele_{partido}_{eleccion}"))) |>
     mutate(ganador = pmap(across(ends_with(glue::glue("_{eleccion}")) &
@@ -344,14 +343,24 @@ extraer_partidos <- function(bd, eleccion, tipo){
 #' @return base con columnas añadidas de cada partido para el cual se calculó el índice
 #' @export
 crear_indice <- function(bd, partido, nivel){
+  nombres <- subset(names(bd), grepl(glue::glue("pct_"), names(bd)))
+  nombres <- subset(nombres, grepl(partido, nombres))
+
   bd_partido <- bd |>
     as_tibble() |>
-    select(all_of(nivel), contains(c(glue::glue("pct_{partido}_")))) |>
+    select(all_of(nivel), nombres) |>
     mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0))) |>
     na.omit()
 
-  pca_modelo <- bd_partido |>
+  utiles <- bd_partido |>
     select(-all_of(nivel)) |>
+    summarise(across(everything(), sum)) |>
+    tidyr::pivot_longer(cols = everything()) |>
+    filter(value != 0) |>
+    pull(name)
+
+  pca_modelo <- bd_partido |>
+    select(all_of(utiles)) |>
     stats::prcomp(scale. = T)
 
   aux <- pca_modelo %>%

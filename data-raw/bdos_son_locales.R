@@ -33,6 +33,7 @@ aux <- read_csv(path) |>
   janitor::clean_names() |>
   rename_with(~gsub("num_votos_", "", .x), contains("num_votos_")) |>
   rename_with(~gsub("cand_", "", .x), contains("cand_")) |>
+  glimpse()
   rename(
     panal = nas,
     # pes = es,
@@ -137,7 +138,6 @@ glimpse(aux)
 write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
 
 # PM_18 -------------------------------------------------------------------
-# pm_21 -------------------------------------------------------------------
 path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/computos/SONORA/SON_PEL_2018/AYUNTAMIENTOS_csv/2018_SEE_AYUN_SON_CAS.csv"
 
 eleccion <- "pm_18"
@@ -242,6 +242,7 @@ aux <- readxl::read_excel(path) |>
     municipio_24 = id_municipio_local,
     nulos = num_votos_nulos) |>
   rename_with(.fn = function(x) paste0("ind", 1:6), .cols = amigos_de_baes:nacozari_somos_todos) |>
+  relocate(total, .before = nominal) |>
   rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
   mutate(casilla = paste0(tipo_casilla, id_casilla)) |>
   homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>
@@ -287,6 +288,7 @@ aux <- readxl::read_excel(path) |>
     municipio_24 = id_municipio_local,
     nulos = num_votos_nulos) |>
   #rename_with(.fn = function(x) paste0("ind", 1:6), .cols = amigos_de_baes:nacozari_somos_todos) |>
+  relocate(total, .before = nominal) |>
   rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
   mutate(casilla = paste0(tipo_casilla, id_casilla)) |>
   homologar_bd(estado = id_estado, nombre_estado = nombre_estado) |>

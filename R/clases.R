@@ -64,7 +64,8 @@ Electoral <- R6::R6Class("Electoral",
                                                  llaves = "seccion",
                                                  tipo_eleccion = "MR",
                                                  partidos = NULL,
-                                                 extranjero = T, especiales = NULL){
+                                                 extranjero = T,
+                                                 especiales = NULL){
                              self$eleccion <- eleccion
                              self$elecciones_agregadas <- eleccion
                              self$entidad <- entidad
@@ -113,7 +114,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                            obtener_bd = function(){
                              self$bd <- leer_base(eleccion = self$eleccion,
                                                   entidad = self$entidad,
-                                                  tipo_eleccion = self$tipo_eleccion)
+                                                  tipo_eleccion = self$tipo_eleccion,
+                             )
                            },
 
                            #' @description
@@ -173,7 +175,9 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                            agregar_bd = function(eleccion){
 
                              add <- leer_base(eleccion = eleccion,
-                                              entidad = self$entidad, tipo_eleccion = self$tipo_eleccion)
+                                              entidad = self$entidad,
+                                              tipo_eleccion = self$tipo_eleccion,
+                                              cc = self$cc)
 
                              self$todas <- self$todas %>%
                                append(list(add) %>%
@@ -252,6 +256,38 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                                    purrr::set_names(self$nivel[length(self$nivel)])
                                )
                            },
+                           #' @description incluye al vector self$partidos las candidaturas comunes
+                           #' @param base Base de datos que se utiliza
+                           #' @param eleccion Es el tipo de elección y su año separado por "_".
+                           #' @return El vector self$partido modificado
+                           incluir_cc = function(base, eleccion){
+                             aux <- anadir_cc(self[[base]][[eleccion]], eleccion)
+
+                             walk(aux, ~{
+                               if (grepl("pan", .x)){
+                                 self$colores <- paleta |>
+                                   filter(partidos == "cc_pan") |>
+                                   pull(colores) |>
+                                   set_names(.x) |>
+                                   append(self$colores)
+                               } else if (grepl("pri", .x)){
+                                 self$colores <-paleta |>
+                                   filter(partidos == "cc_pri") |>
+                                   pull(colores) |>
+                                   set_names(.x) |>
+                                   append(self$colores)
+                               } else if (grepl("morena", .x)){
+                                 self$colores <- paleta |>
+                                   filter(partidos == "cc_morena") |>
+                                   pull(colores) |>
+                                   set_names(.x) |>
+                                   append(self$colores)
+                               }
+                             })
+
+                             self$partidos <- aux |>
+                               append(self$partidos)
+                           },
                            #' @description Calcula los votos relativos para los partidos seleccionados
                            #' @param base Es la base de datos que será modificada
                            #' @param eleccion Es el tipo de elección y su año separado por "_".
@@ -317,7 +353,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                            #' Los absolutos tienen como prefijo 'ele', mientras que los relativos tienen como prefijo 'pct'.
                            obtener_degradado_ganador = function(base, eleccion, tipo = "relativo"){
                              if(!tipo %in% c("relativo", "absoluto")){
-                               stop("Error: príncipe, 'tipo' solo puede tomar los valores 'relativo' o 'absoluto'")
+                               stop("Error: 'tipo' solo puede tomar los valores 'relativo' o 'absoluto'")
                              }
                              #Acá se debe incluir un objeto ya creado de colores
                              nombres <- names(self[[base]][[eleccion]])
@@ -355,15 +391,19 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                            #'
                            #' @return base con columnas de índice para cada partido
                            obtener_indice_completo = function(base){
-                             #Esto está parchado hasta que el vector de colores no tenga rezago
-                             ind <- setdiff(names(self$colores), "rezago") |>
-                               purrr::map2(setdiff(self$colores, "#140a8c"), ~{
+                             self[[base]] <- self[[base]] |>
+                               rename_with(~gsub("panal", "parnal", .x), contains("panal"))
+
+                             partidos <- gsub("panal", "parnal", subset(names(self$colores), subset = !grepl("cc", names(self$colores))))
+                             colores <- subset(self$colores, gsub("panal", "parnal", names(self$colores)) %in% partidos)
+
+                             ind <- partidos |>
+                               purrr::map2(colores, ~{
                                  tryCatch(
                                    {
                                      aux <- crear_indice(self[[base]], .x, nivel = self$nivel[length(self$nivel)])
                                      aux <- colorear_indice(aux, c_principal = .y, var = .x)
                                      aux <- crear_quantiles(aux, .x)
-
                                      aux  # return the successfully processed result
                                    },
                                    error = function(e) {
@@ -377,7 +417,8 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                              self[[base]] <- self[[base]] |>
                                left_join(reduce(ind, left_join, by = self$nivel[length(self$nivel)]),
-                                         by = self$nivel[length(self$nivel)])
+                                         by = self$nivel[length(self$nivel)]) |>
+                               rename_with(~gsub("parnal", "panal", .x), contains("parnal"))
 
                              self$analisis <- self$analisis |>
                                tibble::add_row(eleccion = "todas",

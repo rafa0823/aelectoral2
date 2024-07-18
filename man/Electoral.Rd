@@ -71,6 +71,7 @@ Este conjunto de bases electorales pueden ser de distintas elecciones, candidato
 \item \href{#method-Electoral-accion_especiales}{\code{Electoral$accion_especiales()}}
 \item \href{#method-Electoral-eliminar_votoExtranjero}{\code{Electoral$eliminar_votoExtranjero()}}
 \item \href{#method-Electoral-fusionar_shp}{\code{Electoral$fusionar_shp()}}
+\item \href{#method-Electoral-incluir_cc}{\code{Electoral$incluir_cc()}}
 \item \href{#method-Electoral-voto_relativo}{\code{Electoral$voto_relativo()}}
 \item \href{#method-Electoral-calcular_ganador}{\code{Electoral$calcular_ganador()}}
 \item \href{#method-Electoral-colapsar_base}{\code{Electoral$colapsar_base()}}
@@ -314,6 +315,28 @@ Añade al objeto tipo lista shp el shp definido como parámetro con los datos el
 }
 \subsection{Returns}{
 lista con shapefiles
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Electoral-incluir_cc"></a>}}
+\if{latex}{\out{\hypertarget{method-Electoral-incluir_cc}{}}}
+\subsection{Method \code{incluir_cc()}}{
+incluye al vector self$partidos las candidaturas comunes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Electoral$incluir_cc(base, eleccion)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{base}}{Base de datos que se utiliza}
+
+\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_".}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+El vector self$partido modificado
 }
 }
 \if{html}{\out{<hr>}}

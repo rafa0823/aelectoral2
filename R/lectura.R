@@ -7,7 +7,7 @@
 #' @param tipo_eleccion Por default es "MR" refiriéndose a mayoría relativa.
 #'
 #' @return tibble de la base electoral
-leer_base <- function(eleccion, entidad, tipo_eleccion){
+leer_base <- function(eleccion, entidad, tipo_eleccion, cc){
   estado <- if_else(grepl("df_|pr_|cp_|sen_",eleccion), "nacional",entidad)
   res <- readr::read_rds(system.file(glue::glue("electoral/{estado}/{eleccion}.rda"),
                                      package = "aelectoral2",
@@ -161,4 +161,12 @@ leer_shp <- function(unidad, entidad){
 #' @return Un shp unido con bd
 join_shp_bd <- function(shp, bd){
   shp %>% left_join(bd)
+}
+
+#' Para incluir las candidaturas comunes en el análisis
+#' @export
+#' @return el vector de self$partido con las candidaturas comunes
+anadir_cc <- function(bd, eleccion){
+  cc <- gsub(glue::glue("ele_|_{eleccion}"), "", subset(names(bd), grepl("_cc", names(bd))))
+  return(cc)
 }

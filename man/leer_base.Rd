@@ -5,7 +5,7 @@
 \title{Función para leer una base de datos electoral
 Basada en la funcion read_rds del paquete readr}
 \usage{
-leer_base(eleccion, entidad, tipo_eleccion)
+leer_base(eleccion, entidad, tipo_eleccion, cc)
 }
 \arguments{
 \item{eleccion}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}

@@ -126,7 +126,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
                            coalicion = function(eleccion){
                              if(!eleccion %in% names(self$todas)) stop("Favor de agregar la elección primero con el método agregar_bd")
 
-                             self$partido(self$nivel[length(self$nivel)], eleccion)
+                             self$partido(eleccion)
 
                              al <- leer_alianza(self$nivel[length(self$nivel)], eleccion, self$entidad, self$bd)
 

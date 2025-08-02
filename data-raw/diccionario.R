@@ -1,5 +1,3 @@
-renv::deactivate()
-
 library(tabulizer)
 library(dplyr)
 diccionario <- extract_tables("~/Downloads/diccionario.pdf",) %>% purrr::pluck(1) %>% as_tibble %>%

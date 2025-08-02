@@ -660,3 +660,128 @@ aux |>
 glimpse(aux)
 write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
 
+### 2024
+
+library(dplyr)
+library(readr)
+
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/computos/Nacional"
+
+# Presidencia 24 ----------------------------------------------------------
+homologar_bd <- function(bd){
+  bd |>
+    mutate(casilla = case_when(casilla == "B"~ "B01",
+                               grepl("MEC", casilla) ~ gsub("MEC", "M", casilla),
+                               grepl("EC", casilla) ~ gsub("EC", "E", casilla),
+                               grepl("VA", casilla) ~ gsub("VA|VAP", "V", casilla),
+                               grepl("VPP", casilla) ~ gsub("VPPP|VPP", "P", casilla),
+                               grepl("SMR", casilla) ~ gsub("SMR", "S", casilla),
+                               T ~casilla),
+           id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
+                                  T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
+           tipo_casilla = substr(casilla, 1, 1),
+           ext_contigua = if_else(nchar(casilla) >= 4, stringr::str_extract_all(casilla,"(?<=C)(\\d+)"), list("0")),
+           clave_casilla = glue::glue("{estado}{stringr::str_pad(seccion,pad = '0', width = 4)}{tipo_casilla}{stringr::str_pad(id_casilla,pad = '0', width = 2)}{stringr::str_pad(ext_contigua,pad = '0', width = 2)}")
+    ) |>
+    tidyr::unnest(cols = c(casilla:ext_contigua))
+}
+
+estado <- "nacional"
+eleccion <- "pr_24"
+
+aux <- readr::read_delim(paste0(path,"/pr_24/PRES_2024.csv"), delim = "|", skip = 7, locale = readr::locale(encoding = "ISO-8859-1")) |>
+  janitor::clean_names() |>
+  filter(id_distrito_federal != "N/A") |>
+  mutate(clave_casilla = gsub("'", "", clave_casilla),
+         across(c(contains("id_"), seccion), readr::parse_number)) |>
+  rename(
+    noreg = candidato_a_no_registrado_a,
+    # panal = nva_alianza,
+    # pes = es,
+    nulos = votos_nulos,
+    total = total_votos_calculados,
+    nominal = lista_nominal,
+    nombre_estado = entidad,
+    !!glue::glue("distritof_{readr::parse_number(eleccion)}") := id_distrito_federal,
+    !!glue::glue("nombre_distritof_{readr::parse_number(eleccion)}") := distrito_federal
+  ) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
+  mutate(estado = sprintf("%02s", id_entidad),
+         distritof_24 = sprintf("%02s", distritof_24),
+         seccion = sprintf("%04s", seccion),
+         across(contains("ele_"), as.numeric)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  select(-c(id_entidad, clave_acta))
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+readr::write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+# Distrito Federal 24 ----------------------------------------------------------
+eleccion <- "df_24"
+
+aux <- readr::read_delim(paste0(path,"/df_24/DIP_FED_2024.csv"), delim = "|", skip = 7, locale = readr::locale(encoding = "ISO-8859-1")) |>
+  janitor::clean_names() |>
+  mutate(clave_casilla = gsub("'", "", clave_casilla),
+         across(c(contains("id_"), seccion), readr::parse_number)) |>
+  rename(
+    noreg = candidato_a_no_registrado_a,
+    ind1 = candidato_a_independiente,
+    # panal = nva_alianza,
+    # pes = es,
+    nulos = votos_nulos,
+    total = total_votos_calculados,
+    nominal = lista_nominal,
+    nombre_estado = entidad,
+    !!glue::glue("distritof_{readr::parse_number(eleccion)}") := id_distrito_federal,
+    !!glue::glue("nombre_distritof_{readr::parse_number(eleccion)}") := distrito_federal
+  ) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
+  mutate(estado = sprintf("%02s", id_entidad),
+         distritof_24 = sprintf("%02s", distritof_24),
+         seccion = sprintf("%04s", seccion),
+         across(contains("ele_"), as.numeric)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  select(-c(id_entidad, clave_acta))
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+readr::write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+# Senado 24
+eleccion <- "sen_24"
+
+aux <- read_delim(paste0(path, "/sen_24/SEN_2024.csv"), delim = "|", skip = 7, locale = locale(encoding = "ISO-8859-1")) |>
+  janitor::clean_names() |>
+  mutate(clave_casilla = gsub("'", "", clave_casilla),
+         across(c(contains("id_"), seccion), readr::parse_number)) |>
+  rename(
+    noreg = candidato_a_no_registrado_a,
+    # panal = nva_alianza,
+    # pes = es,
+    nombre_estado = entidad,
+    nulos = votos_nulos,
+    total = total_votos_calculados,
+    nominal = lista_nominal,
+    !!glue::glue("distritof_{readr::parse_number(eleccion)}") := id_distrito_federal,
+    !!glue::glue("nombre_distritof_{readr::parse_number(eleccion)}") := distrito_federal
+  ) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = c(pan:nominal)) |>
+  mutate(estado = sprintf("%02s", id_entidad),
+         distritof_24 = sprintf("%02s", distritof_24),
+         seccion = sprintf("%04s", seccion),
+         across(contains("ele_"), as.numeric)) |>
+  relocate(clave_casilla, .after = seccion) |>
+  select(-c(id_entidad, clave_acta))
+
+aux |>
+  count(nchar(clave_casilla))
+
+glimpse(aux)
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+

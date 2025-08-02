@@ -1,4 +1,8 @@
 ## code to prepare `bdos_son_auxiliares` dataset goes here
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/PREP/Locales"
+files <- list.files(path, recursive = T, pattern = ".csv",full.names = T)
+files_cand <- subset(files, grepl("AYUN_CAND|AYUN_Cand", files))
+
 entidad <- "son"
 
 dicc <- aelectoral2::diccionario |>
@@ -20,9 +24,10 @@ pm_24 <- readr::read_csv(files_cand[[22]]) |>
   transmute(eleccion = "pm_24",
             estado = sprintf("%02s", entidad),
             municipio = sprintf("%03s", municipio),
-            coalicion = tolower(gsub("CC_|COA_|C_", "", partido_ci)),
-            coalicion = gsub("-", "_", coalicion),
-            coalicion = if_else(coalicion == "mprogresa", "mc_progresa", coalicion),
+            coaliciones = tolower(gsub("CC_|COA_|C_", "", partido_ci)),
+            coaliciones = gsub("-", "_", coaliciones),
+            coaliciones = if_else(coaliciones == "mprogresa", "mc_progresa", coaliciones),
+            coaliciones = gsub("nas", "panal", coaliciones),
             candidatura_comun = if_else(grepl("CC_", partido_ci), T, NA)
   ) |>
   left_join(dicc, join_by(estado == id_estado))

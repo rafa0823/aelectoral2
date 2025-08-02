@@ -16,7 +16,6 @@ wd %>% list.files(full.names = T) %>% map(~{
                                                 formatC(DISTRITO_F, width = 2, flag = 0), sep = "_"))
   readr::write_rds(temp,glue::glue("inst/shp/df_22/{aux}.rda"))
 
-
 })
 
 

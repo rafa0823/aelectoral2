@@ -99,7 +99,7 @@ leer_alianza <- function(nivel, eleccion, entidad, bd_e){
   if(!nivel %in% names(alianzas)) {
 
     alianzas <- alianzas %>%
-      left_join(bd_e %>% distinct(!!rlang::sym(names(alianzas)[1]), !!rlang::sym(nivel)))
+      left_join(bd_e %>% distinct(!!names(alianzas)[1]:= .data[[glue::glue("{names(alianzas)[1]}_{readr::parse_number(eleccion)}")]], !!rlang::sym(nivel)))
   }
 
 

@@ -4,3 +4,9 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^LICENSE\.md$
+^\.Rhistory$
+^\.RData$
+^\.RDataTmp.*$
+^\.DS_Store$
+^\.git$
+^\.github$

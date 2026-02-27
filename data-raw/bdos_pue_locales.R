@@ -108,7 +108,7 @@ glimpse(gb_18)
 
 write_rds(gb_18, glue::glue("inst/electoral/pue/{elec}.rda"))
 # pm_18 -------------------------------------------------------------------
-path <- "~/Google Drive/Unidades compartidas/2_Recursos/Externas/Limpieza/Resultados definitivos/Local/2018/Municipio/puebla_normal_casilla.xlsx"
+path <- "~/Google Drive/Unidades compartidas/3_Insumos/Externas/Limpieza/Resultados definitivos/Local/2018/Municipio/puebla_normal_casilla.xlsx"
 aux <- readxl::read_excel(path, skip = 1) |>
   janitor::clean_names() |>
   mutate(seccion = sprintf("%04s", seccion)) |>

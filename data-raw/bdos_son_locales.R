@@ -221,6 +221,8 @@ aux <- readxl::read_excel(path) |>
   janitor::clean_names() |>
   rename_with(~gsub("numero_votos_", "", .x), contains("numero_votos_")) |>
   rename_with(~gsub("coalicion_", "", .x), contains("coalicion_")) |>
+  mutate(pan_pri_prd = candidatura_comun_furza_y_corazon_por_sonora + pan_pri_prd) |>
+  select(-candidatura_comun_furza_y_corazon_por_sonora) |>
   rename(
     pan = partido_accion_nacional,
     pri = partido_revolucionario_institucional,
@@ -231,8 +233,7 @@ aux <- readxl::read_excel(path) |>
     pes = partido_encuentro_solidario_sonora,
     ps = partido_sonorense,
     panal = partido_nueva_alianza,
-    ccmorenapvempt = candidatura_comun_sigamos_haciendo_historia,
-    ccpanpriprd = candidatura_comun_furza_y_corazon_por_sonora,
+    pt_pvem_morena_panal_pes = candidatura_comun_sigamos_haciendo_historia,
     noreg = no_registrados,
     total = total_votos,
     nominal = lista_nominal,

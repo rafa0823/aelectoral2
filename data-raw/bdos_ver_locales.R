@@ -2,11 +2,15 @@
 library(tidyverse)
 
 # Funciones ---------------------------------------------------------------
-homologar_bd <- function(bd, estado, nombre_estado){
+homologar_bd <- function(bd){
   bd |>
-    mutate(estado = !!estado,
-           nombre_estado = nombre_estado,
-           casilla = if_else(casilla == "B", "B01",casilla),
+    mutate(casilla = case_when(casilla == "B"~ "B01",
+                               grepl("MEC", casilla) ~ gsub("MEC", "M", casilla),
+                               grepl("EC", casilla) ~ gsub("EC", "E", casilla),
+                               grepl("VA", casilla) ~ gsub("VA|VAP", "V", casilla),
+                               grepl("VPP", casilla) ~ gsub("VPPP|VPP", "P", casilla),
+                               grepl("SMR", casilla) ~ gsub("SMR", "S", casilla),
+                               T ~casilla),
            id_casilla = case_when(nchar(casilla) >= 4 ~ stringr::str_extract_all(casilla,"(?<=E)[^C]*?(\\d+)(?=C)"),
                                   T ~ stringr::str_extract_all(casilla,"(?<=[a-zA-Z])(\\d+)")),
            tipo_casilla = substr(casilla, 1, 1),
@@ -220,3 +224,139 @@ dl_21 |>
 glimpse(dl_21)
 
 write_rds(dl_21, "inst/electoral/ver/dl_21.rda")
+
+# 2024 --------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/computos/Locales/VER"
+estado <- "ver"
+id_estado <- "30"
+## Distrito local
+eleccion <- "dl_24"
+aux <- map(1:30, ~readxl::read_excel(paste0(path, "/VER_OPLE_2024/Proceso_Electoral_Veracruz2024_Diputaciones_9-6-2024_4.00_AM.xlsx"), sheet = .x)) |>
+  reduce(bind_rows) |>
+  janitor::clean_names() |>
+  rename(
+    distritol_24 = distrito,
+    municipio_24 = municipio,
+    total = suma_total,
+    nominal = lista_nominal,
+    casilla = codigo
+  ) |>
+  mutate(estado = id_estado,
+         distritol_24 = sprintf("%03s", distritol_24),
+         municipio_24 = sprintf("%03s", municipio_24),
+         seccion = sprintf("%04s", seccion)
+  ) |>
+  homologar_bd()  |>
+  relocate(c(total, nominal), .after = pt_morena) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = pan:nominal) |>
+  rename_with(~gsub("verde", "pvem", .x), contains("verde")) |>
+  filter(nchar(seccion) == 4)
+
+glimpse(aux)
+
+aux |>
+  count(nchar(clave_casilla))
+
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+## Gobernatura
+eleccion <- "gb_24"
+aux <- readxl::read_excel(paste0(path, "/VER_OPLE_2024/Proceso_Electoral_Veracruz2024_Gubernatura_9-6-2024_4.00_AM.xlsx")) |>
+  janitor::clean_names() |>
+  rename(
+    distritol_24 = distrito,
+    municipio_24 = municipio,
+    total = suma_total,
+    nominal = lista_nominal,
+    casilla = codigo
+  ) |>
+  mutate(estado = id_estado,
+         distritol_24 = sprintf("%03s", distritol_24),
+         municipio_24 = sprintf("%03s", municipio_24),
+         seccion = sprintf("%04s", seccion)
+  ) |>
+  homologar_bd()  |>
+  relocate(c(total, nominal), .after = morena_fxm) |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = pan:nominal) |>
+  rename_with(~gsub("verde", "pvem", .x), contains("verde")) |>
+  filter(nchar(seccion) == 4)
+
+glimpse(aux)
+
+aux |>
+  count(nchar(clave_casilla))
+
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+# 2016 --------------------------------------------------------------------
+path <- "~/Google Drive/Unidades compartidas/Morant Consultores/Insumos/INE/computos/Locales/VER"
+estado <- "ver"
+id_estado <- "30"
+
+## Distrito Local
+eleccion <- "dl_16"
+aux <- read_csv(paste0(path, "/VER_PEL_2016/DIPUTACIONES_LOC_MR_csv/2016_SEE_DIP_LOC_MR_VER_CAS.csv")) |>
+  janitor::clean_names() |>
+  rename_with(~gsub("num_votos_|cand_", "", .x), contains(c("num_votos_", "cand_"))) |>
+  rename(
+    distritol_16 = id_distrito,
+    nombre_distritol_16 = cabecera_distrital,
+    municipio_16 = id_municipio,
+    nombre_municipio_16 = municipio,
+    total = total_votos,
+    nominal = lista_nominal,
+    noreg = can_nreg,
+    pes = es,
+    panal = nva_alianza
+  ) |>
+  mutate(estado = as.character(id_estado),
+         distritol_16 = sprintf("%03s", distritol_16),
+         municipio_16 = sprintf("%03s", municipio_16),
+         seccion = sprintf("%04s", seccion)
+  ) |>
+  homologar_bd()  |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = pan:nominal) |>
+  rename_with(~gsub("_nva_alianza_", "_panal_", .x), contains("_nva_alianza_")) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
+  select(-contains("x"))
+
+glimpse(aux)
+
+aux |>
+  count(nchar(clave_casilla))
+
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))
+
+## Gobernatura
+eleccion <- "gb_16"
+aux <- read_csv(paste0(path, "/VER_PEL_2016/GUBERNATURA_csv/2016_SEE_GOB_VER_CAS.csv")) |>
+  janitor::clean_names() |>
+  rename_with(~gsub("num_votos_|cand_", "", .x), contains(c("num_votos_", "cand_"))) |>
+  rename(
+    distritol_16 = id_distrito,
+    nombre_distritol_16 = cabecera_distrital,
+    municipio_16 = id_municipio,
+    nombre_municipio_16 = municipio,
+    total = total_votos,
+    nominal = lista_nominal,
+    noreg = can_nreg,
+    pes = es,
+    panal = nva_alianza
+  ) |>
+  mutate(estado = as.character(id_estado),
+         distritol_16 = sprintf("%03s", distritol_16),
+         municipio_16 = sprintf("%03s", municipio_16),
+         seccion = sprintf("%04s", seccion)
+  ) |>
+  homologar_bd()  |>
+  rename_with(~paste("ele", .x, eleccion, sep = "_"), .cols = pan:nominal) |>
+  rename_with(~gsub("_nva_alianza_", "_panal_", .x), contains("_nva_alianza_")) |>
+  rename_with(~gsub("_es_", "_pes_", .x), contains("_es_")) |>
+  select(-contains("x"))
+
+glimpse(aux)
+
+aux |>
+  count(nchar(clave_casilla))
+
+write_rds(aux, file = glue::glue("inst/electoral/{estado}/{eleccion}.rda"))

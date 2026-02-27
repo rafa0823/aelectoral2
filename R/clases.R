@@ -90,7 +90,6 @@ Electoral <- R6::R6Class("Electoral",
                            },
                            #' @description describe lo que se ha incluído en la clase
                            print = function(){
-
                              mensaje <- cat(
                                glue::glue("Entidad: {self$entidad} \nElecciones agregadas: {paste(self$todas %>% names, collapse = ', ')}
 
@@ -130,7 +129,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
                              al <- leer_alianza(self$nivel[length(self$nivel)], eleccion, self$entidad, self$bd)
 
-                             self$candidato(al, self$nivel[length(self$nivel)], eleccion)
+                             self$candidato(alianzas = al, eleccion = eleccion)
                            },
 
                            #' @description

@@ -12,7 +12,13 @@ leer_base <- function(eleccion, entidad, tipo_eleccion, cc) {
     glue::glue("electoral/{estado}/{eleccion}.rda"),
     package = "aelectoral2"
   )
-  
+
+  # PILOT: Remote data access for 'ags'
+  if (entidad == "ags" && file_path == "") {
+    message("Local file not found. Attempting remote fetch for pilot entity 'ags'...")
+    file_path <- drive_fetch_pilot(eleccion, entidad, subfolder = "electoral")
+  }
+
   if (file_path == "") {
     stop(glue::glue("Electoral data file not found: electoral/{estado}/{eleccion}.rda"))
   }

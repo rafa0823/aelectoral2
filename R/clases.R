@@ -70,6 +70,12 @@ Electoral <- R6::R6Class(
       extranjero = T,
       especiales = NULL
     ) {
+      # Validation
+      if (missing(eleccion) || is.na(eleccion)) stop("'eleccion' is required.")
+      if (missing(entidad) || is.na(entidad)) stop("'entidad' is required.")
+      
+      message(glue::glue("Initializing Electoral object for {eleccion} in {entidad}..."))
+
       self$eleccion <- eleccion
       self$elecciones_agregadas <- eleccion
       self$entidad <- entidad
@@ -79,7 +85,13 @@ Electoral <- R6::R6Class(
       self$llaves <- c("estado", llaves)
       self$tipo_eleccion <- tipo_eleccion
       self$partidos <- partidos
+      
       self$obtener_bd()
+      
+      if (is.null(self$bd) || nrow(self$bd) == 0) {
+        stop(glue::glue("Failed to load data for {eleccion} in {entidad}."))
+      }
+
       self$todas <- list(self$bd) %>% purrr::set_names(eleccion)
       self$colores <- asociar_colores(partidos = self$partidos)
 
@@ -90,6 +102,8 @@ Electoral <- R6::R6Class(
       self$bd <- self$bd %>% self$accion_especiales(self$especiales)
 
       self$bd <- self$bd %>% reducir(NULL, self$llaves)
+      
+      message("Electoral object initialized successfully.")
     },
     #' @description describe lo que se ha incluído en la clase
     print = function() {

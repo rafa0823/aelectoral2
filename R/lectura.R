@@ -8,18 +8,33 @@
 #' @return tibble de la base electoral
 leer_base <- function(eleccion, entidad, tipo_eleccion, cc) {
   estado <- if_else(grepl("df_|pr_|cp_|sen_", eleccion), "nacional", entidad)
-  res <- readr::read_rds(system.file(
+  file_path <- system.file(
     glue::glue("electoral/{estado}/{eleccion}.rda"),
-    package = "aelectoral2",
-    mustWork = TRUE
-  )) %>%
+    package = "aelectoral2"
+  )
+  
+  if (file_path == "") {
+    stop(glue::glue("Electoral data file not found: electoral/{estado}/{eleccion}.rda"))
+  }
+
+  res <- tryCatch({
+    readr::read_rds(file_path)
+  }, error = function(e) {
+    stop(glue::glue("Error reading electoral data: {e$message}"))
+  }) %>%
     tibble::as_tibble()
+    
   if (estado == "nacional") {
     if (entidad != "nacional") {
       nombre <- aelectoral2::diccionario %>%
         filter(abreviatura == !!entidad) %>%
         pull(id_estado) %>%
         stringr::str_pad(width = 2, pad = "0")
+      
+      if (length(nombre) == 0) {
+        stop(glue::glue("Entity abbreviation '{entidad}' not found in dictionary."))
+      }
+      
       res <- res %>% filter(estado == !!nombre)
     }
   }
@@ -199,19 +214,40 @@ leer_shp <- function(unidad, entidad) {
       pull(id_estado) %>%
       stringr::str_pad(width = 2, pad = "0")
   }
+  
+  if (length(id) == 0) {
+    stop(glue::glue("Entity '{entidad}' not found or no IDs available."))
+  }
 
   res <- id %>%
     purrr::map(
       ~ {
-        readr::read_rds(system.file(
+        file_path <- system.file(
           glue::glue("shp/{unidad}/{.x}.rda"),
-          package = "aelectoral2",
-          mustWork = TRUE
-        )) %>%
-          sf::st_transform(sf::st_crs(4326))
+          package = "aelectoral2"
+        )
+        if (file_path == "") {
+          warning(glue::glue("Shapefile not found for entity ID {.x} at level '{unidad}'."))
+          return(NULL)
+        }
+        
+        tryCatch({
+          readr::read_rds(file_path) %>%
+            sf::st_transform(sf::st_crs(4326))
+        }, error = function(e) {
+          warning(glue::glue("Error reading shapefile for entity ID {.x}: {e$message}"))
+          return(NULL)
+        })
       }
     ) %>%
+    purrr::compact() %>%
     bind_rows()
+    
+  if (nrow(res) == 0) {
+    stop(glue::glue("No shapefile data loaded for unit '{unidad}' and entity '{entidad}'."))
+  }
+  
+  return(res)
 }
 
 #' Para juntar un shapefile con otra base de datos

@@ -4,17 +4,15 @@
 \alias{Graficas}
 \title{Clase R6 para procesar y graficar los datos electorales}
 \description{
-Se inicia definiendo la unidad geográfica de trabajo mediante el método $filtrar.
-Se puede definir un nivel y una unidad geográfica.
+Provides methods for visualizing electoral results using ggplot2 and other plotting libraries.
 }
 \details{
-Algunas funciones tienen parámetros espécificos, pero otras solo tienes que llamarlas y usan los datos ya incluidos en la clase tablero.
+Operates on a `Tablero` object and its filtered `aux` datasets.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{tab}}{Recibe como un único insumo la clase tablero
-Initialize: Obtener los datos incorporados en clase}
+\item{\code{tab}}{The `Tablero` object providing the data for visualization.}
 }
 \if{html}{\out{</div>}}
 }
@@ -36,7 +34,7 @@ Initialize: Obtener los datos incorporados en clase}
 \if{html}{\out{<a id="method-Graficas-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-new}{}}}
 \subsection{Method \code{new()}}{
-Recupera los datos de la clase tablero
+Initializes the Graficas object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$new(tablero)}\if{html}{\out{</div>}}
 }
@@ -44,7 +42,7 @@ Recupera los datos de la clase tablero
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{tablero}}{Clase tablero}
+\item{\code{tablero}}{A `Tablero` object.}
 }
 \if{html}{\out{</div>}}
 }
@@ -53,7 +51,7 @@ Recupera los datos de la clase tablero
 \if{html}{\out{<a id="method-Graficas-mapa"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-mapa}{}}}
 \subsection{Method \code{mapa()}}{
-crea un mapa con el coloreo que se desee
+Creates a map of the filtered geographic units.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$mapa(seccion, fill, linewidth = 0.6, labels = F)}\if{html}{\out{</div>}}
 }
@@ -61,25 +59,25 @@ crea un mapa con el coloreo que se desee
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{seccion}}{variable booleana para especificar que el mapa que se quiere ese de secciones o no}
+\item{\code{seccion}}{Logical. If TRUE, plots sections; if FALSE, plots the higher geographic level.}
 
-\item{\code{fill}}{variable con la cual se va a colorear el mapa}
+\item{\code{fill}}{Character. The variable name used for coloring the map.}
 
-\item{\code{linewidth}}{ancho de la línea, parámetro heredado de `geom_sf`}
+\item{\code{linewidth}}{Numeric. The width of the unit boundaries.}
 
-\item{\code{labels}}{booleano para definir si se quieren leyendas en el mapa}
+\item{\code{labels}}{Logical. If TRUE, adds text labels to the map units.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-objeto tipo ggplot
+A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graficas-secciones_ganadas"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-secciones_ganadas}{}}}
 \subsection{Method \code{secciones_ganadas()}}{
-grafica de barras de secciones ganadas
+Plots a bar chart of won sections per party.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$secciones_ganadas(
   bd = self$tab$aux$shp_secc,
@@ -92,25 +90,25 @@ grafica de barras de secciones ganadas
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{bd}}{es el shape de secciones luego de usar la función  `Tablero$filtrar`}
+\item{\code{bd}}{An sf/tibble object. Defaults to the filtered section-level data.}
 
-\item{\code{eleccion}}{elección de interés}
+\item{\code{eleccion}}{Character. The election identifier.}
 
-\item{\code{eje_x}}{leyenda del eje x}
+\item{\code{eje_x}}{Character. Label for the X axis.}
 
-\item{\code{eje_y}}{leyenda del eje y}
+\item{\code{eje_y}}{Character. Label for the Y axis.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-objeto tipo ggplot
+A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graficas-voto_relativo"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-voto_relativo}{}}}
 \subsection{Method \code{voto_relativo()}}{
-gráfica de barras con el total de votos obtenidos en términos absolutos y relativos
+Plots a bar chart of relative vote shares for selected parties.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$voto_relativo(
   partidos = self$tab$info$partidos,
@@ -123,25 +121,25 @@ gráfica de barras con el total de votos obtenidos en términos absolutos y rela
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{partidos}}{heredado de la clase Tablero, partidos definidos desde la clase Electoral}
+\item{\code{partidos}}{Character vector. Parties to include in the chart.}
 
-\item{\code{eleccion}}{elección de interés, debe estar en la clase Electoral}
+\item{\code{eleccion}}{Character. The election identifier.}
 
-\item{\code{eje_x}}{leyenda del eje x}
+\item{\code{eje_x}}{Character. Label for the X axis.}
 
-\item{\code{eje_y}}{leyenda del eje y}
+\item{\code{eje_y}}{Character. Label for the Y axis.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-objeto de ggplot
+A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graficas-distribucion_participacion"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-distribucion_participacion}{}}}
 \subsection{Method \code{distribucion_participacion()}}{
-gráfica de tipo violín con la distribución de la participación
+Plots a violin chart showing the distribution of participation.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$distribucion_participacion(eleccion, eje_x = "", eje_y = "")}\if{html}{\out{</div>}}
 }
@@ -149,33 +147,36 @@ gráfica de tipo violín con la distribución de la participación
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{eleccion}}{elección de interés, debe estar en la clase Electoral}
+\item{\code{eleccion}}{Character. The election identifier.}
 
-\item{\code{eje_x}}{leyenda del eje x}
+\item{\code{eje_x}}{Character. Label for the X axis.}
 
-\item{\code{eje_y}}{leyenda del eje y
-Gráfica de sankey}
+\item{\code{eje_y}}{Character. Label for the Y axis.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graficas-sankey"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-sankey}{}}}
 \subsection{Method \code{sankey()}}{
+Generates a Sankey diagram showing vote transitions between elections.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$sankey()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-objeto tipo ggplot
-Gráfica tipo pointrange
+A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graficas-pointrange"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-pointrange}{}}}
 \subsection{Method \code{pointrange()}}{
+Plots a point-range chart for a specific index across parties or elections.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$pointrange(indice, variables)}\if{html}{\out{</div>}}
 }
@@ -183,21 +184,21 @@ Gráfica tipo pointrange
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{indice}}{ínndice de interés}
+\item{\code{indice}}{Character. The index to plot (e.g., "participacion").}
 
-\item{\code{variables}}{determina si la gráfica va a ser de partidos o de elecciones, solo puede tomar "partidos" o "elecciones" como varlor.}
+\item{\code{variables}}{Character. "partidos" or "eleccion" to define the grouping.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-objeto de ggplot
-gráfica de mosaico
+A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Graficas-tiles"></a>}}
 \if{latex}{\out{\hypertarget{method-Graficas-tiles}{}}}
 \subsection{Method \code{tiles()}}{
+Plots a tile (mosaic) chart comparing participation with another index.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Graficas$tiles(indice, low = "#118ab2", high = "#ef476f")}\if{html}{\out{</div>}}
 }
@@ -205,16 +206,16 @@ gráfica de mosaico
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{indice}}{indice a comparar con el de participación}
+\item{\code{indice}}{Character. The index to compare with participation.}
 
-\item{\code{low}}{color mínimo de la cloropleta}
+\item{\code{low}}{Character. Hex color for low values.}
 
-\item{\code{high}}{color máximo de la cloropleta}
+\item{\code{high}}{Character. Hex color for high values.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-objeto de ggplot
+A ggplot object.
 }
 }
 \if{html}{\out{<hr>}}

@@ -20,39 +20,39 @@ Este conjunto de bases electorales pueden ser de distintas elecciones, candidato
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{bd}}{base agrupada por sección con todos los datos}
+\item{\code{bd}}{A tibble containing the electoral data grouped by section and geographic levels.}
 
-\item{\code{todas}}{base a nivel casilla procesada para ser utilizada por la clase}
+\item{\code{todas}}{A list of tibbles, each representing a processed election at the casilla level.}
 
-\item{\code{censo}}{censo a nivel seccional}
+\item{\code{censo}}{A tibble containing census data at the section level.}
 
-\item{\code{bd_partido}}{base por partido; los votos de las coaliciones fueron repartidos}
+\item{\code{bd_partido}}{A list of tibbles with votes split by political party.}
 
-\item{\code{bd_candidato}}{base agrupada por candidato}
+\item{\code{bd_candidato}}{A list of tibbles with votes split by candidate.}
 
-\item{\code{shp}}{archivo geospacial de nivel seccional que recibe los datos electorales}
+\item{\code{shp}}{A list containing spatial data (sf objects) associated with the electoral data.}
 
-\item{\code{eleccion}}{elección para la cual se quieren obtener los datos}
+\item{\code{eleccion}}{Character. The identifier of the primary election (e.g., "pm_21").}
 
-\item{\code{nivel}}{esta clase solo recibe datos a nivel sección, este parámetro no se tiene que especificar.}
+\item{\code{nivel}}{Character. The geographic level of the analysis (e.g., "seccion").}
 
-\item{\code{entidad}}{abreviatura del estado para el cual se quieren los datos.}
+\item{\code{entidad}}{Character. The abbreviation of the state or "nac" for national.}
 
-\item{\code{tipo_eleccion}}{parámetro para escoger si los datos se quieren de mayoría relativa o representación proporcional}
+\item{\code{tipo_eleccion}}{Character. Type of election: "MR" (Majority Relative) or "RP" (Proportional Representation).}
 
-\item{\code{extranjero}}{booleano (T, F) para especificar si se quieren preservar o remover las casillas de voto extranjero}
+\item{\code{extranjero}}{Logical. Whether to include votes from abroad (section 0000).}
 
-\item{\code{especiales}}{booleano (T, F) para especificar si se quieren preservar o remover las casilllas especiales}
+\item{\code{especiales}}{Logical or Character. Action for special polling stations: NULL, "eliminar", or "repartir".}
 
-\item{\code{partidos}}{vector con los partidos para los cuales se ejecutarán los métodos de las clase}
+\item{\code{partidos}}{Character vector. Selected political parties for analysis.}
 
-\item{\code{colores}}{los colores asociados a los partidos seleccionados}
+\item{\code{colores}}{Named character vector. Hex codes associated with the selected parties.}
 
-\item{\code{llaves}}{vector que permite mantener un nivel además del seccional}
+\item{\code{llaves}}{Character vector. Geographic identifiers to maintain (e.g., "municipio").}
 
-\item{\code{elecciones_agregadas}}{vector que guarda las elecciones que se han agregado a la clase mediando `agregar_bd()`}
+\item{\code{elecciones_agregadas}}{Character vector. Names of all elections added to the object.}
 
-\item{\code{analisis}}{base auxiliar que registra los métodos, elecciones, niveles y parámetros que se han utilizado en la clase
+\item{\code{analisis}}{A tibble tracking methods and parameters used on this object.
 #' Initialize: Obtener base de datos electoral}
 }
 \if{html}{\out{</div>}}
@@ -188,7 +188,7 @@ Reparte los voto de acuerdo con las coaliciones
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.}
+\item{\code{eleccion}}{Es el tipo de elección y su año separado por "_". Opciones posibles for 2021: pm_21, dl_21, df_21.}
 }
 \if{html}{\out{</div>}}
 }

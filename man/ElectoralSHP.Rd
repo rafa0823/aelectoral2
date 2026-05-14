@@ -4,17 +4,18 @@
 \alias{ElectoralSHP}
 \title{Clase R6 para leer y unir shapefiles}
 \description{
-Se inicia leyendo un shp
+Manages loading and joining of spatial data (shapefiles) with electoral results.
 }
 \details{
-Al shp leído se le pude agregar otrabase de datos
+Supports loading shapefiles at various geographic levels (section, municipality, district)
+and joining them with data processed by the `Electoral` class.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{shp}}{lista con los shps cargados}
+\item{\code{shp}}{A list containing loaded sf objects, named by geographic unit and entity.}
 
-\item{\code{entidades}}{entidad para la cual se quiere cargar el shp}
+\item{\code{entidades}}{Character vector. The entities (states) for which shapefiles are loaded.}
 }
 \if{html}{\out{</div>}}
 }
@@ -32,7 +33,7 @@ Al shp leído se le pude agregar otrabase de datos
 \if{html}{\out{<a id="method-ElectoralSHP-new"></a>}}
 \if{latex}{\out{\hypertarget{method-ElectoralSHP-new}{}}}
 \subsection{Method \code{new()}}{
-Lee un shapefile
+Initializes the object by loading a shapefile for a specific unit and entity.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ElectoralSHP$new(unidad, entidad)}\if{html}{\out{</div>}}
 }
@@ -40,21 +41,21 @@ Lee un shapefile
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{unidad}}{si es de municipio, estado, distrito, seccion, etc.}
+\item{\code{unidad}}{Character. Geographic unit (e.g., "secc_22", "mun_22").}
 
-\item{\code{entidad}}{el estado de donde es}
+\item{\code{entidad}}{Character. State abbreviation (e.g., "mex") or "nacional".}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Una lista con shapefiles
+A new 'ElectoralSHP' object.
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ElectoralSHP-print"></a>}}
 \if{latex}{\out{\hypertarget{method-ElectoralSHP-print}{}}}
 \subsection{Method \code{print()}}{
-muestra qué se ha incluído en la clase
+Prints a summary of the loaded shapefiles and entities.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ElectoralSHP$print()}\if{html}{\out{</div>}}
 }
@@ -64,7 +65,7 @@ muestra qué se ha incluído en la clase
 \if{html}{\out{<a id="method-ElectoralSHP-agregar_shp"></a>}}
 \if{latex}{\out{\hypertarget{method-ElectoralSHP-agregar_shp}{}}}
 \subsection{Method \code{agregar_shp()}}{
-añade otro shp al objeto shp
+Adds an additional shapefile to the collection.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ElectoralSHP$agregar_shp(unidad, entidad = NULL)}\if{html}{\out{</div>}}
 }
@@ -72,21 +73,21 @@ añade otro shp al objeto shp
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{unidad}}{nivel de shp que se quiere cargar}
+\item{\code{unidad}}{Character. Geographic unit level to load.}
 
-\item{\code{entidad}}{entidad para la que se quiere datos, se hereda del método `Electoral$new`}
+\item{\code{entidad}}{Character. State abbreviation. Defaults to the first loaded entity.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-lista con un nuevo shp
+The modified 'ElectoralSHP' object (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ElectoralSHP-juntar_bd"></a>}}
 \if{latex}{\out{\hypertarget{method-ElectoralSHP-juntar_bd}{}}}
 \subsection{Method \code{juntar_bd()}}{
-Junta shapefiles
+Joins a shapefile with an external data frame.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ElectoralSHP$juntar_bd(nivel, bd)}\if{html}{\out{</div>}}
 }
@@ -94,11 +95,14 @@ Junta shapefiles
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{nivel}}{Si la base que se va a juntar es por seccion, municipio, distrito, etc}
+\item{\code{nivel}}{Character. The identifier of the shapefile in the collection.}
 
-\item{\code{bd}}{base de datos que se le quiere pegar al shp}
+\item{\code{bd}}{Data frame to join with the shapefile.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The modified 'ElectoralSHP' object (invisibly).
 }
 }
 \if{html}{\out{<hr>}}

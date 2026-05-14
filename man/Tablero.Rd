@@ -4,18 +4,22 @@
 \alias{Tablero}
 \title{Clase R6 para replicar las operaciones de la clase Electoral para otros niveles: municipio, distrito local, distrito federal}
 \description{
-Esta clase requiere una clase Electoral. Dicha clase tiene un registro de qué métodos fueron utilizados, mismo que son replicados para el nuevo nivel de interés
+Facilitates scaling section-level analysis from an `Electoral` object to other geographic levels.
+}
+\details{
+This class clones an `Electoral` object and re-runs its analysis history at higher aggregation levels
+using bridge datasets and corresponding shapefiles.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{info}}{objeto que recoge todos los elementos de la clase Electoral}
+\item{\code{info}}{The `Electoral` object containing the data and analysis history.}
 
-\item{\code{nombres_elecciones}}{objeto que guarda la relación entre la elección seleccionada 'pm_21' y su nombre 'Presidente municipal 21'}
+\item{\code{nombres_elecciones}}{A tibble mapping election IDs to human-readable names.}
 
-\item{\code{graficas}}{objeto que incorpora las funciones de la clase `Graficar`}
+\item{\code{graficas}}{A `Graficas` object associated with this tablero.}
 
-\item{\code{aux}}{objeto que recoge las bases transformadas por la función `Tablero$filtrar`}
+\item{\code{aux}}{A list containing filtered datasets for the active visualization.}
 }
 \if{html}{\out{</div>}}
 }
@@ -35,7 +39,7 @@ Esta clase requiere una clase Electoral. Dicha clase tiene un registro de qué m
 \if{html}{\out{<a id="method-Tablero-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-new}{}}}
 \subsection{Method \code{new()}}{
-esta clase replica todo lo hecho en la clase Electoral para otros niveles de agregación
+Initializes the Tablero object by cloning a section-level `Electoral` object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$new(info_seccion)}\if{html}{\out{</div>}}
 }
@@ -43,7 +47,7 @@ esta clase replica todo lo hecho en la clase Electoral para otros niveles de agr
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{info_seccion}}{es un único parámetro que es la clase Electoral}
+\item{\code{info_seccion}}{An `Electoral` object.}
 }
 \if{html}{\out{</div>}}
 }
@@ -52,7 +56,7 @@ esta clase replica todo lo hecho en la clase Electoral para otros niveles de agr
 \if{html}{\out{<a id="method-Tablero-agregar_eleccion"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-agregar_eleccion}{}}}
 \subsection{Method \code{agregar_eleccion()}}{
-replica todas las operaciones realizadas para el nivel seccional a los niveles seleccionados
+Replicates all section-level analysis for higher geographic levels.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$agregar_eleccion(elecciones, nivel, bd_relacion, shp)}\if{html}{\out{</div>}}
 }
@@ -60,13 +64,13 @@ replica todas las operaciones realizadas para el nivel seccional a los niveles s
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{elecciones}}{elecciones para las que hay que obtener el análisis}
+\item{\code{elecciones}}{Character vector of election identifiers.}
 
-\item{\code{nivel}}{nivel de agregación para el que se quiere el análisis}
+\item{\code{nivel}}{Character. Target geographic level (e.g., "municipio_22").}
 
-\item{\code{bd_relacion}}{base que sirve de puente entre las secciones y el nivel que se desea.}
+\item{\code{bd_relacion}}{Data frame mapping sections to the target level.}
 
-\item{\code{shp}}{archivos al cual se le añadirán los datos colapsados. Debe ser del mismo nivel que el parámetro 'nivel'}
+\item{\code{shp}}{An sf object for the target level.}
 }
 \if{html}{\out{</div>}}
 }
@@ -75,7 +79,7 @@ replica todas las operaciones realizadas para el nivel seccional a los niveles s
 \if{html}{\out{<a id="method-Tablero-reiniciar_info"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-reiniciar_info}{}}}
 \subsection{Method \code{reiniciar_info()}}{
-reinicia la bd_partido
+Clears the `bd_partido` list in the internal `info` object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$reiniciar_info()}\if{html}{\out{</div>}}
 }
@@ -85,7 +89,7 @@ reinicia la bd_partido
 \if{html}{\out{<a id="method-Tablero-obtener_nombres_elecciones"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-obtener_nombres_elecciones}{}}}
 \subsection{Method \code{obtener_nombres_elecciones()}}{
-Genera un objeto auxiliar para mejorar el nombre de los niveles que se han incluido en la clase
+Populates the `nombres_elecciones` field and standardizes level names.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$obtener_nombres_elecciones()}\if{html}{\out{</div>}}
 }
@@ -95,7 +99,7 @@ Genera un objeto auxiliar para mejorar el nombre de los niveles que se han inclu
 \if{html}{\out{<a id="method-Tablero-cambiar_nombre_participacion"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-cambiar_nombre_participacion}{}}}
 \subsection{Method \code{cambiar_nombre_participacion()}}{
-cambia todos los lugar donde aparezca la columna "total" para que se llame "participación"
+Standardizes the name of the 'total' column to 'participación' across datasets and palettes.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$cambiar_nombre_participacion()}\if{html}{\out{</div>}}
 }
@@ -105,7 +109,7 @@ cambia todos los lugar donde aparezca la columna "total" para que se llame "part
 \if{html}{\out{<a id="method-Tablero-filtrar"></a>}}
 \if{latex}{\out{\hypertarget{method-Tablero-filtrar}{}}}
 \subsection{Method \code{filtrar()}}{
-crea una lista con los objetos filtrados
+Filters the internal data and shapefiles for a specific unit within a level.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Tablero$filtrar(nivel = "municipio_22", unidad = NULL)}\if{html}{\out{</div>}}
 }
@@ -113,9 +117,9 @@ crea una lista con los objetos filtrados
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{nivel}}{del conjunto de niveles incluidos en la clase, cuál se quiere filtrar}
+\item{\code{nivel}}{Character. The geographic level to filter.}
 
-\item{\code{unidad}}{por si se quiere especificar una unidad del nivel}
+\item{\code{unidad}}{Character. The specific unit identifier (e.g., a municipality ID).}
 }
 \if{html}{\out{</div>}}
 }

@@ -117,7 +117,7 @@ ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL) {
     partido <- extraer_partidos(bd, eleccion, tipo)
   }
   res <- bd %>%
-    select(nivel, matches(glue::glue("ele_{partido}_{eleccion}"))) |>
+    select(all_of(nivel), matches(glue::glue("ele_{partido}_{eleccion}"))) |>
     mutate(
       ganador = pmap(
         across(
@@ -132,7 +132,7 @@ ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL) {
     ) %>%
     rename("ganador_{eleccion}" := ganador) %>%
     as_tibble() |>
-    left_join(select(bd, nivel, !contains("ele")), by = nivel)
+    left_join(select(bd, all_of(nivel), !contains("ele")), by = nivel)
   return(res)
 }
 
@@ -589,7 +589,7 @@ crear_label <- function(bd, nivel) {
     ungroup() |>
     select(all_of(nivel), contains("pct")) |>
     mutate(across(contains("pct"), ~ scales::percent(.x, 1))) |>
-    tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+    tidyr::pivot_longer(-all_of(nivel)) |>
     tidyr::separate(
       col = name,
       into = c("basura", "partido", "eleccion", "ano")
@@ -608,7 +608,7 @@ crear_label <- function(bd, nivel) {
       as_tibble() |>
       ungroup() |>
       select(all_of(nivel), contains("ganador")) |>
-      tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+      tidyr::pivot_longer(-all_of(nivel)) |>
       tidyr::separate(col = name, into = c("basura", "eleccion", "ano")) |>
       summarise(
         label_g = glue::glue("Ganador: {toupper(value)}<br>"),
@@ -619,7 +619,7 @@ crear_label <- function(bd, nivel) {
   if (sum(grepl("quant", names(bd))) > 0) {
     indice <- bd |>
       select(all_of(nivel), contains("quant")) |>
-      tidyr::pivot_longer(-!!rlang::sym(nivel)) |>
+      tidyr::pivot_longer(-all_of(nivel)) |>
       tidyr::separate(col = name, into = c("basura", "partido")) |>
       mutate(label = glue::glue("Indice {toupper(partido)}: {value}")) |>
       summarise(

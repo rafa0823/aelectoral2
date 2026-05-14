@@ -18,7 +18,7 @@ repartir_coalicion <- function(bd, nivel, eleccion) {
     summarise(across(starts_with("ele_"), ~ sum(.x, na.rm = T))) %>%
     filter(!is.na(!!rlang::sym(nivel))) %>%
     select(all_of(nivel), contains(eleccion)) %>%
-    tidyr::pivot_longer(-nivel) %>%
+    tidyr::pivot_longer(-all_of(nivel)) %>%
     mutate(
       alianza = gsub(pattern = glue::glue("ele_|_{eleccion}|_cc"), "", name),
       partidos = stringr::str_split(alianza, "_"),

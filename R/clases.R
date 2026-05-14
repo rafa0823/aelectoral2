@@ -9,39 +9,39 @@
 Electoral <- R6::R6Class(
   "Electoral",
   public = list(
-    #' @field bd base agrupada por sección con todos los datos
+    #' @field bd A tibble containing the electoral data grouped by section and geographic levels.
     bd = NA,
-    #' @field todas base a nivel casilla procesada para ser utilizada por la clase
+    #' @field todas A list of tibbles, each representing a processed election at the casilla level.
     todas = NULL,
-    #' @field censo censo a nivel seccional
+    #' @field censo A tibble containing census data at the section level.
     censo = NULL,
-    #' @field bd_partido base por partido; los votos de las coaliciones fueron repartidos
+    #' @field bd_partido A list of tibbles with votes split by political party.
     bd_partido = list(),
-    #' @field bd_candidato base agrupada por candidato
+    #' @field bd_candidato A list of tibbles with votes split by candidate.
     bd_candidato = list(),
-    #' @field shp archivo geospacial de nivel seccional que recibe los datos electorales
+    #' @field shp A list containing spatial data (sf objects) associated with the electoral data.
     shp = list(),
-    #' @field eleccion elección para la cual se quieren obtener los datos
+    #' @field eleccion Character. The identifier of the primary election (e.g., "pm_21").
     eleccion = NA_character_,
-    #' @field nivel esta clase solo recibe datos a nivel sección, este parámetro no se tiene que especificar.
+    #' @field nivel Character. The geographic level of the analysis (e.g., "seccion").
     nivel = NA_character_,
-    #' @field entidad abreviatura del estado para el cual se quieren los datos.
+    #' @field entidad Character. The abbreviation of the state or "nac" for national.
     entidad = NA_character_,
-    #' @field tipo_eleccion parámetro para escoger si los datos se quieren de mayoría relativa o representación proporcional
+    #' @field tipo_eleccion Character. Type of election: "MR" (Majority Relative) or "RP" (Proportional Representation).
     tipo_eleccion = NA_character_,
-    #' @field extranjero booleano (T, F) para especificar si se quieren preservar o remover las casillas de voto extranjero
+    #' @field extranjero Logical. Whether to include votes from abroad (section 0000).
     extranjero = NA,
-    #' @field especiales booleano (T, F) para especificar si se quieren preservar o remover las casilllas especiales
+    #' @field especiales Logical or Character. Action for special polling stations: NULL, "eliminar", or "repartir".
     especiales = NA,
-    #' @field partidos vector con los partidos para los cuales se ejecutarán los métodos de las clase
+    #' @field partidos Character vector. Selected political parties for analysis.
     partidos = NA_character_,
-    #' @field colores los colores asociados a los partidos seleccionados
+    #' @field colores Named character vector. Hex codes associated with the selected parties.
     colores = NA,
-    #' @field llaves vector que permite mantener un nivel además del seccional
+    #' @field llaves Character vector. Geographic identifiers to maintain (e.g., "municipio").
     llaves = NULL,
-    #' @field elecciones_agregadas vector que guarda las elecciones que se han agregado a la clase mediando `agregar_bd()`
+    #' @field elecciones_agregadas Character vector. Names of all elections added to the object.
     elecciones_agregadas = NULL,
-    #' @field analisis base auxiliar que registra los métodos, elecciones, niveles y parámetros que se han utilizado en la clase
+    #' @field analisis A tibble tracking methods and parameters used on this object.
     analisis = tibble::tribble(
       ~eleccion , ~nivel , ~analisis , ~parametros
     ),
@@ -587,24 +587,25 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 #' Clase R6 para leer y unir shapefiles
 #'
 #' @description
-#' Se inicia leyendo un shp
+#' Manages loading and joining of spatial data (shapefiles) with electoral results.
 #'
 #' @details
-#' Al shp leído se le pude agregar otrabase de datos
+#' Supports loading shapefiles at various geographic levels (section, municipality, district)
+#' and joining them with data processed by the `Electoral` class.
 
 ElectoralSHP <- R6::R6Class(
   "ElectoralSHP",
   public = list(
-    #' @field shp lista con los shps cargados
+    #' @field shp A list containing loaded sf objects, named by geographic unit and entity.
     shp = list(),
-    #' @field entidades entidad para la cual se quiere cargar el shp
+    #' @field entidades Character vector. The entities (states) for which shapefiles are loaded.
     entidades = NULL,
-    #'@description
-    #'Lee un shapefile
-    #' @param unidad si es de municipio, estado, distrito, seccion, etc.
-    #' @param entidad el estado de donde es
+    #' @description
+    #' Initializes the object by loading a shapefile for a specific unit and entity.
+    #' @param unidad Character. Geographic unit (e.g., "secc_22", "mun_22").
+    #' @param entidad Character. State abbreviation (e.g., "mex") or "nacional".
     #'
-    #' @return Una lista con shapefiles
+    #' @return A new 'ElectoralSHP' object.
     #' @export
     initialize = function(unidad, entidad) {
       self$entidades <- entidad
@@ -653,16 +654,16 @@ ElectoralSHP <- R6::R6Class(
           list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_"))
         )
     },
-    #' @description muestra qué se ha incluído en la clase
+    #' @description Prints a summary of the loaded shapefiles and entities.
     print = function() {
       cat(glue::glue(
         "Entidad(es): {paste(self$entidades, collapse = ', ')} \n\n Shps agregados: {paste(names(self$shp), collapse = ', ')}"
       ))
     },
-    #' @description añade otro shp al objeto shp
-    #' @param unidad nivel de shp que se quiere cargar
-    #' @param entidad entidad para la que se quiere datos, se hereda del método `Electoral$new`
-    #' @return lista con un nuevo shp
+    #' @description Adds an additional shapefile to the collection.
+    #' @param unidad Character. Geographic unit level to load.
+    #' @param entidad Character. State abbreviation. Defaults to the first loaded entity.
+    #' @return The modified 'ElectoralSHP' object (invisibly).
     agregar_shp = function(unidad, entidad = NULL) {
       if (!entidad %in% self$entidades) {
         self$entidades <- self$entidades %>% append(entidad)
@@ -699,10 +700,10 @@ ElectoralSHP <- R6::R6Class(
           list(aux) %>% purrr::set_names(paste(unidad, entidad, sep = "_"))
         )
     },
-    #'@description
-    #' Junta shapefiles
-    #' @param nivel Si la base que se va a juntar es por seccion, municipio, distrito, etc
-    #' @param bd base de datos que se le quiere pegar al shp
+    #' @description Joins a shapefile with an external data frame.
+    #' @param nivel Character. The identifier of the shapefile in the collection.
+    #' @param bd Data frame to join with the shapefile.
+    #' @return The modified 'ElectoralSHP' object (invisibly).
     juntar_bd = function(nivel, bd) {
       self$shp[[nivel]] <- join_shp_bd(self$shp[[nivel]], bd)
     }
@@ -713,33 +714,36 @@ ElectoralSHP <- R6::R6Class(
 #' Clase R6 para replicar las operaciones de la clase Electoral para otros niveles: municipio, distrito local, distrito federal
 #'
 #' @description
-#' Esta clase requiere una clase Electoral. Dicha clase tiene un registro de qué métodos fueron utilizados, mismo que son replicados para el nuevo nivel de interés
+#' Facilitates scaling section-level analysis from an `Electoral` object to other geographic levels.
 #'
-#'
+#' @details
+#' This class clones an `Electoral` object and re-runs its analysis history at higher aggregation levels
+#' using bridge datasets and corresponding shapefiles.
+
 Tablero <- R6::R6Class(
   "Tablero",
   public = list(
-    #' @field info objeto que recoge todos los elementos de la clase Electoral
+    #' @field info The `Electoral` object containing the data and analysis history.
     info = NULL,
-    #' @field nombres_elecciones objeto que guarda la relación entre la elección seleccionada 'pm_21' y su nombre 'Presidente municipal 21'
+    #' @field nombres_elecciones A tibble mapping election IDs to human-readable names.
     nombres_elecciones = NA,
-    #' @field graficas objeto que incorpora las funciones de la clase `Graficar`
+    #' @field graficas A `Graficas` object associated with this tablero.
     graficas = NA,
-    #' @field aux objeto que recoge las bases transformadas por la función `Tablero$filtrar`
+    #' @field aux A list containing filtered datasets for the active visualization.
     aux = NA,
     #' @description
-    #' esta clase replica todo lo hecho en la clase Electoral para otros niveles de agregación
-    #' @param info_seccion es un único parámetro que es la clase Electoral
+    #' Initializes the Tablero object by cloning a section-level `Electoral` object.
+    #' @param info_seccion An `Electoral` object.
     initialize = function(info_seccion) {
       self$info <- info_seccion$clone()
       self$reiniciar_info()
       self$graficas <- Graficas$new(self)
     },
-    #' @description replica todas las operaciones realizadas para el nivel seccional a los niveles seleccionados
-    #' @param elecciones elecciones para las que hay que obtener el análisis
-    #' @param nivel nivel de agregación para el que se quiere el análisis
-    #' @param bd_relacion base que sirve de puente entre las secciones y el nivel que se desea.
-    #' @param shp archivos al cual se le añadirán los datos colapsados. Debe ser del mismo nivel que el parámetro 'nivel'
+    #' @description Replicates all section-level analysis for higher geographic levels.
+    #' @param elecciones Character vector of election identifiers.
+    #' @param nivel Character. Target geographic level (e.g., "municipio_22").
+    #' @param bd_relacion Data frame mapping sections to the target level.
+    #' @param shp An sf object for the target level.
     agregar_eleccion = function(elecciones, nivel, bd_relacion, shp) {
       self$info$bd <- self$info$bd |>
         dplyr::left_join(bd_relacion, by = self$info$nivel[[1]])
@@ -809,12 +813,12 @@ Tablero <- R6::R6Class(
       self$info$fusionar_shp(shp = shp, base = "bd_partido")
       self$reiniciar_info()
     },
-    #' @description reinicia la bd_partido
+    #' @description Clears the `bd_partido` list in the internal `info` object.
     reiniciar_info = function() {
       #luego pensamos cómo hacerle para quitar bd_partido y ponerlo como parametro por si se requiere bd o bd_candidato
       self$info$bd_partido <- list()
     },
-    #' @description Genera un objeto auxiliar para mejorar el nombre de los niveles que se han incluido en la clase
+    #' @description Populates the `nombres_elecciones` field and standardizes level names.
     obtener_nombres_elecciones = function() {
       nombres <- tibble(
         niveles = c(
@@ -845,7 +849,7 @@ Tablero <- R6::R6Class(
       self$info$nivel <- aux$niveles |>
         set_names(aux$nombres)
     },
-    #' @description cambia todos los lugar donde aparezca la columna "total" para que se llame "participación"
+    #' @description Standardizes the name of the 'total' column to 'participación' across datasets and palettes.
     cambiar_nombre_participacion = function() {
       self$info$nivel |>
         purrr::walk(
@@ -868,9 +872,9 @@ Tablero <- R6::R6Class(
           }
         )
     },
-    #' @description crea una lista con los objetos filtrados
-    #' @param nivel del conjunto de niveles incluidos en la clase, cuál se quiere filtrar
-    #' @param unidad por si se quiere especificar una unidad del nivel
+    #' @description Filters the internal data and shapefiles for a specific unit within a level.
+    #' @param nivel Character. The geographic level to filter.
+    #' @param unidad Character. The specific unit identifier (e.g., a municipality ID).
     filtrar = function(nivel = "municipio_22", unidad = NULL) {
       shp <- self$info$shp[[nivel]]
       shp_secc <- self$info$shp[["seccion"]]
@@ -893,32 +897,29 @@ Tablero <- R6::R6Class(
 #' Clase R6 para procesar y graficar los datos electorales
 #'
 #' @description
-#' Se inicia definiendo la unidad geográfica de trabajo mediante el método $filtrar.
-#' Se puede definir un nivel y una unidad geográfica.
+#' Provides methods for visualizing electoral results using ggplot2 and other plotting libraries.
 #'
 #' @details
-#' Algunas funciones tienen parámetros espécificos, pero otras solo tienes que llamarlas y usan los datos ya incluidos en la clase tablero.
-#'
+#' Operates on a `Tablero` object and its filtered `aux` datasets.
+
 Graficas <- R6::R6Class(
   "Graficas",
   public = list(
-    #' @field tab Recibe como un único insumo la clase tablero
+    #' @field tab The `Tablero` object providing the data for visualization.
     tab = NULL,
-    #' Initialize: Obtener los datos incorporados en clase
     #' @description
-    #' Recupera los datos de la clase tablero
-    #' @param tablero Clase tablero
+    #' Initializes the Graficas object.
+    #' @param tablero A `Tablero` object.
     #' @export
     initialize = function(tablero) {
       self$tab = tablero
     },
-    #' @description crea un mapa con el coloreo que se desee
-    #' @param seccion variable booleana para especificar que el mapa que se quiere ese de secciones o no
-    #' @param fill variable con la cual se va a colorear el mapa
-    #' @param linewidth ancho de la línea, parámetro heredado de `geom_sf`
-    #' @param labels booleano para definir si se quieren leyendas en el mapa
-    #'
-    #' @return objeto tipo ggplot
+    #' @description Creates a map of the filtered geographic units.
+    #' @param seccion Logical. If TRUE, plots sections; if FALSE, plots the higher geographic level.
+    #' @param fill Character. The variable name used for coloring the map.
+    #' @param linewidth Numeric. The width of the unit boundaries.
+    #' @param labels Logical. If TRUE, adds text labels to the map units.
+    #' @return A ggplot object.
     mapa = function(seccion, fill, linewidth = 0.6, labels = F) {
       nivel = if_else(seccion == T, "shp_secc", "shp")
       mapa <- crear_mapa(
@@ -939,13 +940,12 @@ Graficas <- R6::R6Class(
       }
       return(mapa)
     },
-    #' @description grafica de barras de secciones ganadas
-    #' @param bd es el shape de secciones luego de usar la función  `Tablero$filtrar`
-    #' @param eleccion elección de interés
-    #' @param eje_x leyenda del eje x
-    #' @param eje_y leyenda del eje y
-    #'
-    #' @return objeto tipo ggplot
+    #' @description Plots a bar chart of won sections per party.
+    #' @param bd An sf/tibble object. Defaults to the filtered section-level data.
+    #' @param eleccion Character. The election identifier.
+    #' @param eje_x Character. Label for the X axis.
+    #' @param eje_y Character. Label for the Y axis.
+    #' @return A ggplot object.
     secciones_ganadas = function(
       bd = self$tab$aux$shp_secc,
       eleccion,
@@ -963,13 +963,12 @@ Graficas <- R6::R6Class(
           eje_y = eje_y
         )
     },
-    #' @description gráfica de barras con el total de votos obtenidos en términos absolutos y relativos
-    #' @param partidos heredado de la clase Tablero, partidos definidos desde la clase Electoral
-    #' @param eleccion elección de interés, debe estar en la clase Electoral
-    #' @param eje_x leyenda del eje x
-    #' @param eje_y leyenda del eje y
-    #'
-    #' @return objeto de ggplot
+    #' @description Plots a bar chart of relative vote shares for selected parties.
+    #' @param partidos Character vector. Parties to include in the chart.
+    #' @param eleccion Character. The election identifier.
+    #' @param eje_x Character. Label for the X axis.
+    #' @param eje_y Character. Label for the Y axis.
+    #' @return A ggplot object.
     voto_relativo = function(
       partidos = self$tab$info$partidos,
       eleccion,
@@ -993,10 +992,11 @@ Graficas <- R6::R6Class(
           eje_y = eje_y
         )
     },
-    #' @description gráfica de tipo violín con la distribución de la participación
-    #' @param eleccion elección de interés, debe estar en la clase Electoral
-    #' @param eje_x leyenda del eje x
-    #' @param eje_y leyenda del eje y
+    #' @description Plots a violin chart showing the distribution of participation.
+    #' @param eleccion Character. The election identifier.
+    #' @param eje_x Character. Label for the X axis.
+    #' @param eje_y Character. Label for the Y axis.
+    #' @return A ggplot object.
     distribucion_participacion = function(eleccion, eje_x = "", eje_y = "") {
       self$tab$aux$shp_secc |>
         as_tibble() |>
@@ -1010,8 +1010,8 @@ Graficas <- R6::R6Class(
           eje_y = eje_y
         )
     },
-    #' Gráfica de sankey
-    #' @return objeto tipo ggplot
+    #' @description Generates a Sankey diagram showing vote transitions between elections.
+    #' @return A ggplot object.
     sankey = function() {
       procesar_sankey(
         bd = self$tab$aux$shp_secc,
@@ -1019,10 +1019,10 @@ Graficas <- R6::R6Class(
       ) |>
         ejecutar_sankey(colores = self$tab$info$colores)
     },
-    #' Gráfica tipo pointrange
-    #' @param indice ínndice de interés
-    #' @param variables determina si la gráfica va a ser de partidos o de elecciones, solo puede tomar "partidos" o "elecciones" como varlor.
-    #' @return objeto de ggplot
+    #' @description Plots a point-range chart for a specific index across parties or elections.
+    #' @param indice Character. The index to plot (e.g., "participacion").
+    #' @param variables Character. "partidos" or "eleccion" to define the grouping.
+    #' @return A ggplot object.
     pointrange = function(indice, variables) {
       if (!variables %in% c("partidos", "eleccion")) {
         stop("Error: Revisar qué parámetros están ingresando a la función")
@@ -1055,12 +1055,11 @@ Graficas <- R6::R6Class(
           )
       }
     },
-    #' gráfica de mosaico
-    #' @param indice indice a comparar con el de participación
-    #' @param low color mínimo de la cloropleta
-    #' @param high color máximo de la cloropleta
-    #'
-    #' @return objeto de ggplot
+    #' @description Plots a tile (mosaic) chart comparing participation with another index.
+    #' @param indice Character. The index to compare with participation.
+    #' @param low Character. Hex color for low values.
+    #' @param high Character. Hex color for high values.
+    #' @return A ggplot object.
     tiles = function(indice, low = "#118ab2", high = "#ef476f") {
       graficar_tiles(
         bd = self$tab$aux$shp_secc,

@@ -130,6 +130,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
     #' @return tibble de la bd
 
     obtener_bd = function() {
+      message(glue::glue("Loading base data for {self$eleccion}..."))
       self$bd <- leer_base(
         eleccion = self$eleccion,
         entidad = self$entidad,
@@ -143,6 +144,7 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
     #'
     #' @return La lista de coaliciones que hubieron en la elección señalada.
     coalicion = function(eleccion) {
+      message(glue::glue("Processing coalitions for {eleccion}..."))
       if (!eleccion %in% names(self$todas)) {
         stop("Favor de agregar la elección primero con el método agregar_bd")
       }
@@ -161,10 +163,11 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
 
     #' @description
     #' Reparte los voto de acuerdo con las coaliciones
-    #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
+    #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles for 2021: pm_21, dl_21, df_21.
     #'
     #' @return tibble con las votos obtenidos por las coaliciones divididos por partido político
     partido = function(eleccion) {
+      message(glue::glue("Splitting coalition votes for {eleccion}..."))
       aux_c <- self$bd |>
         repartir_coalicion(
           nivel = self$nivel[length(self$nivel)],

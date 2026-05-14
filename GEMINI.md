@@ -16,7 +16,7 @@ The following rules must be followed to ensure compliance with ISO 27001 standar
     *   Avoid using `eval(parse())` or similar functions on untrusted input.
     *   Sanitize any input used to construct file paths or database queries.
 5.  **Documentation:** All production code must be fully documented using Roxygen2. This includes all public fields and methods in R6 classes.
-6.  **Change Management:** All changes must be made through branches and reviewed before merging into `develop` or `main`.
+6.  **Change Management:** All changes must be made through feature branches. Merges into `develop` and `master` (or `main`) MUST be performed via Pull Requests (or equivalent formal review and approval process in this environment). **NEVER merge directly to production branches.**
 7.  **Dependency Management:** Regularly review and update package dependencies. Avoid adding unnecessary dependencies.
 8.  **Logging and Traceability:** Implement logging for critical operations and error states to ensure traceability of data processing.
 

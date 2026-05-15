@@ -42,6 +42,7 @@ test_that("Remote workflow works for Aguascalientes (ags)", {
   expect_true(length(bd$bd_partido) == 2)
 
   # 4. Spatial Join (This will test remote shp fetching if missing)
+  # Ensure we use the new standardized fetcher
   shp <- ElectoralSHP$new(unidad = "secc_21", entidad = entidad)
   
   # 5. Colapse and Join

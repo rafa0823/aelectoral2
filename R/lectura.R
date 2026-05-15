@@ -13,13 +13,13 @@ leer_base <- function(eleccion, entidad, tipo_eleccion, cc) {
     package = "aelectoral2"
   )
 
-  # PILOT: Remote data access for 'ags'
-  if (entidad == "ags" && file_path == "") {
-    message("Local file not found. Attempting remote fetch for pilot entity 'ags'...")
-    file_path <- drive_fetch_pilot(eleccion, entidad, subfolder = "electoral")
+  # Remote fetch if not found in package inst/
+  if (file_path == "") {
+    filename <- paste0(eleccion, ".rda")
+    file_path <- fetch_remote_data(filename, entidad = estado, subfolder = "electoral")
   }
 
-  if (file_path == "") {
+  if (file_path == "" || !file.exists(file_path)) {
     stop(glue::glue("Electoral data file not found: electoral/{estado}/{eleccion}.rda"))
   }
 
@@ -59,11 +59,22 @@ leer_base <- function(eleccion, entidad, tipo_eleccion, cc) {
 #' @param nivel Unidad geográfica en la que se requiere la información del censo
 #' @return tibble de la base del censo
 leer_censo <- function(ano, entidad, nivel) {
-  res <- readr::read_rds(system.file(
+  file_path <- system.file(
     glue::glue("censo/{nivel}_{ano}.rda"),
-    package = "aelectoral2",
-    mustWork = TRUE
-  )) %>%
+    package = "aelectoral2"
+  )
+
+  # Remote fetch if not found in package inst/
+  if (file_path == "") {
+    filename <- glue::glue("{nivel}_{ano}.rda")
+    file_path <- fetch_remote_data(filename, entidad = "nacional", subfolder = "censo")
+  }
+
+  if (file_path == "" || !file.exists(file_path)) {
+    stop(glue::glue("Census data file not found: censo/{nivel}_{ano}.rda"))
+  }
+
+  res <- readr::read_rds(file_path) %>%
     tibble::as_tibble()
 
   if (entidad != "nacional") {
@@ -91,31 +102,23 @@ leer_censo <- function(ano, entidad, nivel) {
 leer_alianza <- function(nivel, eleccion, entidad, bd_e) {
   estado <- if_else(grepl("df_|pr_", eleccion), "nacional", entidad)
 
-  if (estado == "nacional") {
-    res <- readr::read_rds(system.file(
-      glue::glue("alianzas/{estado}/{eleccion}.rda"),
-      package = "aelectoral2",
-      mustWork = TRUE
-    )) %>%
-      tibble::as_tibble()
+  file_path <- system.file(
+    glue::glue("alianzas/{estado}/{eleccion}.rda"),
+    package = "aelectoral2"
+  )
 
-    if (entidad != "nacional") {
-      nombre <- aelectoral2::diccionario %>%
-        filter(abreviatura == !!entidad) %>%
-        pull(id_estado) %>%
-        stringr::str_pad(width = 2, pad = "0")
-
-      res <- res %>%
-        filter(estado == !!nombre)
-    }
-  } else {
-    res <- readr::read_rds(system.file(
-      glue::glue("alianzas/{estado}/{eleccion}.rda"),
-      package = "aelectoral2",
-      mustWork = TRUE
-    )) |>
-      tibble::as_tibble()
+  # Remote fetch if not found in package inst/
+  if (file_path == "") {
+    filename <- paste0(eleccion, ".rda")
+    file_path <- fetch_remote_data(filename, entidad = estado, subfolder = "alianzas")
   }
+
+  if (file_path == "" || !file.exists(file_path)) {
+    stop(glue::glue("Alliance data file not found: alianzas/{estado}/{eleccion}.rda"))
+  }
+
+  res <- readr::read_rds(file_path) %>%
+    tibble::as_tibble()
 
   res <- res |>
     select(-any_of(c("eleccion", "nombre_estado", "candidatura_comun")))
@@ -233,13 +236,13 @@ leer_shp <- function(unidad, entidad) {
           package = "aelectoral2"
         )
         
-        # PILOT: Remote data access for 'ags' (ID 01)
-        if (.x == "01" && file_path == "") {
-          message(glue::glue("Local shapefile for ags (01) not found. Attempting remote fetch for level '{unidad}'..."))
-          file_path <- drive_fetch_pilot(eleccion = .x, entidad = "ags", subfolder = glue::glue("shp/{unidad}"))
+        # Remote fetch if not found in package inst/
+        if (file_path == "") {
+          filename <- paste0(.x, ".rda")
+          file_path <- fetch_remote_data(filename, entidad = .x, subfolder = glue::glue("shp/{unidad}"))
         }
 
-        if (file_path == "") {
+        if (file_path == "" || !file.exists(file_path)) {
           warning(glue::glue("Shapefile not found for entity ID {.x} at level '{unidad}'."))
           return(NULL)
         }

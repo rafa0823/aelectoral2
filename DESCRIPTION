@@ -26,6 +26,7 @@ Imports:
     leaflet,
     purrr,
     R6,
+    rappdirs,
     RColorBrewer,
     readr,
     rlang,

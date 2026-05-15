@@ -18,9 +18,14 @@ The following rules must be followed to ensure compliance with ISO 27001 standar
 5.  **Documentation:** All production code must be fully documented using Roxygen2. This includes all public fields and methods in R6 classes.
 6.  **Change Management:** All changes must be made through feature branches. Merges into `develop` and `master` (or `main`) MUST be performed via Pull Requests (or equivalent formal review and approval process in this environment). **NEVER merge directly to production branches.**
 7.  **Dependency Management:** Regularly review and update package dependencies. Avoid adding unnecessary dependencies.
-8.  **Logging and Traceability:** Implement logging for critical operations and error states to ensure traceability of data processing.
+9.  **Remote Data Strategy:** The package uses a hybrid loading strategy to minimize local weight (~2GB reduced to few MBs).
+    *   **Local-First:** Checks the installed package (`inst/`).
+    *   **Cache-Second:** Checks the persistent local cache (`rappdirs::user_cache_dir("aelectoral2")`).
+    *   **Remote-Third:** If missing, authenticates via `googledrive` and downloads from the company Shared Drive to the local cache.
+    *   **Configuration:** The Drive root folder can be configured via `options(aelectoral2.drive_root = "folder_name")`.
 
 ## Core Architecture
+
 
 The package utilizes R6 classes for stateful data management and a clean API:
 

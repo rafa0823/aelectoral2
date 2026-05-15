@@ -393,15 +393,19 @@ Criterio de casillas especiales: {if(is.null(self$especiales)) 'ninguna acción 
     #' @param filtro subconjunto de secciones a preservar
     #' @return Regresa una única tibble con todas las bases de datos unidas como columnas
     colapsar_base = function(base, filtro = NULL) {
+      if (length(self[[base]]) == 0) {
+        stop(glue::glue("The list '{base}' is empty. Cannot collapse."))
+      }
+      
       aux <- self[[base]] |>
-        reduce(full_join, self$nivel[length(self$nivel)])
+        purrr::reduce(dplyr::full_join, by = self$nivel[length(self$nivel)])
 
       if (!is.null(filtro)) {
-        aux <- select(as_tibble(filtro), contains(self$nivel)) |>
-          left_join(aux, by = self$nivel[length(self$nivel)])
+        aux <- dplyr::select(tibble::as_tibble(filtro), dplyr::contains(self$nivel)) |>
+          dplyr::left_join(aux, by = self$nivel[length(self$nivel)])
 
-        self$bd <- select(as_tibble(filtro), contains(self$nivel)) |>
-          left_join(self$bd, by = self$nivel[length(self$nivel)])
+        self$bd <- dplyr::select(tibble::as_tibble(filtro), dplyr::contains(self$nivel)) |>
+          dplyr::left_join(self$bd, by = self$nivel[length(self$nivel)])
       }
       self[[base]] <- aux
     },
@@ -753,7 +757,6 @@ Tablero <- R6::R6Class(
     #' @param info_seccion An `Electoral` object.
     initialize = function(info_seccion) {
       self$info <- info_seccion$clone()
-      self$reiniciar_info()
       self$graficas <- Graficas$new(self)
     },
     #' @description Replicates all section-level analysis for higher geographic levels.
@@ -828,7 +831,6 @@ Tablero <- R6::R6Class(
       }
 
       self$info$fusionar_shp(shp = shp, base = "bd_partido")
-      self$reiniciar_info()
     },
     #' @description Clears the `bd_partido` list in the internal `info` object.
     reiniciar_info = function() {
@@ -907,6 +909,31 @@ Tablero <- R6::R6Class(
       }
 
       self$aux <- list(shp_secc = shp_secc, shp = shp, general = general)
+    },
+    #' @description Delegates the `colapsar_base` call to the internal `Electoral` object.
+    #' @param ... Arguments passed to `Electoral$colapsar_base`.
+    colapsar_base = function(...) {
+      self$info$colapsar_base(...)
+    },
+    #' @description Delegates the `obtener_indice_completo` call to the internal `Electoral` object.
+    #' @param ... Arguments passed to `Electoral$obtener_indice_completo`.
+    obtener_indice_completo = function(...) {
+      self$info$obtener_indice_completo(...)
+    },
+    #' @description Delegates the `calcular_irs` call to the internal `Electoral` object.
+    #' @param ... Arguments passed to `Electoral$calcular_irs`.
+    calcular_irs = function(...) {
+      self$info$calcular_irs(...)
+    },
+    #' @description Delegates the `anadir_leyenda` call to the internal `Electoral` object.
+    #' @param ... Arguments passed to `Electoral$anadir_leyenda`.
+    anadir_leyenda = function(...) {
+      self$info$anadir_leyenda(...)
+    },
+    #' @description Delegates the `fusionar_shp` call to the internal `Electoral` object.
+    #' @param ... Arguments passed to `Electoral$fusionar_shp`.
+    fusionar_shp = function(...) {
+      self$info$fusionar_shp(...)
     }
   )
 )

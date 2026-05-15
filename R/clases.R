@@ -909,31 +909,6 @@ Tablero <- R6::R6Class(
       }
 
       self$aux <- list(shp_secc = shp_secc, shp = shp, general = general)
-    },
-    #' @description Delegates the `colapsar_base` call to the internal `Electoral` object.
-    #' @param ... Arguments passed to `Electoral$colapsar_base`.
-    colapsar_base = function(...) {
-      self$info$colapsar_base(...)
-    },
-    #' @description Delegates the `obtener_indice_completo` call to the internal `Electoral` object.
-    #' @param ... Arguments passed to `Electoral$obtener_indice_completo`.
-    obtener_indice_completo = function(...) {
-      self$info$obtener_indice_completo(...)
-    },
-    #' @description Delegates the `calcular_irs` call to the internal `Electoral` object.
-    #' @param ... Arguments passed to `Electoral$calcular_irs`.
-    calcular_irs = function(...) {
-      self$info$calcular_irs(...)
-    },
-    #' @description Delegates the `anadir_leyenda` call to the internal `Electoral` object.
-    #' @param ... Arguments passed to `Electoral$anadir_leyenda`.
-    anadir_leyenda = function(...) {
-      self$info$anadir_leyenda(...)
-    },
-    #' @description Delegates the `fusionar_shp` call to the internal `Electoral` object.
-    #' @param ... Arguments passed to `Electoral$fusionar_shp`.
-    fusionar_shp = function(...) {
-      self$info$fusionar_shp(...)
     }
   )
 )

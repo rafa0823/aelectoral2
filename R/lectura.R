@@ -232,6 +232,13 @@ leer_shp <- function(unidad, entidad) {
           glue::glue("shp/{unidad}/{.x}.rda"),
           package = "aelectoral2"
         )
+        
+        # PILOT: Remote data access for 'ags' (ID 01)
+        if (.x == "01" && file_path == "") {
+          message(glue::glue("Local shapefile for ags (01) not found. Attempting remote fetch for level '{unidad}'..."))
+          file_path <- drive_fetch_pilot(eleccion = .x, entidad = "ags", subfolder = glue::glue("shp/{unidad}"))
+        }
+
         if (file_path == "") {
           warning(glue::glue("Shapefile not found for entity ID {.x} at level '{unidad}'."))
           return(NULL)

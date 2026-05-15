@@ -15,45 +15,76 @@ drive_fetch_pilot <- function(eleccion, entidad, subfolder = "electoral") {
     stop("Remote data pilot is currently only enabled for entity 'ags' (Aguascalientes).")
   }
 
-  # Ensure googledrive is authenticated
-  # In a production environment, we might want to manage this more robustly
   if (!googledrive::drive_has_token()) {
     message("Authenticating with Google Drive for remote data access...")
     googledrive::drive_auth()
   }
 
-  # Define the remote path (this will eventually be driven by a centralized config)
-  # For now, we assume a specific structure on the Drive
   remote_filename <- paste0(eleccion, ".rda")
   
-  # Temporary local path for the pilot
+  # Local cache path
   local_dir <- file.path(tempdir(), "aelectoral2_cache", subfolder, entidad)
   if (!dir.exists(local_dir)) dir.create(local_dir, recursive = TRUE)
   local_path <- file.path(local_dir, remote_filename)
 
-  # Check if we already have it in the temp cache for this session
   if (file.exists(local_path)) {
     return(local_path)
   }
 
-  # Search for the file on Drive
-  # Note: This requires the user to have access to the file/folder
-  # We should eventually use a specific Folder ID or Shared Drive
-  message(glue::glue("Fetching {remote_filename} for {entidad} from Google Drive..."))
+  message(glue::glue("Locating {remote_filename} for {entidad} in Google Drive..."))
+
+  # 1. Find the root data folder
+  current_parent <- googledrive::drive_find(
+    pattern = "aelectoral_data",
+    type = "folder",
+    corpus = "allDrives",
+    n_max = 1
+  )
   
-  # Search by name (this is a pilot, so we keep it simple)
-  # In production, we'd use folder IDs to avoid name collisions
+  if (nrow(current_parent) == 0) {
+    stop("Root folder 'aelectoral_data' not found in Google Drive (checked all accessible drives).")
+  }
+
+  # 2. Navigate nested subfolders (e.g., "shp/secc_21")
+  path_parts <- unlist(strsplit(subfolder, "/"))
+  for (part in path_parts) {
+    parent_name <- current_parent$name
+    current_parent <- googledrive::drive_find(
+      q = sprintf("'%s' in parents and name = '%s' and mimeType = 'application/vnd.google-apps.folder'", 
+                  current_parent$id, part),
+      corpus = "allDrives",
+      n_max = 1
+    )
+    if (nrow(current_parent) == 0) {
+      stop(glue::glue("Subfolder '{part}' not found inside '{parent_name}' folder."))
+    }
+  }
+
+  # 3. Find the entity folder (e.g., 'ags') inside last subfolder
+  entidad_folder <- googledrive::drive_find(
+    q = sprintf("'%s' in parents and name = '%s' and mimeType = 'application/vnd.google-apps.folder'", 
+                current_parent$id, entidad),
+    corpus = "allDrives",
+    n_max = 1
+  )
+
+  if (nrow(entidad_folder) == 0) {
+    stop(glue::glue("Entity folder '{entidad}' not found inside '{current_parent$name}' folder."))
+  }
+
+  # 4. Find the specific file inside the entity folder
   drive_file <- googledrive::drive_find(
-    pattern = remote_filename,
-    type = "file",
+    q = sprintf("'%s' in parents and name = '%s'", 
+                entidad_folder$id, remote_filename),
+    corpus = "allDrives",
     n_max = 1
   )
 
   if (nrow(drive_file) == 0) {
-    stop(glue::glue("File {remote_filename} not found on Google Drive."))
+    stop(glue::glue("File '{remote_filename}' not found in Google Drive folder '{entidad}'."))
   }
 
-  # Download the file
+  # Download
   googledrive::drive_download(
     file = drive_file,
     path = local_path,

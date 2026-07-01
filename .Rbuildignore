@@ -10,3 +10,8 @@
 ^\.DS_Store$
 ^\.git$
 ^\.github$
+^GEMINI\.md$
+^CLAUDE\.md$
+^\.claude$
+^dev$
+^\.Rbuildignore$

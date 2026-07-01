@@ -6,6 +6,11 @@
 \usage{
 anadir_cc(bd, eleccion)
 }
+\arguments{
+\item{bd}{Base de datos electoral sobre la que se detectan las candidaturas comunes.}
+
+\item{eleccion}{Es el tipo de elección y su año separado por "_" (e.g. `"pm_21"`).}
+}
 \value{
 el vector de self$partido con las candidaturas comunes
 }

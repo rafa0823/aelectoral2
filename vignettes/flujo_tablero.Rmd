@@ -10,13 +10,17 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  # This vignette documents a workflow that requires remote electoral data
+  # (Google Drive). Chunks are shown but not evaluated so the package builds
+  # without credentials/data. Run them interactively after `drive_auth()`.
+  eval = FALSE
 )
 ```
 
 ## Creación de clase Electoral con los objetos requeridos
 ```{r}
-devtools::load_all()
+library(aelectoral2)
 
 elecciones <- c("gb_18", "pm_18", "dl_18", "df_18", "dl_21", "df_21")
 partidos <- c("morena", "pan", "pri", "mc", "prd", "pvem", "pt", "total")

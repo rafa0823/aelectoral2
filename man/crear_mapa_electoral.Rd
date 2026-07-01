@@ -5,14 +5,14 @@
 \title{Title
 Se utiliza un método matemático llamada análisis de componentes principales (PCA por sus siglas en inglés) que captura los patrones de votación y los sintetiza en una gráfica de dos dimensiones.}
 \usage{
-crear_mapa_electoral(bd, eleccion, año, grupo = NA, partido = NA)
+crear_mapa_electoral(bd, eleccion, anio, grupo = NA, partido = NA)
 }
 \arguments{
 \item{bd}{base de datos con resultados electorales}
 
 \item{eleccion}{elección o vector de elecciones de la cual se van a obtener los ganadores}
 
-\item{año}{año de las elecciones seleccionadas}
+\item{anio}{año de las elecciones seleccionadas}
 
 \item{grupo}{nivel de observación de la gráfica (secciones, municipios, distritos)}
 

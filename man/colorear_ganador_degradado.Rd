@@ -22,6 +22,9 @@ colorear_ganador_degradado(
 
 \item{grupo}{nivel de observación de la gráfica (secciones, municipios, distritos)}
 
+\item{tipo}{tipo de resultado a colorear: `"relativo"` usa porcentajes (`pct_`),
+cualquier otro valor usa votos absolutos (`ele_`).}
+
 \item{saturacion}{nivel de saturación de la paleta de color}
 }
 \value{

@@ -15,7 +15,10 @@ Este conjunto de bases electorales pueden ser de distintas elecciones, candidato
 ## Method `Electoral$new`
 ## ------------------------------------------------
 
- Electoral$new(eleccion = "pm_21", entidad = "mex", partidos = c("morena", "pan", "pri"), extranjero = FALSE)
+ Electoral$new(
+   eleccion = "pm_21", entidad = "mex",
+   partidos = c("morena", "pan", "pri"), extranjero = FALSE
+ )
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -126,7 +129,10 @@ Un nuevo objeto 'Electoral'
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{ Electoral$new(eleccion = "pm_21", entidad = "mex", partidos = c("morena", "pan", "pri"), extranjero = FALSE)
+\preformatted{ Electoral$new(
+   eleccion = "pm_21", entidad = "mex",
+   partidos = c("morena", "pan", "pri"), extranjero = FALSE
+ )
 }
 \if{html}{\out{</div>}}
 

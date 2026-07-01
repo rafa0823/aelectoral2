@@ -11,6 +11,12 @@ ganador_eleccion(bd, eleccion, tipo = NULL, nivel, partido = NULL)
 \item{bd}{base de datos con resultados electorales}
 
 \item{eleccion}{elección o vector de elecciones de la cual se van a obtener los ganadores}
+
+\item{tipo}{tipo de resultado a usar (`"relativo"` o absoluto). Por default `NULL`.}
+
+\item{nivel}{nivel de observación (sección, municipio o distrito).}
+
+\item{partido}{partido de interés para filtrar el ganador. Por default `NULL`.}
 }
 \value{
 base de datos con una columna que indica el partido ganador de cada eleccion referida

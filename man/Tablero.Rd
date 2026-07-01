@@ -20,6 +20,8 @@ using bridge datasets and corresponding shapefiles.
 \item{\code{graficas}}{A `Graficas` object associated with this tablero.}
 
 \item{\code{aux}}{A list containing filtered datasets for the active visualization.}
+
+\item{\code{clasificacion}}{Section-level rentabilidad classification results.}
 }
 \if{html}{\out{</div>}}
 }

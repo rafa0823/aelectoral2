@@ -2,7 +2,7 @@
 #'
 #' Función de poca utilidad, se valorará su remoción
 #'
-#' @param bd
+#' @param bd Base de datos del censo a relativizar.
 #'
 relativizar_censo <- function(bd) {
   dicc <- diccionario_censo20 %>%

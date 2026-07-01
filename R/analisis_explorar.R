@@ -108,6 +108,9 @@ calcular_votos_totales <- function(bd, partido, eleccion, grupo = NULL) {
 #' Obtiene el partido ganador para cada una de las observaciones de la base. Puede ser sección, municipio o distrito
 #' @param bd base de datos con resultados electorales
 #' @param eleccion elección o vector de elecciones de la cual se van a obtener los ganadores
+#' @param tipo tipo de resultado a usar (`"relativo"` o absoluto). Por default `NULL`.
+#' @param nivel nivel de observación (sección, municipio o distrito).
+#' @param partido partido de interés para filtrar el ganador. Por default `NULL`.
 #'
 #' @return base de datos con una columna que indica el partido ganador de cada eleccion referida
 #' @export
@@ -141,13 +144,13 @@ ganador_eleccion <- function(bd, eleccion, tipo = NULL, nivel, partido = NULL) {
 #' Se utiliza un método matemático llamada análisis de componentes principales (PCA por sus siglas en inglés) que captura los patrones de votación y los sintetiza en una gráfica de dos dimensiones.
 #' @param bd base de datos con resultados electorales
 #' @param eleccion elección o vector de elecciones de la cual se van a obtener los ganadores
-#' @param año año de las elecciones seleccionadas
+#' @param anio año de las elecciones seleccionadas
 #' @param partido vector que partidos que se van a graficar
 #' @param grupo nivel de observación de la gráfica (secciones, municipios, distritos)
 #' @return gráfica de modelo pca
 #' @export
 #' @import dplyr purrr ggplot2
-crear_mapa_electoral <- function(bd, eleccion, año, grupo = NA, partido = NA) {
+crear_mapa_electoral <- function(bd, eleccion, anio, grupo = NA, partido = NA) {
   base <- bd %>%
     calcular_votos_relativos(
       partido = partido,
@@ -173,7 +176,7 @@ crear_mapa_electoral <- function(bd, eleccion, año, grupo = NA, partido = NA) {
     mutate(
       column = stringr::str_remove(column, "ele_") %>%
         stringr::str_remove(glue::glue(
-          "_{eleccion}_{stringr::str_sub(año, -2, -1)}"
+          "_{eleccion}_{stringr::str_sub(anio, -2, -1)}"
         ))
     ) %>%
     ggplot(aes(PC1, PC2)) +
@@ -199,7 +202,7 @@ crear_mapa_electoral <- function(bd, eleccion, año, grupo = NA, partido = NA) {
     ) +
     theme_void()
   # Output
-  res <- list(bd = base, modelo = pca_modelo, gráfico = g)
+  res <- list(bd = base, modelo = pca_modelo, grafico = g)
   return(res)
 }
 
@@ -207,8 +210,8 @@ crear_mapa_electoral <- function(bd, eleccion, año, grupo = NA, partido = NA) {
 #' Se obtiene una gráfica con las cantidades de secciones ganadas por cada uno de los partidos en cada elección.
 #' De esta manera, al comparar una elección con otra vemos las secciones que un partido ganó en una elección pero no en otra y qué partido ganó dichas secciones.
 #' @param bd base de datos con resultados electorales
-#' @param eleccion elección o vector de elecciones de la cual se van a obtener los ganadores
-#' @param grupo nivel de observación de la gráfica (secciones, municipios, distritos)
+#' @param elecciones vector de elecciones de las cuales se van a obtener los ganadores
+#' @param unidad_analisis nivel de observación de la gráfica (secciones, municipios, distritos)
 #' @import dplyr purrr ggplot2
 #' @return Se obtiene una gráfica con el comparativo de las cantidades de secciones ganadas por cada uno de los partidos en cada elección.
 #' @export

@@ -1,11 +1,23 @@
 Type: Package
 Package: aelectoral2
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Emilio Morones, Déborah Martínez, Pablo Morales
-Maintainer: Emilio Morones <emiliomorones@gmail.com>
-Description: More about what it does (maybe more than one line) Use four
-    spaces when indenting paragraphs within the Description.
+Title: Processing, Analysis and Visualization of Mexican Electoral Data
+Version: 0.2.0
+Authors@R: c(
+    person("Rafael", "Lopez", email = "rlopez@morant.com.mx",
+           role = c("aut", "cre")),
+    person("Emilio", "Morones", role = "aut"),
+    person("Déborah", "Martínez", role = "aut"),
+    person("Pablo", "Morales", role = "aut"),
+    person("Morant Consultores", role = c("cph", "fnd")))
+Description: An object-oriented (R6) framework to process, analyze and
+    visualize Mexican electoral data at multiple geographic levels
+    (sections, municipalities and districts). It handles coalition vote
+    splitting, special and foreign votes, winner and relative-result
+    calculations, electoral "rentabilidad" (profitability) modelling, and
+    high-level cartographic and statistical visualizations. Large
+    electoral, shapefile and census resources are loaded through a hybrid
+    local-first / cached / remote (Google Drive) strategy to keep the
+    installed package lightweight.
 URL: https://github.com/morant-consultores/aelectoral2
 BugReports: https://github.com/morant-consultores/aelectoral2/issues
 Depends: 
@@ -14,11 +26,14 @@ Imports:
     broom,
     cluster,
     ClustGeo,
+    colortools,
     dplyr,
     dvmisc,
     forcats,
+    ggfittext,
     ggplot2,
     ggrepel,
+    ggsankey,
     glue,
     googledrive,
     grDevices,
@@ -40,7 +55,8 @@ Imports:
     tidyr
 Remotes:
     yutannihilation/ggsflabel,
-    gastonstat/colortools
+    gastonstat/colortools,
+    davidsjoberg/ggsankey
 Suggests: 
     janitor,
     knitr,

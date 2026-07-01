@@ -11,9 +11,9 @@ graficar_sankey_ganadores(bd, elecciones, unidad_analisis)
 \arguments{
 \item{bd}{base de datos con resultados electorales}
 
-\item{eleccion}{elección o vector de elecciones de la cual se van a obtener los ganadores}
+\item{elecciones}{vector de elecciones de las cuales se van a obtener los ganadores}
 
-\item{grupo}{nivel de observación de la gráfica (secciones, municipios, distritos)}
+\item{unidad_analisis}{nivel de observación de la gráfica (secciones, municipios, distritos)}
 }
 \value{
 Se obtiene una gráfica con el comparativo de las cantidades de secciones ganadas por cada uno de los partidos en cada elección.

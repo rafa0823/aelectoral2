@@ -7,7 +7,7 @@
 asociar_colores(partidos)
 }
 \arguments{
-\item{partidos}{}
+\item{partidos}{Vector de claves de partidos para los que se quiere obtener el color.}
 }
 \value{
 Un vector nombrado con los colores de los partidos seleccionados

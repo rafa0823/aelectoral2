@@ -5,6 +5,8 @@
 #'
 #' @details
 #' Este conjunto de bases electorales pueden ser de distintas elecciones, candidatos, años, tipos de eleccion; se puede decidir la forma en la se reparten los votos en el extranjero y las casillas especiales; así como agregar distintas variables geográficas como el municipio o el estado.
+#'
+#' @importFrom R6 R6Class
 
 Electoral <- R6::R6Class(
   "Electoral",
@@ -59,7 +61,10 @@ Electoral <- R6::R6Class(
     #' @return Un nuevo objeto 'Electoral'
     #' @export
     #' @examples
-    #'  Electoral$new(eleccion = "pm_21", entidad = "mex", partidos = c("morena", "pan", "pri"), extranjero = FALSE)
+    #'  Electoral$new(
+    #'    eleccion = "pm_21", entidad = "mex",
+    #'    partidos = c("morena", "pan", "pri"), extranjero = FALSE
+    #'  )
     initialize = function(
       eleccion,
       entidad,
@@ -752,6 +757,8 @@ Tablero <- R6::R6Class(
     graficas = NA,
     #' @field aux A list containing filtered datasets for the active visualization.
     aux = NA,
+    #' @field clasificacion Section-level rentabilidad classification results.
+    clasificacion = NULL,
     #' @description
     #' Initializes the Tablero object by cloning a section-level `Electoral` object.
     #' @param info_seccion An `Electoral` object.

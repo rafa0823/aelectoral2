@@ -4,6 +4,7 @@
 #' @param eleccion Es el tipo de elección y su año separado por "_". Opciones posibles para 2021: pm_21, dl_21, df_21.
 #' @param entidad Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".
 #' @param tipo_eleccion Por default es "MR" refiriéndose a mayoría relativa.
+#' @param cc Lógico. Si es `TRUE`, incluye las candidaturas comunes en la lectura.
 #'
 #' @return tibble de la base electoral
 leer_base <- function(eleccion, entidad, tipo_eleccion, cc) {
@@ -277,6 +278,9 @@ join_shp_bd <- function(shp, bd) {
 }
 
 #' Para incluir las candidaturas comunes en el análisis
+#'
+#' @param bd Base de datos electoral sobre la que se detectan las candidaturas comunes.
+#' @param eleccion Es el tipo de elección y su año separado por "_" (e.g. `"pm_21"`).
 #' @export
 #' @return el vector de self$partido con las candidaturas comunes
 anadir_cc <- function(bd, eleccion) {

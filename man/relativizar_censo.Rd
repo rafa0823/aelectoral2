@@ -7,7 +7,7 @@
 relativizar_censo(bd)
 }
 \arguments{
-\item{bd}{}
+\item{bd}{Base de datos del censo a relativizar.}
 }
 \description{
 Función de poca utilidad, se valorará su remoción

@@ -10,7 +10,11 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  # This vignette documents a workflow that requires remote electoral data
+  # (Google Drive). Chunks are shown but not evaluated so the package builds
+  # without credentials/data. Run them interactively after `drive_auth()`.
+  eval = FALSE
 )
 ```
 

@@ -13,6 +13,8 @@ leer_base(eleccion, entidad, tipo_eleccion, cc)
 \item{entidad}{Cuando es nacional es "nac", cuando es local se pone la abreviatura oficial, por ejemplo "chis", "dgo", "mex".}
 
 \item{tipo_eleccion}{Por default es "MR" refiriéndose a mayoría relativa.}
+
+\item{cc}{Lógico. Si es `TRUE`, incluye las candidaturas comunes en la lectura.}
 }
 \value{
 tibble de la base electoral

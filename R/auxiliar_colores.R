@@ -5,6 +5,8 @@
 #' @param eleccion elección elegida para analizar
 #' @param colores_nombrados vector compuesto con los nombres de partidos y colores que le corresponden
 #' @param grupo nivel de observación de la gráfica (secciones, municipios, distritos)
+#' @param tipo tipo de resultado a colorear: `"relativo"` usa porcentajes (`pct_`),
+#'   cualquier otro valor usa votos absolutos (`ele_`).
 #' @param saturacion nivel de saturación de la paleta de color
 #'
 #' @return base con columnas adicionales
@@ -66,7 +68,7 @@ degradar_color_partido <- function(bd_larga, nombre, variable, colores_nombrados
 
 #' Asigna a un objeto de la clase los colores de los partidos seleccionados
 #'
-#' @param partidos
+#' @param partidos Vector de claves de partidos para los que se quiere obtener el color.
 #'
 #' @return Un vector nombrado con los colores de los partidos seleccionados
 #' @export

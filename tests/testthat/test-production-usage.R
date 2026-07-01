@@ -1,7 +1,8 @@
 test_that("Production usage example works for CDMX 2024", {
   # This test replicates the user's provided usage example
   # to ensure end-to-end functionality for 2024 data.
-  
+  skip_if_no_drive()
+
   entidad <- "cdmx"
   elecciones <- c("pm_24", "gb_24", "dl_24") # Subset for speed
   partidos <- c("morena", "pan", "pri", "mc", "prd", "pvem", "pt", "panal", "total")

@@ -5,7 +5,8 @@ test_that("Remote workflow works for Aguascalientes (ags)", {
   # 2. 'aelectoral_data/electoral/ags/pm_21.rda' on Drive.
   # 3. 'aelectoral_data/electoral/ags/dl_21.rda' on Drive.
   # 4. 'aelectoral_data/shp/secc_21/ags/01.rda' on Drive.
-  
+  skip_if_no_drive()
+
   entidad <- "ags"
   elecciones <- c("pm_21", "dl_21")
   partidos <- c("pan", "pri", "prd", "morena", "total")

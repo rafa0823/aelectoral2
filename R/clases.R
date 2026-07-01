@@ -781,6 +781,15 @@ Tablero <- R6::R6Class(
       analisis <- self$info$analisis |>
         filter(nivel == !!self$info$nivel[1])
 
+      # `partido()` appends each election to the `bd_partido` list, but at this
+      # point `self$info$bd_partido` is the already-collapsed single tibble
+      # (from a previous `colapsar_base()`). Appending onto it would corrupt the
+      # list (mixing columns and tibbles) and make `colapsar_base()` fail with
+      # "no applicable method for 'full_join' applied to an object of class
+      # 'character'". Reset it to an empty list so the replay rebuilds it clean
+      # at the new geographic level.
+      self$reiniciar_info()
+
       elecciones |>
         purrr::walk(
           ~ {

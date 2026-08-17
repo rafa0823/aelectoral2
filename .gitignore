@@ -5,6 +5,7 @@
 .Rdata
 .httr-oauth
 .DS_Store
-.claude/
+.claude/settings.local.json
+.claude/worktrees/
 inst/doc
 inst/censo/seccion_2020.rda

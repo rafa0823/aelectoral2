@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; if echo \"$f\" | grep -qE '^NAMESPACE$|/NAMESPACE$|^renv\\.lock$|/renv\\.lock$|^man/[^/]+\\.Rd$|/man/[^/]+\\.Rd$|^data/[^/]+\\.rda$|/data/[^/]+\\.rda$'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Generated file (see CLAUDE.md) - regenerate via devtools::document(), data-raw scripts, or renv::snapshot() instead of hand-editing.\"}}'; fi; }",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; if echo \"$f\" | grep -qE '^R/[^/]+\\.R$|/R/[^/]+\\.R$'; then Rscript -e 'devtools::document()' >/dev/null 2>&1 || true; fi; }",
+            "timeout": 120,
+            "statusMessage": "Regenerating NAMESPACE/man via devtools::document()..."
+          }
+        ]
+      }
+    ]
+  }
+}
